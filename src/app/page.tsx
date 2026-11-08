@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight, BadgePercent, CheckCircle2, ChevronRight, Clock3, Heart, Leaf, MapPin, PackageCheck, ShieldCheck, ShoppingBag, Sprout, Truck, Wheat, Sparkles, Headphones, Star } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { ProductCatalog } from "@/components/product-catalog";
+import { PromoCarousel } from "@/components/promo-carousel";
 import { SiteHeader } from "@/components/site-header";
 
 type Product = { id: string; name: string; slug: string; category: string; description: string | null; image_url: string | null; is_featured: boolean; product_variants?: { id: string; pack_size: string; price: number; stock_quantity: number }[] };
@@ -29,7 +30,7 @@ export default async function HomePage() {
       <div className="bg-[#173e2d] px-4 py-2 text-center text-[11px] font-semibold tracking-wide text-white sm:text-xs">Fresh from eCuisinefoods · Good food, better living</div>
       <SiteHeader />
 
-      <section className="relative overflow-hidden bg-[#f7f3e9]">
+      <section className="hero-motion relative overflow-hidden bg-[#f7f3e9]">
         <div className="absolute -right-20 -top-24 h-80 w-80 rounded-full bg-[#e7d8b8]/60 blur-3xl" />
         <div className="mx-auto grid max-w-7xl items-center gap-8 px-5 py-12 sm:py-16 md:grid-cols-[1fr_1fr] md:py-20">
           <div className="relative z-10 max-w-xl">
@@ -64,16 +65,7 @@ export default async function HomePage() {
         {[{icon:Truck,title:"Local pickup",sub:"Jos & Bauchi"},{icon:ShieldCheck,title:"Quality first",sub:"Care in every choice"},{icon:PackageCheck,title:"Order with ease",sub:"Simple shopping"},{icon:Headphones,title:"We're here to help",sub:"Friendly support"}].map(x=><div key={x.title} className="flex items-center gap-3 rounded-2xl border border-[#edf0e9] bg-white p-3 sm:p-4"><div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[#edf3e9] text-[#245b42]"><x.icon size={19}/></div><div><p className="text-xs font-extrabold text-[#304436] sm:text-sm">{x.title}</p><p className="mt-1 text-[10px] text-[#899287] sm:text-xs">{x.sub}</p></div></div>)}
       </section>
 
-      <section className="mx-auto max-w-7xl px-5 pb-8">
-        <div className="relative overflow-hidden rounded-[1.6rem] bg-gradient-to-r from-[#153b2b] via-[#245b42] to-[#315f43] px-6 py-7 text-white shadow-lg sm:px-10 sm:py-9">
-          <div className="absolute -right-8 -top-16 h-56 w-56 rounded-full border-[24px] border-white/5"/>
-          <div className="absolute right-1/4 top-4 text-[#d5bd75]/70"><Sparkles size={22}/></div>
-          <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-4"><div className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-white/10 text-[#f3d98e]"><BadgePercent size={31}/></div><div><p className="text-[10px] font-bold uppercase tracking-[.2em] text-[#d6e2d1]">A little something to look forward to</p><h2 className="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl">Good things are coming!</h2><p className="mt-1 text-sm text-[#e0e9dc]">Watch this space for our first special offer.</p></div></div>
-            <Link href="/shop" className="inline-flex items-center justify-center gap-2 self-start rounded-full bg-[#f5e7bd] px-5 py-3 text-xs font-extrabold text-[#254632] transition hover:bg-white">Explore the shop <ArrowRight size={15}/></Link>
-          </div>
-        </div>
-      </section>
+      <PromoCarousel />
 
       <section id="shop" className="bg-[#fbfaf7] py-14 sm:py-16">
         <div className="mx-auto max-w-7xl px-5">
