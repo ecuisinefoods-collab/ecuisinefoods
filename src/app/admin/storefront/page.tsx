@@ -2,7 +2,7 @@
 
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, LoaderCircle, Save, Palette, Type, Image as ImageIcon } from "lucide-react";
+import { ArrowLeft, LoaderCircle, Save, Palette, Type, Image as ImageIcon, Undo2, Redo2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { BrandLogoUploader } from "@/components/brand-logo-uploader";
 
@@ -43,6 +43,8 @@ export default function StorefrontEditorPage(){
  const [saving,setSaving]=useState(false);
  const [message,setMessage]=useState("");
  const [error,setError]=useState("");
+ const [undoStack,setUndoStack]=useState<Config[]>([]);
+ const [redoStack,setRedoStack]=useState<Config[]>([]);
  const load=useCallback(async()=>{
   if(!supabase){setError("Database connection is not configured.");setLoading(false);return;}
   const {data:{user}}=await supabase.auth.getUser();
@@ -56,7 +58,41 @@ export default function StorefrontEditorPage(){
   setLoading(false);
  },[]);
  useEffect(()=>{void load();},[load]);
- const change=(key:keyof Config,value:string)=>setConfig(current=>({...current,[key]:value}));
+ const change=(key:keyof Config,value:string)=>setConfig(current=>{
+  if(current[key]===value)return current;
+  setUndoStack(stack=>[...stack,current].slice(-100));
+  setRedoStack([]);
+  return {...current,[key]:value};
+ });
+ const undo=useCallback(()=>{
+  setUndoStack(stack=>{
+   if(!stack.length)return stack;
+   const previous=stack[stack.length-1];
+   setConfig(current=>{setRedoStack(items=>[...items,current].slice(-100));return previous;});
+   return stack.slice(0,-1);
+  });
+ },[]);
+ const redo=useCallback(()=>{
+  setRedoStack(stack=>{
+   if(!stack.length)return stack;
+   const next=stack[stack.length-1];
+   setConfig(current=>{setUndoStack(items=>[...items,current].slice(-100));return next;});
+   return stack.slice(0,-1);
+  });
+ },[]);
+ useEffect(()=>{
+  const handleKeyDown=(event:KeyboardEvent)=>{
+   if(!(event.ctrlKey||event.metaKey)||event.key.toLowerCase()!=="z")return;
+   event.preventDefault();
+   if(event.shiftKey)redo();else undo();
+  };
+  const handleRedo=(event:KeyboardEvent)=>{
+   if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==="y"){event.preventDefault();redo();}
+  };
+  window.addEventListener("keydown",handleKeyDown);
+  window.addEventListener("keydown",handleRedo);
+  return ()=>{window.removeEventListener("keydown",handleKeyDown);window.removeEventListener("keydown",handleRedo);};
+ },[undo,redo]);
  const save=async(e:FormEvent<HTMLFormElement>)=>{
   e.preventDefault();if(!supabase||!authorized)return;setSaving(true);setError("");setMessage("");
   const {error:saveError}=await supabase.from("site_settings").upsert({setting_key:"storefront_config",setting_value:JSON.stringify(config),updated_at:new Date().toISOString()},{onConflict:"setting_key"});
@@ -75,7 +111,7 @@ export default function StorefrontEditorPage(){
    <section className="rounded-2xl border border-[#e4e9e1] bg-white p-5 shadow-sm sm:p-7"><div className="mb-5 flex items-center gap-2"><Type size={18}/><h2 className="font-bold">Homepage write-ups</h2></div><div className="grid gap-4 sm:grid-cols-2">{fields.map(([key,label,hint])=><label key={key} className={["hero_description","promise_description","quote"].includes(key)?"sm:col-span-2 block text-xs font-bold text-[#405443]":"block text-xs font-bold text-[#405443]"}>{label}<span className="mt-1 block text-[10px] font-normal text-[#899487]">{hint}</span>{["hero_description","promise_description","quote"].includes(key)?<textarea rows={3} value={config[key]} onChange={e=>change(key,e.target.value)} className="mt-2 w-full rounded-xl border border-[#dfe6dc] bg-[#fbfcfa] px-4 py-3 text-sm font-normal outline-none focus:border-[#4c805b]"/>:<input value={config[key]} onChange={e=>change(key,e.target.value)} className="mt-2 w-full rounded-xl border border-[#dfe6dc] bg-[#fbfcfa] px-4 py-3 text-sm font-normal outline-none focus:border-[#4c805b]"/>}</label>)}</div></section>
    <section className="rounded-2xl border border-[#e4e9e1] bg-white p-5 shadow-sm sm:p-7"><div className="mb-5 flex items-center gap-2"><Palette size={18}/><h2 className="font-bold">Storefront colours</h2></div><p className="mb-5 text-xs text-[#7d897a]">Choose your primary, dark, accent, background, surface and text colours.</p><div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{([["brand_primary","Primary buttons and highlights"],["brand_dark","Deep brand colour"],["brand_accent","Gold/accent colour"],["brand_background","Hero background"],["brand_surface","Section background"],["brand_text","Main text colour"]] as [keyof Config,string][]).map(([key,label])=><label key={key} className="flex items-center gap-3 rounded-xl border border-[#edf0e9] p-3 text-xs font-semibold"><input type="color" value={config[key]} onChange={e=>change(key,e.target.value)} className="h-10 w-12 cursor-pointer rounded border-0 bg-transparent"/><span className="flex-1">{label}<small className="mt-1 block font-mono text-[10px] text-[#899487]">{config[key]}</small></span></label>)}</div></section>
    <section className="rounded-2xl border border-[#e4e9e1] bg-white p-5 shadow-sm sm:p-7"><div className="mb-5 flex items-center gap-2"><ImageIcon size={18}/><h2 className="font-bold">Live preview</h2></div><div className="overflow-hidden rounded-2xl p-6" style={{backgroundColor:config.brand_background,color:config.brand_text,fontFamily:config.font_family}}><p className="text-xs font-bold">{config.hero_eyebrow}</p><h3 className="mt-2 text-3xl font-black">{config.hero_title}<br/><span style={{color:config.brand_accent}}>{config.hero_highlight}</span></h3><p className="mt-3 max-w-xl text-sm">{config.hero_description}</p><span className="mt-4 inline-flex rounded-full px-4 py-2 text-xs font-bold text-white" style={{backgroundColor:config.brand_primary}}>{config.hero_primary_cta}</span></div></section>
-   <div className="sticky bottom-3 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#e4e9e1] bg-white/95 p-3 shadow-xl backdrop-blur"><button type="button" onClick={()=>setConfig(defaults)} className="rounded-xl border border-[#dfe6dc] px-4 py-3 text-xs font-bold text-[#536b57]">Reset editor defaults</button><button disabled={saving} className="inline-flex items-center gap-2 rounded-xl bg-[#245b42] px-6 py-3 text-xs font-bold text-white disabled:opacity-60"><Save size={15}/>{saving?"Saving…":"Save storefront changes"}</button></div>
+   <div className="sticky bottom-3 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#e4e9e1] bg-white/95 p-3 shadow-xl backdrop-blur"><div className="flex flex-wrap gap-2"><button type="button" disabled={!undoStack.length} onClick={undo} title="Undo (Ctrl+Z)" className="inline-flex items-center gap-2 rounded-xl border border-[#dfe6dc] px-3 py-3 text-xs font-bold text-[#536b57] disabled:cursor-not-allowed disabled:opacity-40"><Undo2 size={14}/>Undo</button><button type="button" disabled={!redoStack.length} onClick={redo} title="Redo (Ctrl+Shift+Z or Ctrl+Y)" className="inline-flex items-center gap-2 rounded-xl border border-[#dfe6dc] px-3 py-3 text-xs font-bold text-[#536b57] disabled:cursor-not-allowed disabled:opacity-40"><Redo2 size={14}/>Redo</button><button type="button" onClick={()=>{setUndoStack(stack=>[...stack,config].slice(-100));setRedoStack([]);setConfig(defaults);}} className="rounded-xl border border-[#dfe6dc] px-4 py-3 text-xs font-bold text-[#536b57]">Reset editor defaults</button></div><button disabled={saving} className="inline-flex items-center gap-2 rounded-xl bg-[#245b42] px-6 py-3 text-xs font-bold text-white disabled:opacity-60"><Save size={15}/>{saving?"Saving…":"Save storefront changes"}</button></div><p className="text-center text-[10px] text-[#899487]">Undo/redo tracks up to 100 changes in this editing session. Keyboard: Ctrl/⌘+Z to undo, Ctrl/⌘+Shift+Z or Ctrl/⌘+Y to redo.</p>
   </form>
  </div></main>;
 }
