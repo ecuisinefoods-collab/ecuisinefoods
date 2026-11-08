@@ -3,7 +3,7 @@ import { Mail, MessageCircle } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 
 export default function ContactPage() {
-  return <main className="min-h-screen bg-[#fbfaf7]"><div className="bg-[#173e2d] px-4 py-2 text-center text-xs text-white">Good food, better living</div><SiteHeader/><section className="px-5 py-12">
+  return <main className="storefront-glass min-h-screen bg-[#fbfaf7]"><div className="bg-[#173e2d] px-4 py-2 text-center text-xs text-white">Good food, better living</div><SiteHeader/><section className="px-5 py-12">
     <div className="mx-auto max-w-3xl">
       <div className="mt-8 rounded-3xl border border-[#e4e7dd] bg-white p-7 sm:p-10">
         <p className="text-xs font-bold uppercase tracking-[.18em] text-[#78906b]">We are here to help</p>

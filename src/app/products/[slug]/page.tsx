@@ -13,7 +13,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   const { data: product } = await supabase.from("products").select("id,name,slug,category,description,ingredients,nutrition_info,image_url,product_variants(id,pack_size,price,stock_quantity)").eq("slug", slug).eq("is_active", true).maybeSingle();
   if (!product) notFound();
   const variants = (product.product_variants ?? []) as { id: string; pack_size: string; price: number; stock_quantity: number }[];
-  return <main className="min-h-screen bg-[#fbfaf7]">
+  return <main className="storefront-glass min-h-screen bg-[#fbfaf7]">
     <div className="bg-[#173e2d] px-4 py-2 text-center text-xs font-semibold text-white">Good food, better living · Thoughtful food choices</div>
     <SiteHeader />
     <section className="mx-auto max-w-6xl px-5 py-8 sm:py-12">

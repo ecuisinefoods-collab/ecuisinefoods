@@ -115,7 +115,7 @@ export default function ProductsAdminPage() {
     if (updateError) setError(updateError.message); else { setMessage(product.is_active ? "Product paused; it is hidden from the storefront." : "Product published to the storefront."); await load(); }
   };
 
-  if (loading) return <main className="grid min-h-screen place-items-center bg-[#f5f7f3] text-sm text-[#42694b]"><LoaderCircle className="animate-spin"/>Loading product manager…</main>;
+  if (loading) return <main className="admin-glass-shell grid min-h-screen place-items-center bg-[#f5f7f3] text-sm text-[#42694b]"><LoaderCircle className="animate-spin"/>Loading product manager…</main>;
   if (!authorized) return <main className="min-h-screen bg-[#f5f7f3] p-8"><div className="mx-auto max-w-lg rounded-2xl bg-white p-7"><h1 className="text-xl font-bold text-[#203b2a]">Product access</h1><p className="mt-3 text-sm text-red-700">{error}</p><Link href="/admin" className="mt-5 inline-flex text-sm font-bold text-[#315b43]">Back to admin</Link></div></main>;
 
   return <main className="min-h-screen bg-[#f5f7f3] px-4 py-7 text-[#26392c] sm:px-8"><div className="mx-auto max-w-6xl">

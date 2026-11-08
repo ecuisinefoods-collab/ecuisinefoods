@@ -110,7 +110,7 @@ export default function StorefrontEditorPage(){
   if(saveError)setError(saveError.message);else setMessage("Storefront settings saved. Refresh the live website to see your changes.");
   setSaving(false);
  };
- if(loading)return <main className="grid min-h-screen place-items-center bg-[#f5f7f3] text-sm text-[#42694b]"><LoaderCircle className="mr-2 animate-spin"/>Loading storefront editor…</main>;
+ if(loading)return <main className="admin-glass-shell grid min-h-screen place-items-center bg-[#f5f7f3] text-sm text-[#42694b]"><LoaderCircle className="mr-2 animate-spin"/>Loading storefront editor…</main>;
  if(!authorized)return <main className="min-h-screen bg-[#f5f7f3] p-8"><div className="mx-auto max-w-lg rounded-2xl bg-white p-7"><h1 className="text-xl font-bold">Storefront editor access</h1><p className="mt-3 text-sm text-red-700">{error}</p><Link href="/admin" className="mt-5 inline-flex text-sm font-bold text-[#315b43]">Back to admin</Link></div></main>;
  return <main className="min-h-screen bg-[#f5f7f3] px-4 py-8 text-[#26392c] sm:px-8"><div className="mx-auto max-w-5xl">
   <Link href="/admin" className="inline-flex items-center gap-2 text-xs font-bold text-[#65806a]"><ArrowLeft size={14}/> Admin overview</Link>

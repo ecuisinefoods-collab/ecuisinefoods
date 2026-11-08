@@ -132,3 +132,27 @@ input,select,textarea{accent-color:var(--brand-primary)}
 @keyframes ec-run-cycle{from{transform:translateY(0) rotate(-8deg)}to{transform:translateY(-5px) rotate(8deg)}}
 @media(max-width:640px){.discount-mascot{animation-duration:22s}.discount-mascot span:nth-child(2){max-width:104px}}
 @media(prefers-reduced-motion:reduce){.discount-mascot,.discount-mascot-runner{animation:none!important}}
+
+/* eCuisinefoods glass finish */
+:root{--glass-blur:blur(22px) saturate(165%)}
+body{background:radial-gradient(ellipse at 7% 5%,rgba(222,237,218,.68),transparent 32%),radial-gradient(ellipse at 94% 12%,rgba(236,224,194,.5),transparent 28%),linear-gradient(135deg,#fbfcf8 0%,#f4f2e9 52%,#f7faf5 100%)}
+.site-header{background:rgba(255,255,255,.74);border-bottom:1px solid rgba(255,255,255,.82);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:0 12px 40px rgba(32,62,39,.08),inset 0 1px 0 rgba(255,255,255,.9)}
+.storefront-glass{background:radial-gradient(ellipse at 0% 0%,rgba(226,239,220,.44),transparent 35%),radial-gradient(ellipse at 100% 5%,rgba(237,226,199,.34),transparent 30%),linear-gradient(135deg,#fbfcf8 0%,#f5f3ea 56%,#f8fbf6 100%)}
+.storefront-glass h1,.storefront-glass h2,.storefront-glass h3{text-shadow:0 1px 0 rgba(255,255,255,.9),0 9px 26px rgba(53,78,53,.11);-webkit-text-stroke:.12px rgba(255,255,255,.5)}
+.storefront-glass .bg-white{background:rgba(255,255,255,.78)!important;backdrop-filter:blur(18px) saturate(155%)}
+.store-hero .hero-product-scene{border:1px solid rgba(255,255,255,.82);box-shadow:0 32px 90px rgba(47,65,42,.16),inset 0 1px 0 rgba(255,255,255,.95);backdrop-filter:blur(16px) saturate(150%)}
+.store-hero .hero-product-scene:after{content:"";position:absolute;inset:-55% -90%;z-index:15;pointer-events:none;background:linear-gradient(110deg,transparent 39%,rgba(255,255,255,.28) 47%,rgba(255,255,255,.06) 53%,transparent 61%);transform:translateX(-45%) rotate(8deg);animation:ec-glass-sheen 11s ease-in-out infinite}
+.product-card{border:1px solid rgba(255,255,255,.88);background:linear-gradient(145deg,rgba(255,255,255,.94),rgba(247,250,244,.76));box-shadow:0 14px 38px rgba(45,72,47,.09),inset 0 1px 0 rgba(255,255,255,.96);backdrop-filter:blur(18px) saturate(160%)}
+.product-card:hover{box-shadow:0 28px 60px rgba(39,72,44,.16),inset 0 1px 0 rgba(255,255,255,.98)}
+.promo-stage{border:1px solid rgba(255,255,255,.72);box-shadow:0 28px 76px rgba(32,62,39,.17),inset 0 1px 0 rgba(255,255,255,.82)}
+.storefront-glass input,.storefront-glass select,.storefront-glass textarea{background:rgba(255,255,255,.78);border-color:rgba(204,216,199,.82);box-shadow:inset 0 1px 2px rgba(43,68,46,.035)}
+.admin-glass-shell{min-height:100vh;background:radial-gradient(ellipse at 3% 0%,rgba(218,235,216,.88),transparent 34%),radial-gradient(ellipse at 100% 6%,rgba(232,222,194,.58),transparent 28%),linear-gradient(135deg,#f2f7f0 0%,#f6f3e9 58%,#f4f8f2 100%);background-attachment:fixed}
+.admin-glass-shell h1,.admin-glass-shell h2,.admin-glass-shell h3{text-shadow:0 1px 0 rgba(255,255,255,.9),0 8px 24px rgba(45,73,48,.12)}
+.admin-glass-shell .bg-white{background:rgba(255,255,255,.68)!important;backdrop-filter:blur(22px) saturate(165%)}
+.admin-glass-shell .rounded-2xl.border,.admin-glass-shell .rounded-3xl.border,.admin-glass-shell .rounded-xl.border{border-color:rgba(255,255,255,.8);box-shadow:0 18px 52px rgba(47,75,49,.085),inset 0 1px 0 rgba(255,255,255,.92);backdrop-filter:blur(18px) saturate(155%)}
+.admin-glass-shell input,.admin-glass-shell select,.admin-glass-shell textarea{background:rgba(255,255,255,.82);border-color:rgba(198,213,194,.88)}
+.admin-glass-shell button{transition:transform .2s ease,box-shadow .2s ease,filter .2s ease}
+.admin-glass-shell button:not(:disabled):hover{filter:saturate(1.12);box-shadow:0 8px 20px rgba(42,75,45,.11)}
+.admin-glass-shell button:not(:disabled):active{transform:translateY(1px) scale(.99)}
+@keyframes ec-glass-sheen{0%,22%{transform:translateX(-45%) rotate(8deg);opacity:0}30%{opacity:.9}45%,100%{transform:translateX(45%) rotate(8deg);opacity:0}}
+@media(prefers-reduced-motion:reduce){.store-hero .hero-product-scene:after{animation:none}}

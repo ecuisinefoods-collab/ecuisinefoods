@@ -4,7 +4,7 @@ import { FormEvent, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import {
-  Activity, ArrowDownRight, ArrowUpRight, BarChart3, Boxes, CalendarDays, Truck,
+  Activity, ArrowDownRight, ArrowUpRight, BarChart3, Boxes, CalendarDays, Truck, MapPin,
   ChevronRight, CircleDollarSign, ClipboardList, LayoutDashboard, LogOut,
   Megaphone, Package, ShieldCheck, ShoppingBag, Users, Wallet,
 } from "lucide-react";
@@ -35,8 +35,10 @@ const navItems: { label: string; icon: typeof LayoutDashboard; active?: boolean;
   { label: "Products & stock", icon: Package, href: "/admin/products" },
   { label: "Promotions & banners", icon: Megaphone, href: "/admin/promotions" },
   { label: "Delivery setup", icon: Truck, href: "/admin/delivery" },
+  { label: "Pickup locations", icon: MapPin, href: "/admin/pickups" },
+  { label: "Inventory & stock history", icon: Boxes, href: "/admin/inventory" },
   { label: "Finances", icon: Wallet, href: "/admin/finance" },
-  { label: "Team & permissions", icon: Users },
+  { label: "Team & permissions", icon: Users, href: "/admin/team" },
   { label: "Analytics", icon: BarChart3, href: "/admin/analytics" },
   { label: "Download records", icon: ClipboardList, href: "/admin/exports" },
 ];
@@ -142,11 +144,11 @@ export default function AdminPage() {
     setPassword("");
   };
 
-  if (loading && !profile) return <main className="grid min-h-screen place-items-center bg-[#f4f6f1] text-sm font-semibold text-[#42694b]">Loading secure workspace…</main>;
+  if (loading && !profile) return <main className="admin-glass-shell grid min-h-screen place-items-center bg-[#f4f6f1] text-sm font-semibold text-[#42694b]">Loading secure workspace…</main>;
 
   if (!profile) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-[#f4f6f1] px-4 py-10">
+      <main className="admin-glass-shell flex min-h-screen items-center justify-center bg-[#f4f6f1] px-4 py-10">
         <section className="w-full max-w-md rounded-[2rem] border border-[#e4e9df] bg-white p-7 shadow-xl shadow-[#1b3825]/5 sm:p-9">
           <div className="mb-8 flex items-center gap-3">
             <div className="grid h-12 w-12 place-items-center rounded-2xl bg-[#1d4b34] text-xl font-black text-white">e</div>
@@ -178,7 +180,7 @@ export default function AdminPage() {
   ];
 
   return (
-    <main className="min-h-screen bg-[#f5f7f3] text-[#25392b]">
+    <main className="admin-glass-shell min-h-screen bg-[#f5f7f3] text-[#25392b]">
       <aside className="fixed inset-y-0 left-0 z-20 hidden w-64 flex-col border-r border-[#e7ece4] bg-white px-5 py-6 lg:flex">
         <a href="/" className="flex items-center gap-3"><span className="grid h-11 w-11 place-items-center rounded-2xl bg-[#1d4b34] text-xl font-black text-white">e</span><span><b className="block text-sm text-[#1b3b2a]">eCuisinefoods</b><small className="text-[10px] text-[#849082]">Admin workspace</small></span></a>
         <p className="mb-3 mt-10 text-[9px] font-extrabold uppercase tracking-[.2em] text-[#9aa597]">Workspace</p>
