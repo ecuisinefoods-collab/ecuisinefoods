@@ -5,7 +5,8 @@ import { ArrowLeft, Leaf, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 type Product={id:string;name:string;slug:string;category:string;short_description?:string|null;description:string|null;ingredients?:string|null;highlights?:string[]|null;image_url:string|null;is_featured?:boolean;created_at?:string;product_variants?:{id:string;pack_size:string;price:number;sale_price:number|null;sale_starts_at:string|null;sale_ends_at:string|null;stock_quantity:number}[]};
 export const dynamic="force-dynamic";
-export default async function ShopPage({searchParams}:{searchParams:Promise<{category?:string|string[]}>}){\n const params=await searchParams;const initialCategory=Array.isArray(params.category)?params.category[0]||"All products":params.category||"All products";
+export default async function ShopPage({searchParams}:{searchParams:Promise<{category?:string|string[]}>}){
+ const params=await searchParams;const initialCategory=Array.isArray(params.category)?params.category[0]||"All products":params.category||"All products";
  let products:Product[]=[];
  if(supabase){const {data}=await supabase.from("products").select("id,name,slug,category,short_description,description,ingredients,highlights,image_url,is_featured,created_at,product_variants(id,pack_size,price,sale_price,sale_starts_at,sale_ends_at,stock_quantity)").eq("is_active",true).order("name");products=(data||[]) as Product[];}
  return <main className="storefront-glass min-h-screen bg-[#fbfaf7]"><div className="bg-[#173e2d] px-4 py-2 text-center text-[10px] font-bold tracking-widest text-white">GOOD FOOD · BETTER LIVING</div><SiteHeader/>
