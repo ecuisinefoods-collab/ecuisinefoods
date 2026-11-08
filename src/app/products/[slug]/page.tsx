@@ -5,6 +5,8 @@ import { supabase } from "@/lib/supabase";
 import { SiteHeader } from "@/components/site-header";
 import { ProductPurchasePanel } from "@/components/product-purchase-panel";
 
+export const dynamic = "force-dynamic";
+
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   if (!supabase) notFound();
