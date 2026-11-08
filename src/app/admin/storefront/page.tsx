@@ -38,6 +38,7 @@ const fields:[keyof Config,string,string][]=[
 ];
 export default function StorefrontEditorPage(){
  const [config,setConfig]=useState<Config>(defaults);
+ const [mascotEnabled,setMascotEnabled]=useState(false);
  const [authorized,setAuthorized]=useState(false);
  const [loading,setLoading]=useState(true);
  const [saving,setSaving]=useState(false);
@@ -52,9 +53,14 @@ export default function StorefrontEditorPage(){
   const {data:profile}=await supabase.from("admin_profiles").select("role,is_active").eq("user_id",user.id).maybeSingle();
   if(!profile?.is_active||!["owner","store_manager"].includes(profile.role)){setError("Only the owner or an authorised store manager can edit the storefront.");setLoading(false);return;}
   setAuthorized(true);
-  const {data,error:readError}=await supabase.from("site_settings").select("setting_value").eq("setting_key","storefront_config").maybeSingle();
+  const {data:settings,error:readError}=await supabase.from("site_settings").select("setting_key,setting_value").in("setting_key",["storefront_config","discount_mascot_enabled"]);
   if(readError)setError(readError.message);
-  else if(data?.setting_value){try{setConfig({...defaults,...JSON.parse(data.setting_value)});}catch{setError("Saved storefront settings could not be read. Defaults are shown.");}}
+  else {
+   const savedConfig=settings?.find(item=>item.setting_key==="storefront_config")?.setting_value;
+   const savedMascot=settings?.find(item=>item.setting_key==="discount_mascot_enabled")?.setting_value;
+   if(savedConfig){try{setConfig({...defaults,...JSON.parse(savedConfig)});}catch{setError("Saved storefront settings could not be read. Defaults are shown.");}}
+   setMascotEnabled(savedMascot==="true");
+  }
   setLoading(false);
  },[]);
  useEffect(()=>{void load();},[load]);
@@ -95,7 +101,12 @@ export default function StorefrontEditorPage(){
  },[undo,redo]);
  const save=async(e:FormEvent<HTMLFormElement>)=>{
   e.preventDefault();if(!supabase||!authorized)return;setSaving(true);setError("");setMessage("");
-  const {error:saveError}=await supabase.from("site_settings").upsert({setting_key:"storefront_config",setting_value:JSON.stringify(config),updated_at:new Date().toISOString()},{onConflict:"setting_key"});
+  const now=new Date().toISOString();
+  const [configSave,mascotSave]=await Promise.all([
+   supabase.from("site_settings").upsert({setting_key:"storefront_config",setting_value:JSON.stringify(config),updated_at:now},{onConflict:"setting_key"}),
+   supabase.from("site_settings").upsert({setting_key:"discount_mascot_enabled",setting_value:String(mascotEnabled),updated_at:now},{onConflict:"setting_key"})
+  ]);
+  const saveError=configSave.error||mascotSave.error;
   if(saveError)setError(saveError.message);else setMessage("Storefront settings saved. Refresh the live website to see your changes.");
   setSaving(false);
  };
@@ -108,6 +119,7 @@ export default function StorefrontEditorPage(){
   {message&&<p role="status" className="mt-5 rounded-xl bg-green-50 p-3 text-xs font-semibold text-green-800">{message}</p>}
   <div className="mt-6"><BrandLogoUploader/></div>
   <form onSubmit={save} className="mt-6 space-y-6">
+   <section className="rounded-2xl border border-[#e4e9e1] bg-white p-5 shadow-sm sm:p-7"><h2 className="font-bold">Discount mascot visibility</h2><p className="mt-2 text-xs leading-5 text-[#7d897a]">Keep the promotional mascot hidden from shoppers until you switch it on here. Save your changes to publish the setting.</p><label className="mt-4 flex cursor-pointer items-center gap-3 rounded-xl border border-[#e4e9e1] p-4"><input type="checkbox" checked={mascotEnabled} onChange={event=>setMascotEnabled(event.target.checked)} className="h-5 w-5 accent-[#5d3b91]"/><span><span className="block text-sm font-bold text-[#26392c]">Show discount mascot on the storefront</span><span className="mt-1 block text-xs text-[#899487]">{mascotEnabled?"Enabled — shoppers can see and tap the mascot.":"Disabled — mascot stays hidden from shoppers."}</span></span></label></section>
    <section className="rounded-2xl border border-[#e4e9e1] bg-white p-5 shadow-sm sm:p-7"><div className="mb-5 flex items-center gap-2"><Type size={18}/><h2 className="font-bold">Homepage write-ups</h2></div><div className="grid gap-4 sm:grid-cols-2">{fields.map(([key,label,hint])=><label key={key} className={["hero_description","promise_description","quote"].includes(key)?"sm:col-span-2 block text-xs font-bold text-[#405443]":"block text-xs font-bold text-[#405443]"}>{label}<span className="mt-1 block text-[10px] font-normal text-[#899487]">{hint}</span>{["hero_description","promise_description","quote"].includes(key)?<textarea rows={3} value={config[key]} onChange={e=>change(key,e.target.value)} className="mt-2 w-full rounded-xl border border-[#dfe6dc] bg-[#fbfcfa] px-4 py-3 text-sm font-normal outline-none focus:border-[#4c805b]"/>:<input value={config[key]} onChange={e=>change(key,e.target.value)} className="mt-2 w-full rounded-xl border border-[#dfe6dc] bg-[#fbfcfa] px-4 py-3 text-sm font-normal outline-none focus:border-[#4c805b]"/>}</label>)}</div></section>
    <section className="rounded-2xl border border-[#e4e9e1] bg-white p-5 shadow-sm sm:p-7"><div className="mb-5 flex items-center gap-2"><Palette size={18}/><h2 className="font-bold">Storefront colours</h2></div><p className="mb-5 text-xs text-[#7d897a]">Choose your primary, dark, accent, background, surface and text colours.</p><div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{([["brand_primary","Primary buttons and highlights"],["brand_dark","Deep brand colour"],["brand_accent","Gold/accent colour"],["brand_background","Hero background"],["brand_surface","Section background"],["brand_text","Main text colour"]] as [keyof Config,string][]).map(([key,label])=><label key={key} className="flex items-center gap-3 rounded-xl border border-[#edf0e9] p-3 text-xs font-semibold"><input type="color" value={config[key]} onChange={e=>change(key,e.target.value)} className="h-10 w-12 cursor-pointer rounded border-0 bg-transparent"/><span className="flex-1">{label}<small className="mt-1 block font-mono text-[10px] text-[#899487]">{config[key]}</small></span></label>)}</div></section>
    <section className="rounded-2xl border border-[#e4e9e1] bg-white p-5 shadow-sm sm:p-7"><div className="mb-5 flex items-center gap-2"><ImageIcon size={18}/><h2 className="font-bold">Live preview</h2></div><div className="overflow-hidden rounded-2xl p-6" style={{backgroundColor:config.brand_background,color:config.brand_text,fontFamily:config.font_family}}><p className="text-xs font-bold">{config.hero_eyebrow}</p><h3 className="mt-2 text-3xl font-black">{config.hero_title}<br/><span style={{color:config.brand_accent}}>{config.hero_highlight}</span></h3><p className="mt-3 max-w-xl text-sm">{config.hero_description}</p><span className="mt-4 inline-flex rounded-full px-4 py-2 text-xs font-bold text-white" style={{backgroundColor:config.brand_primary}}>{config.hero_primary_cta}</span></div></section>
