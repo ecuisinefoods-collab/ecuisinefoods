@@ -41,21 +41,16 @@ export default async function HomePage() {
             <div className="mt-8 flex flex-wrap gap-x-5 gap-y-2 text-xs font-semibold text-[#68776a]"><span className="inline-flex items-center gap-2"><ShieldCheck size={15}/> Quality-minded</span><span className="inline-flex items-center gap-2"><Sprout size={15}/> Made with purpose</span></div>
           </div>
           <div className="relative mx-auto w-full max-w-[570px]">
-            <div className="absolute inset-8 rounded-full bg-[#d9e2d0] blur-3xl"/>
-            <div className="relative flex min-h-[340px] items-center justify-center overflow-hidden rounded-[2rem] border border-white/70 bg-gradient-to-br from-[#e6eadb] via-[#f5ead7] to-[#e7d6b9] p-6 sm:min-h-[430px]">
-              <div className="absolute left-7 top-8 h-20 w-20 rounded-full border border-white/60 bg-white/30"/>
-              <div className="absolute bottom-0 right-0 h-44 w-44 rounded-full bg-[#b8c9a9]/40 blur-2xl"/>
-              <div className="relative flex h-[260px] w-[220px] -rotate-3 flex-col items-center justify-center rounded-[1.6rem] border border-[#e2d3b2] bg-gradient-to-br from-[#fffdf6] via-[#f4e9cf] to-[#e7d5ad] shadow-[0_25px_55px_rgba(66,62,38,.2)] sm:h-[320px] sm:w-[265px]">
-                <div className="absolute left-0 top-8 h-2 w-full bg-[#245b42]"/><div className="absolute bottom-8 h-2 w-full bg-[#245b42]"/>
-                <div className="mb-3 grid h-14 w-14 place-items-center rounded-full bg-[#245b42] text-2xl font-bold text-white shadow-md">e</div>
-                <p className="text-[10px] font-bold uppercase tracking-[.24em] text-[#245b42]">eCuisinefoods</p>
-                <p className="mt-3 text-center text-3xl font-semibold tracking-tight text-[#654a2d]">Tom Brown</p>
-                <p className="mt-1 text-[10px] font-bold uppercase tracking-[.18em] text-[#88704b]">Multigrain cereal</p>
-                <div className="mt-5 flex gap-2">{[0,1,2,3,4,5].map(n=><span key={n} className="h-2 w-2 rounded-full bg-[#b18a4d]"/>)}</div>
-                <p className="mt-4 text-[9px] font-bold uppercase tracking-[.2em] text-[#7a684c]">Good food, better living</p>
+            <div className="absolute -inset-8 rounded-full bg-[#d9e2d0]/70 blur-3xl"/>
+            <div className="store-hero-stage relative overflow-hidden rounded-[2rem] border border-white/80 bg-[radial-gradient(circle_at_50%_25%,#fffdf5_0%,#f4e8d1_55%,#e3d7b8_100%)] p-5 shadow-[0_28px_70px_rgba(49,58,34,.18)] sm:p-8">
+              <div className="absolute -left-8 top-12 h-32 w-32 rounded-full bg-[#d2dfc4]/70 blur-2xl"/>
+              <div className="absolute -right-6 bottom-8 h-40 w-40 rounded-full bg-[#e7c98d]/50 blur-2xl"/>
+              <div className="relative z-10 flex min-h-[330px] items-center justify-center sm:min-h-[420px]">
+                {featured[0]?.image_url ? <img src={featured[0].image_url} alt={featured[0].name} className="store-product-image relative z-10 max-h-[390px] w-auto max-w-[78%] object-contain drop-shadow-[0_28px_24px_rgba(38,30,18,.28)] sm:max-h-[440px]"/> : <div className="relative z-10 max-w-[330px] text-center"><div className="mx-auto grid h-20 w-20 place-items-center rounded-full border border-white/80 bg-white/70 text-4xl shadow-xl">🌾</div><p className="mt-5 text-[10px] font-extrabold uppercase tracking-[.25em] text-[#8b733f]">eCuisinefoods presents</p><h2 className="mt-3 text-4xl font-black tracking-[-.05em] text-[#56348b] sm:text-5xl">Tom Brown</h2><p className="mt-2 text-sm font-semibold text-[#38563d]">Instant Whole Grain Cereal</p><p className="mt-4 text-xs leading-5 text-[#697260]">Naturally nourishing. Richly satisfying.</p><Link href="/shop" className="mt-6 inline-flex rounded-full bg-[#245b42] px-6 py-3 text-xs font-bold text-white shadow-lg transition hover:-translate-y-1">Discover the product <ArrowRight size={14}/></Link></div>}
+                <span className="absolute left-3 top-6 rounded-full border border-white/80 bg-white/85 px-3 py-2 text-[9px] font-extrabold uppercase tracking-widest text-[#426346] shadow-lg sm:left-5">Good food · Better living</span>
+                <span className="absolute bottom-5 right-3 rounded-full bg-[#245b42] px-4 py-2.5 text-[10px] font-bold text-white shadow-xl sm:right-5">Wholesome goodness</span>
               </div>
-              <div className="absolute bottom-5 left-4 rounded-2xl border border-white/80 bg-white/90 px-4 py-3 shadow-lg sm:left-7"><p className="text-[9px] font-bold uppercase tracking-[.16em] text-[#849080]">Meet our first product</p><p className="mt-1 text-sm font-bold text-[#245b42]">Multigrain Tom Brown</p></div>
-              <div className="absolute right-4 top-5 rounded-2xl bg-[#245b42] px-4 py-3 text-white shadow-lg sm:right-7"><Sparkles size={17}/><p className="mt-1 text-[10px] font-bold">Made with purpose</p></div>
+              <div className="relative z-10 mt-2 flex items-center justify-between border-t border-[#c8b991]/50 pt-4"><div><p className="text-[9px] font-bold uppercase tracking-[.18em] text-[#8a7a58]">Featured product</p><p className="mt-1 text-sm font-extrabold text-[#24452f]">{featured[0]?.name ?? "Multigrain Tom Brown"}</p></div><Link href="/shop" className="inline-flex items-center gap-2 rounded-full bg-[#fdfbf5] px-4 py-2.5 text-xs font-bold text-[#245b42] shadow-md">Shop now <ArrowRight size={14}/></Link></div>
             </div>
           </div>
         </div>
