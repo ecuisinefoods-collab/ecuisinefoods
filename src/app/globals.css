@@ -156,3 +156,27 @@ body{background:radial-gradient(ellipse at 7% 5%,rgba(222,237,218,.68),transpare
 .admin-glass-shell button:not(:disabled):active{transform:translateY(1px) scale(.99)}
 @keyframes ec-glass-sheen{0%,22%{transform:translateX(-45%) rotate(8deg);opacity:0}30%{opacity:.9}45%,100%{transform:translateX(45%) rotate(8deg);opacity:0}}
 @media(prefers-reduced-motion:reduce){.store-hero .hero-product-scene:after{animation:none}}
+
+
+/* Storefront polish pass: stronger glass hierarchy, focus states, and mobile comfort */
+.storefront-glass .site-header{position:sticky;top:0;z-index:50}
+.storefront-glass .site-header>div{gap:1rem}
+.storefront-glass .nav-link{padding:.35rem .05rem}
+.storefront-glass .nav-link:focus-visible{border-radius:.3rem;outline:2px solid #c6a34b;outline-offset:4px}
+.storefront-glass .store-hero{background:linear-gradient(135deg,rgba(247,244,235,.88),rgba(232,239,226,.72));}
+.storefront-glass .hero-product-scene{background:linear-gradient(145deg,rgba(255,255,255,.72),rgba(239,231,211,.48));backdrop-filter:blur(24px) saturate(160%);-webkit-backdrop-filter:blur(24px) saturate(160%)}
+.storefront-glass .hero-product-scene>span{backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.storefront-glass .product-card{overflow:hidden;border-radius:1.5rem;backdrop-filter:blur(20px) saturate(165%);-webkit-backdrop-filter:blur(20px) saturate(165%)}
+.storefront-glass .product-card-media{background:linear-gradient(145deg,rgba(255,255,255,.8),rgba(232,237,224,.7));}
+.storefront-glass .product-card button:focus-visible,.storefront-glass a:focus-visible{outline:3px solid #c6a34b;outline-offset:3px}
+.storefront-glass .promo-stage{border-radius:1.8rem;background-image:linear-gradient(115deg,#143b2a 0%,#245b42 58%,#42694b 100%);}
+@media(max-width:640px){
+ .storefront-glass .site-header{backdrop-filter:blur(18px) saturate(150%)}
+ .storefront-glass .site-header>div{padding-top:.7rem;padding-bottom:.7rem}
+ .storefront-glass .brand-lockup img{max-width:160px}
+ .storefront-glass .store-hero .mx-auto.grid{gap:1.75rem}
+ .storefront-glass .hero-product-scene{min-height:290px;border-radius:1.5rem}
+ .storefront-glass .promo-stage{padding:1.25rem;border-radius:1.35rem}
+ .storefront-glass .product-card{border-radius:1.25rem}
+}
+@media(prefers-reduced-motion:reduce){.storefront-glass .hero-pack{animation:none!important}}
