@@ -14,7 +14,7 @@ type DeliveryZone = {
   id:string; state:string; city:string; area_name:string; delivery_fee:number;
   minimum_order_amount:number; estimated_days:string|null; instructions:string|null;
 };
-type Item = { variant_id:string; product_id:string; name:string; pack_size:string; price:number; qty:number };
+type Item = { variant_id:string; product_id:string; name:string; pack_size:string; price:number; qty:number; stock_quantity?:number };
 type OrderCreated = { order_number:number; tracking_code:string; subtotal:number; delivery_fee:number; total:number };
 
 const CART_KEY="ecuisinefoods-cart-v1";
@@ -22,6 +22,9 @@ const money=(n:number)=>"₦"+Number(n||0).toLocaleString("en-NG");
 
 export function CheckoutForm({ locations, deliveryZones }: { locations: Location[]; deliveryZones: DeliveryZone[] }) {
   const [cart,setCart]=useState<Item[]>([]);
+  const [stockChecked,setStockChecked]=useState(false);
+  const [stockIssue,setStockIssue]=useState("");
+  const [stockNotice,setStockNotice]=useState("");
   const [method,setMethod]=useState<"pickup"|"delivery">("pickup");
   const [city,setCity]=useState("Jos");
   const [pickup,setPickup]=useState("");
@@ -39,7 +42,37 @@ export function CheckoutForm({ locations, deliveryZones }: { locations: Location
   const [submittedItems,setSubmittedItems]=useState<Item[]>([]);
   const [whatsappUrl,setWhatsappUrl]=useState("");
 
-  useEffect(()=>{try{setCart(JSON.parse(localStorage.getItem(CART_KEY)||"[]"));}catch{setCart([]);}},[]);
+  useEffect(()=>{
+    let active=true;
+    const load=async()=>{
+      let saved:Item[]=[];
+      try{saved=JSON.parse(localStorage.getItem(CART_KEY)||"[]");}catch{saved=[];}
+      if(!active)return;
+      setCart(saved);
+      if(!saved.length){setStockChecked(true);return;}
+      if(!supabase){setStockIssue("We could not verify product stock. Please contact our team before placing this order.");setStockChecked(true);return;}
+      const {data,error}=await supabase.from("product_variants").select("id,pack_size,price,stock_quantity").in("id",saved.map(item=>item.variant_id));
+      if(!active)return;
+      if(error){setStockIssue("We could not verify the latest stock. Please refresh this page and try again.");setStockChecked(true);return;}
+      const rows=new Map((data??[]).map((variant:any)=>[variant.id,variant]));
+      let adjusted=false;
+      const refreshed=saved.map(item=>{
+        const variant=rows.get(item.variant_id) as {id:string;pack_size:string;price:number;stock_quantity:number}|undefined;
+        if(!variant)return {...item,stock_quantity:0};
+        const available=Math.max(0,Number(variant.stock_quantity)||0);
+        const qty=available>0?Math.min(item.qty,available):item.qty;
+        if(qty!==item.qty)adjusted=true;
+        return {...item,pack_size:variant.pack_size,price:Number(variant.price),stock_quantity:available,qty};
+      });
+      setCart(refreshed);
+      localStorage.setItem(CART_KEY,JSON.stringify(refreshed));
+      if(adjusted)setStockNotice("Your cart quantity was adjusted to match the latest available stock.");
+      if(refreshed.some(item=>!item.stock_quantity))setStockIssue("One or more cart items are out of stock. Return to your cart and remove them before checkout.");
+      setStockChecked(true);
+    };
+    void load();
+    return ()=>{active=false;};
+  },[]);
   const subtotal=useMemo(()=>cart.reduce((sum,item)=>sum+Number(item.price)*item.qty,0),[cart]);
   const cityLocations=locations.filter(x=>x.city===city&&x.id);
   const availableZones=deliveryZones.filter(z=>z.state===state);
@@ -48,11 +81,13 @@ export function CheckoutForm({ locations, deliveryZones }: { locations: Location
   const minOrder=Number(selectedZone?.minimum_order_amount||0);
   const minimumMet=method!=="delivery"||!selectedZone||subtotal>=minOrder;
   const missingMinimum=Math.max(0,minOrder-subtotal);
-  const canContinue=Boolean(cart.length>0&&name.trim().length>=2&&phone.trim()&&(method==="pickup"?!!pickup:!!state&&!!deliveryZoneId&&!!street.trim()&&minimumMet));
+  const stockUnavailable=cart.some(item=>!Number(item.stock_quantity)||Number(item.stock_quantity)<item.qty);
+  const canContinue=Boolean(stockChecked&&!stockIssue&&!stockUnavailable&&cart.length>0&&name.trim().length>=2&&phone.trim()&&(method==="pickup"?!!pickup:!!state&&!!deliveryZoneId&&!!street.trim()&&minimumMet));
 
   async function submitOrder(e:FormEvent<HTMLFormElement>){
     e.preventDefault();
     if(!supabase){setError("Checkout is temporarily unavailable. Please contact our team on WhatsApp.");return;}
+    if(!stockChecked||stockIssue||stockUnavailable){setError(stockIssue||"The cart quantity is above the latest available stock. Please return to your cart and review it.");return;}
     if(!canContinue){setError("Please complete the required checkout details and check the minimum order for this delivery area.");return;}
     let whatsappTab: Window | null = null;
     try { whatsappTab = window.open("about:blank", "_blank"); } catch { whatsappTab = null; }
@@ -68,7 +103,7 @@ export function CheckoutForm({ locations, deliveryZones }: { locations: Location
       items:itemsToSave.map(item=>({variant_id:item.variant_id,quantity:item.qty}))
     };
     const {data,error:rpcError}=await supabase.rpc("create_order_request",{p_order:payload});
-    if(rpcError){whatsappTab?.close();setError(rpcError.message);setSubmitting(false);return;}
+    if(rpcError){whatsappTab?.close();setError(/available in the requested quantity|no longer available/i.test(rpcError.message)?"Stock changed while you were checking out. Please return to your cart and review the latest available quantity.":rpcError.message);setSubmitting(false);return;}
     const created=data as OrderCreated;
     if(!created?.order_number||!created?.tracking_code){whatsappTab?.close();setError("Your order could not be confirmed as saved. Please retry or contact support.");setSubmitting(false);return;}
 
@@ -138,6 +173,8 @@ export function CheckoutForm({ locations, deliveryZones }: { locations: Location
             {method==="pickup"?<div className="mt-4 rounded-xl bg-[#fbfaf7]/80 p-4"><label className="text-xs font-semibold text-[#68766b]">Pickup city<select value={city} onChange={e=>{setCity(e.target.value);setPickup("");}} className="mt-1.5 w-full rounded-xl border border-[#dfe4da] bg-white px-3 py-3 text-sm text-[#203329]">{Array.from(new Set(locations.map(l=>l.city))).map(value=><option key={value}>{value}</option>)}</select></label><label className="mt-3 block text-xs font-semibold text-[#68766b]">Pickup location<select required value={pickup} onChange={e=>setPickup(e.target.value)} className="mt-1.5 w-full rounded-xl border border-[#dfe4da] bg-white px-3 py-3 text-sm text-[#203329]"><option value="">Select a location</option>{cityLocations.map(l=><option key={l.id} value={l.id}>{l.location_name}</option>)}</select></label>{pickup&&(()=>{const selected=cityLocations.find(l=>l.id===pickup);return selected?<div className="mt-3 rounded-xl bg-white/75 p-3 text-xs leading-5 text-[#68766b]"><p className="flex gap-2"><MapPin size={14} className="mt-0.5 shrink-0"/>{selected.address||selected.instructions||"Please wait for our order confirmation before visiting."}</p>{selected.opening_hours&&<p className="mt-2">Hours: {selected.opening_hours}</p>}{selected.contact_phone&&<p className="mt-1">Location contact: {selected.contact_phone}</p>}</div>:null;})()}</div>:<div className="mt-4 grid gap-3 rounded-xl bg-[#fbfaf7]/80 p-4 sm:grid-cols-2"><label className="text-xs font-semibold text-[#68766b]">State<select required value={state} onChange={e=>{setState(e.target.value);setDeliveryZoneId("");}} className="mt-1.5 w-full rounded-xl border border-[#dfe4da] bg-white px-3 py-3 text-sm"><option value="">Select state</option>{NIGERIAN_STATES.map(s=><option key={s} value={s}>{s}</option>)}</select></label><label className="text-xs font-semibold text-[#68766b]">Delivery area<select required value={deliveryZoneId} onChange={e=>setDeliveryZoneId(e.target.value)} disabled={!state||!availableZones.length} className="mt-1.5 w-full rounded-xl border border-[#dfe4da] bg-white px-3 py-3 text-sm"><option value="">{!state?"Choose a state first":availableZones.length?"Choose a configured delivery area":"Delivery is not yet available in this state"}</option>{availableZones.map(z=><option key={z.id} value={z.id}>{z.city} — {z.area_name} ({money(Number(z.delivery_fee))})</option>)}</select></label><label className="text-xs font-semibold text-[#68766b] sm:col-span-2">Street address<input required value={street} onChange={e=>setStreet(e.target.value)} className="mt-1.5 w-full rounded-xl border border-[#dfe4da] bg-white px-3 py-3 text-sm" placeholder="Street / area"/></label><label className="text-xs font-semibold text-[#68766b] sm:col-span-2">House number / landmark<input value={landmark} onChange={e=>setLandmark(e.target.value)} className="mt-1.5 w-full rounded-xl border border-[#dfe4da] bg-white px-3 py-3 text-sm" placeholder="House number or nearby landmark"/></label>{selectedZone&&<div className="rounded-xl bg-white/75 p-3 text-xs leading-5 text-[#68766b] sm:col-span-2"><p>Delivery fee: <b>{money(deliveryFee)}</b>{selectedZone.estimated_days?" · Estimated: "+selectedZone.estimated_days:""}</p>{selectedZone.instructions&&<p className="mt-1">{selectedZone.instructions}</p>}{minOrder>0&&<p className={minimumMet?"mt-1 text-green-700":"mt-1 font-bold text-red-700"}>Minimum order: {money(minOrder)}{minimumMet?" — minimum met":" — add "+money(missingMinimum)+" more to continue"}</p>}</div>}</div>}
           </section>
           <section className="border-t border-[#edf0e9] pt-5"><label className="text-xs font-semibold text-[#68766b]">Order notes (optional)<textarea value={notes} onChange={e=>setNotes(e.target.value)} rows={3} className="mt-1.5 w-full rounded-xl border border-[#dfe4da] bg-white/85 px-3 py-3 text-sm text-[#203329] outline-none focus:border-[#245b42]" placeholder="Anything we should know?"/></label></section>
+          {stockNotice&&<p role="status" className="rounded-xl bg-[#fff7e8] p-3 text-sm text-[#795b21]">{stockNotice}</p>}
+          {stockIssue&&<p role="alert" className="rounded-xl bg-red-50 p-3 text-sm text-red-700">{stockIssue}</p>}
           {error&&<p role="alert" className="rounded-xl bg-red-50 p-3 text-sm text-red-700">{error}</p>}
           <button type="submit" disabled={!canContinue||submitting} className="w-full rounded-full bg-[#245b42] px-5 py-3.5 text-sm font-bold text-white shadow-lg shadow-[#245b42]/20 transition hover:bg-[#173e2d] disabled:cursor-not-allowed disabled:opacity-40">{submitting?"Saving your order…":"Place order & continue to WhatsApp"}</button>
           <p className="text-xs leading-5 text-[#899288]">Your order request is saved first and given an order number. It remains unpaid and unconfirmed until our team replies. Product prices, stock availability and delivery fees are checked again when the order is saved.</p>
