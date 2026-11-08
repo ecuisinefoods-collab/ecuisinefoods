@@ -36,7 +36,8 @@ const navItems: { label: string; icon: typeof LayoutDashboard; active?: boolean;
   { label: "Promotions & banners", icon: Megaphone, href: "/admin/promotions" },
   { label: "Finances", icon: Wallet, href: "/admin/finance" },
   { label: "Team & permissions", icon: Users },
-  { label: "Analytics", icon: BarChart3, href: "/admin/analytics" },\n  { label: "Download records", icon: ClipboardList, href: "/admin/exports" },
+  { label: "Analytics", icon: BarChart3, href: "/admin/analytics" },
+  { label: "Download records", icon: ClipboardList, href: "/admin/exports" },
 ];
 
 export default function AdminPage() {
