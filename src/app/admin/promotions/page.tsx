@@ -9,15 +9,15 @@ type Banner = {
   id: string; title: string; subtitle: string | null; image_url: string | null;
   target_url: string | null; is_active: boolean; sort_order: number;
   starts_at: string | null; ends_at: string | null; animation_effect: "fade" | "slide" | "zoom";
-  slide_duration_ms: number; transition_duration_ms: number; show_cta: boolean;
+  slide_duration_ms: number; transition_duration_ms: number; show_cta: boolean; media_type?: "image" | "video";
 };
 type Draft = {
   title: string; subtitle: string; image_url: string; target_url: string;
-  animation_effect: "fade" | "slide" | "zoom"; slide_duration_ms: number;
+  animation_effect: "fade" | "slide" | "zoom"; media_type: "image" | "video"; slide_duration_ms: number;
   transition_duration_ms: number; starts_at: string; ends_at: string; show_cta: boolean;
 };
 const emptyDraft: Draft = {
-  title: "", subtitle: "", image_url: "", target_url: "/shop", animation_effect: "fade",
+  title: "", subtitle: "", image_url: "", target_url: "/shop", animation_effect: "fade", media_type: "image",
   slide_duration_ms: 5000, transition_duration_ms: 600, starts_at: "", ends_at: "", show_cta: true,
 };
 
@@ -29,6 +29,8 @@ export default function PromotionsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
+  const [mediaFile, setMediaFile] = useState<File | null>(null);
+  const [mediaPreview, setMediaPreview] = useState("");
   const [error, setError] = useState("");
 
   const load = useCallback(async () => {
@@ -49,10 +51,11 @@ export default function PromotionsPage() {
   useEffect(() => { void load(); }, [load]);
 
   const edit = (banner: Banner) => {
+    setMediaFile(null); setMediaPreview(banner.image_url ?? "");
     setEditing(banner.id);
     setDraft({
       title: banner.title, subtitle: banner.subtitle ?? "", image_url: banner.image_url ?? "",
-      target_url: banner.target_url ?? "/shop", animation_effect: banner.animation_effect ?? "fade",
+      target_url: banner.target_url ?? "/shop", animation_effect: banner.animation_effect ?? "fade", media_type: banner.media_type ?? "image",
       slide_duration_ms: banner.slide_duration_ms ?? 5000,
       transition_duration_ms: banner.transition_duration_ms ?? 600,
       starts_at: banner.starts_at ? new Date(banner.starts_at).toISOString().slice(0,16) : "",
@@ -68,7 +71,7 @@ export default function PromotionsPage() {
     setSaving(true); setError(""); setMessage("");
     const payload = {
       title: draft.title.trim(), subtitle: draft.subtitle.trim() || null,
-      image_url: draft.image_url.trim() || null, target_url: draft.target_url.trim() || "/shop",
+      image_url: uploadedUrl || null, media_type: mediaType, target_url: draft.target_url.trim() || "/shop",
       animation_effect: draft.animation_effect, slide_duration_ms: draft.slide_duration_ms,
       transition_duration_ms: draft.transition_duration_ms,
       starts_at: draft.starts_at ? new Date(draft.starts_at).toISOString() : null,
@@ -79,7 +82,7 @@ export default function PromotionsPage() {
       ? await supabase.from("promotional_banners").update(payload).eq("id", editing)
       : await supabase.from("promotional_banners").insert({ ...payload, is_active: true, sort_order: banners.length });
     if (result.error) setError(result.error.message);
-    else { setMessage(editing ? "Promotion updated." : "Promotion created and enabled."); setDraft(emptyDraft); setEditing(null); await load(); }
+    else { setMessage(editing ? "Promotion updated." : "Promotion created and enabled."); setDraft(emptyDraft); setEditing(null); setMediaFile(null); setMediaPreview(""); await load(); }
     setSaving(false);
   };
 
@@ -116,14 +119,14 @@ export default function PromotionsPage() {
           <section className="space-y-3">
             <h2 className="text-sm font-bold text-[#405744]">Your slides ({banners.length})</h2>
             {banners.length === 0 && <div className="rounded-2xl border border-dashed border-[#cbd8c8] bg-white p-9 text-center"><ImagePlus className="mx-auto text-[#88a088]" size={30}/><p className="mt-3 text-sm font-bold text-[#405744]">No promotions created yet</p><p className="mt-1 text-xs text-[#8b9688]">Create your first banner to replace the default offer.</p></div>}
-            {banners.map((banner,index) => <article key={banner.id} className="flex gap-3 rounded-2xl border border-[#e5ebe2] bg-white p-4 shadow-sm"><div className="grid h-14 w-16 shrink-0 place-items-center overflow-hidden rounded-xl bg-[#edf2e9] text-[#4a7652]">{banner.image_url ? <img src={banner.image_url} alt="" className="h-full w-full object-cover"/> : <ImagePlus size={20}/>}</div><div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><h3 className="truncate text-sm font-bold text-[#304735]">{banner.title}</h3><span className={`rounded-full px-2 py-1 text-[9px] font-bold ${banner.is_active ? "bg-[#e9f3e7] text-[#3b7046]" : "bg-[#f1f1ee] text-[#899184]"}`}>{banner.is_active ? "Enabled" : "Paused"}</span></div><p className="mt-1 truncate text-xs text-[#8a9687]">{banner.subtitle || "No subtitle"}</p><p className="mt-2 text-[10px] font-semibold capitalize text-[#66806a]">{banner.animation_effect} · {banner.slide_duration_ms/1000}s display</p><div className="mt-3 flex flex-wrap gap-2"><button onClick={() => edit(banner)} className="rounded-lg bg-[#eef3eb] px-3 py-2 text-[10px] font-bold text-[#42664a]">Edit</button><button onClick={() => void updateBanner(banner.id,{is_active:!banner.is_active})} className="inline-flex items-center gap-1 rounded-lg border border-[#e6ebe3] px-3 py-2 text-[10px] font-bold text-[#697866]">{banner.is_active ? <EyeOff size={12}/> : <Eye size={12}/>} {banner.is_active ? "Pause" : "Enable"}</button><button onClick={() => void remove(banner.id)} className="inline-flex items-center gap-1 rounded-lg border border-[#f0dfdc] px-3 py-2 text-[10px] font-bold text-[#a05f54]"><Trash2 size={12}/> Delete</button><button disabled={index===0} onClick={() => void reorder(index,-1)} aria-label="Move up" className="rounded-lg border border-[#e6ebe3] p-2 text-[#71816e] disabled:opacity-30"><ArrowUp size={13}/></button><button disabled={index===banners.length-1} onClick={() => void reorder(index,1)} aria-label="Move down" className="rounded-lg border border-[#e6ebe3] p-2 text-[#71816e] disabled:opacity-30"><ArrowDown size={13}/></button></div></div></article>)}
+            {banners.map((banner,index) => <article key={banner.id} className="flex gap-3 rounded-2xl border border-[#e5ebe2] bg-white p-4 shadow-sm"><div className="grid h-14 w-16 shrink-0 place-items-center overflow-hidden rounded-xl bg-[#edf2e9] text-[#4a7652]">{banner.image_url ? (banner.media_type === "video" ? <video src={banner.image_url} muted className="h-full w-full object-cover"/> : <img src={banner.image_url} alt="" className="h-full w-full object-cover"/>) : <ImagePlus size={20}/>}</div><div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><h3 className="truncate text-sm font-bold text-[#304735]">{banner.title}</h3><span className={`rounded-full px-2 py-1 text-[9px] font-bold ${banner.is_active ? "bg-[#e9f3e7] text-[#3b7046]" : "bg-[#f1f1ee] text-[#899184]"}`}>{banner.is_active ? "Enabled" : "Paused"}</span></div><p className="mt-1 truncate text-xs text-[#8a9687]">{banner.subtitle || "No subtitle"}</p><p className="mt-2 text-[10px] font-semibold capitalize text-[#66806a]">{banner.animation_effect} · {banner.slide_duration_ms/1000}s display</p><div className="mt-3 flex flex-wrap gap-2"><button onClick={() => edit(banner)} className="rounded-lg bg-[#eef3eb] px-3 py-2 text-[10px] font-bold text-[#42664a]">Edit</button><button onClick={() => void updateBanner(banner.id,{is_active:!banner.is_active})} className="inline-flex items-center gap-1 rounded-lg border border-[#e6ebe3] px-3 py-2 text-[10px] font-bold text-[#697866]">{banner.is_active ? <EyeOff size={12}/> : <Eye size={12}/>} {banner.is_active ? "Pause" : "Enable"}</button><button onClick={() => void remove(banner.id)} className="inline-flex items-center gap-1 rounded-lg border border-[#f0dfdc] px-3 py-2 text-[10px] font-bold text-[#a05f54]"><Trash2 size={12}/> Delete</button><button disabled={index===0} onClick={() => void reorder(index,-1)} aria-label="Move up" className="rounded-lg border border-[#e6ebe3] p-2 text-[#71816e] disabled:opacity-30"><ArrowUp size={13}/></button><button disabled={index===banners.length-1} onClick={() => void reorder(index,1)} aria-label="Move down" className="rounded-lg border border-[#e6ebe3] p-2 text-[#71816e] disabled:opacity-30"><ArrowDown size={13}/></button></div></div></article>)}
           </section>
           <section className="h-fit rounded-2xl border border-[#e5ebe2] bg-white p-5 shadow-sm sm:p-6">
             <div className="flex items-center justify-between"><h2 className="text-sm font-bold text-[#304735]">{editing ? "Edit promotion" : "Create promotion"}</h2><span className="text-[10px] text-[#91a08d]">Changes show on homepage</span></div>
             <form onSubmit={save} className="mt-5 space-y-4">
               <label className="block text-xs font-bold text-[#526352]">Headline<input required maxLength={90} value={draft.title} onChange={e=>setDraft({...draft,title:e.target.value})} placeholder="e.g. Special launch offer" className="mt-2 w-full rounded-xl border border-[#dfe7dc] bg-[#fbfcfa] px-3 py-3 text-sm outline-none focus:border-[#719477]"/></label>
               <label className="block text-xs font-bold text-[#526352]">Supporting text<textarea rows={2} value={draft.subtitle} onChange={e=>setDraft({...draft,subtitle:e.target.value})} placeholder="A short message for your customers" className="mt-2 w-full rounded-xl border border-[#dfe7dc] bg-[#fbfcfa] px-3 py-3 text-sm outline-none focus:border-[#719477]"/></label>
-              <label className="block text-xs font-bold text-[#526352]">Banner image URL (optional)<input type="url" value={draft.image_url} onChange={e=>setDraft({...draft,image_url:e.target.value})} placeholder="https://…" className="mt-2 w-full rounded-xl border border-[#dfe7dc] bg-[#fbfcfa] px-3 py-3 text-sm outline-none focus:border-[#719477]"/></label>
+              <div className="rounded-xl border border-[#dfe7dc] bg-[#fbfcfa] p-3"><label className="block text-xs font-bold text-[#526352]">Add banner image or video<input type="file" accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime" onChange={e=>{const file=e.target.files?.[0]??null;if(file && file.size>100*1024*1024){setError("File must be 100 MB or smaller.");e.target.value="";return;}setMediaFile(file);setMediaPreview(file?URL.createObjectURL(file):draft.image_url);setDraft({...draft,media_type:file?(file.type.startsWith("video/")?"video":"image"):draft.media_type});}} className="mt-2 block w-full text-xs"/></label><p className="mt-2 text-[10px] text-[#819080]">Choose directly from your device. Images: JPG, PNG, WebP, GIF. Videos: MP4, WebM, MOV. Max 100 MB.</p>{mediaPreview && <div className="mt-3 overflow-hidden rounded-lg">{(mediaFile?.type.startsWith("video/") || (!mediaFile && draft.media_type==="video")) ? <video src={mediaPreview} controls className="max-h-48 w-full bg-black"/> : <img src={mediaPreview} alt="Banner preview" className="max-h-48 w-full object-contain"/>}</div>}</div>
               <label className="block text-xs font-bold text-[#526352]">Button destination<input value={draft.target_url} onChange={e=>setDraft({...draft,target_url:e.target.value})} placeholder="/shop" className="mt-2 w-full rounded-xl border border-[#dfe7dc] bg-[#fbfcfa] px-3 py-3 text-sm outline-none focus:border-[#719477]"/></label>
               <div className="grid grid-cols-2 gap-3"><label className="block text-xs font-bold text-[#526352]">Animation<select value={draft.animation_effect} onChange={e=>setDraft({...draft,animation_effect:e.target.value as Draft["animation_effect"]})} className="mt-2 w-full rounded-xl border border-[#dfe7dc] bg-[#fbfcfa] px-3 py-3 text-sm"><option value="fade">Fade</option><option value="slide">Slide</option><option value="zoom">Zoom</option></select></label><label className="block text-xs font-bold text-[#526352]">Slide time<select value={draft.slide_duration_ms} onChange={e=>setDraft({...draft,slide_duration_ms:Number(e.target.value)})} className="mt-2 w-full rounded-xl border border-[#dfe7dc] bg-[#fbfcfa] px-3 py-3 text-sm"><option value={3000}>3 seconds</option><option value={5000}>5 seconds</option><option value={7000}>7 seconds</option><option value={10000}>10 seconds</option><option value={12000}>12 seconds</option></select></label></div>
               <label className="block text-xs font-bold text-[#526352]">Transition speed<select value={draft.transition_duration_ms} onChange={e=>setDraft({...draft,transition_duration_ms:Number(e.target.value)})} className="mt-2 w-full rounded-xl border border-[#dfe7dc] bg-[#fbfcfa] px-3 py-3 text-sm"><option value={300}>Fast</option><option value={600}>Normal</option><option value={1000}>Slow</option><option value={1500}>Very slow</option></select></label>
