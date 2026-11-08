@@ -34,7 +34,7 @@ const navItems: { label: string; icon: typeof LayoutDashboard; active?: boolean;
   { label: "Storefront editor", icon: LayoutDashboard, href: "/admin/storefront" },
   { label: "Products & stock", icon: Package, href: "/admin/products" },
   { label: "Promotions & banners", icon: Megaphone, href: "/admin/promotions" },
-  { label: "Finances", icon: Wallet },
+  { label: "Finances", icon: Wallet, href: "/admin/finance" },
   { label: "Team & permissions", icon: Users },
   { label: "Analytics", icon: BarChart3 },
 ];
