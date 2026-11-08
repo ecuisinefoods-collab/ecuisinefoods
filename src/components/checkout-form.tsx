@@ -54,7 +54,7 @@ export function CheckoutForm({ locations }: { locations: Location[] }) {
             notes? `Notes: ${notes}` : "",
             "",
             "Please confirm availability, delivery fee (if applicable), and the final order total. I understand this request is not confirmed until your team replies."
-          ].filter(Boolean).join("\\n");
+          ].filter(Boolean).join("\n");
           window.open("https://wa.me/2348080942328?text="+encodeURIComponent(lines),"_blank","noopener,noreferrer");
         }} className="w-full rounded-full bg-[#245b42] px-5 py-3.5 text-sm font-bold text-white transition hover:bg-[#173e2d] disabled:cursor-not-allowed disabled:opacity-40">Continue order on WhatsApp</button>
         <p className="text-xs leading-5 text-[#899288]">Your order details will open in WhatsApp for our team. This is an order request, not a confirmed order or payment. Our team must confirm stock, delivery (if applicable), and the final total.</p>
