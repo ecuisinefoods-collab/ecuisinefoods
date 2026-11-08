@@ -28,19 +28,19 @@ type Order = {
 const money = (value: number) =>
   new Intl.NumberFormat("en-NG", { style: "currency", currency: "NGN", maximumFractionDigits: 0 }).format(value || 0);
 
-const navItems: { label: string; icon: typeof LayoutDashboard; active?: boolean; href?: string }[] = [
+const navItems: { label: string; icon: typeof LayoutDashboard; active?: boolean; href?: string; roles?: string[] }[] = [
   { label: "Overview", icon: LayoutDashboard, active: true },
-  { label: "Orders", icon: ClipboardList, href: "/admin/orders" },
-  { label: "Storefront editor", icon: LayoutDashboard, href: "/admin/storefront" },
-  { label: "Products & stock", icon: Package, href: "/admin/products" },
-  { label: "Promotions & banners", icon: Megaphone, href: "/admin/promotions" },
-  { label: "Delivery setup", icon: Truck, href: "/admin/delivery" },
-  { label: "Pickup locations", icon: MapPin, href: "/admin/pickups" },
-  { label: "Inventory & stock history", icon: Boxes, href: "/admin/inventory" },
-  { label: "Finances", icon: Wallet, href: "/admin/finance" },
-  { label: "Team & permissions", icon: Users, href: "/admin/team" },
-  { label: "Analytics", icon: BarChart3, href: "/admin/analytics" },
-  { label: "Download records", icon: ClipboardList, href: "/admin/exports" },
+  { label: "Orders", icon: ClipboardList, href: "/admin/orders", roles: ["owner","store_manager","order_officer","finance_officer","analyst"] },
+  { label: "Storefront editor", icon: LayoutDashboard, href: "/admin/storefront", roles: ["owner","store_manager"] },
+  { label: "Products & stock", icon: Package, href: "/admin/products", roles: ["owner","store_manager"] },
+  { label: "Promotions & banners", icon: Megaphone, href: "/admin/promotions", roles: ["owner","marketing_manager"] },
+  { label: "Delivery setup", icon: Truck, href: "/admin/delivery", roles: ["owner","store_manager"] },
+  { label: "Pickup locations", icon: MapPin, href: "/admin/pickups", roles: ["owner","store_manager"] },
+  { label: "Inventory & stock history", icon: Boxes, href: "/admin/inventory", roles: ["owner","store_manager","analyst"] },
+  { label: "Finances", icon: Wallet, href: "/admin/finance", roles: ["owner","finance_officer","analyst"] },
+  { label: "Team & permissions", icon: Users, href: "/admin/team", roles: ["owner"] },
+  { label: "Analytics", icon: BarChart3, href: "/admin/analytics", roles: ["owner","store_manager","finance_officer","analyst"] },
+  { label: "Download records", icon: ClipboardList, href: "/admin/exports", roles: ["owner"] },
 ];
 
 export default function AdminPage() {
@@ -184,8 +184,8 @@ export default function AdminPage() {
       <aside className="fixed inset-y-0 left-0 z-20 hidden w-64 flex-col border-r border-[#e7ece4] bg-white px-5 py-6 lg:flex">
         <a href="/" className="flex items-center gap-3"><span className="grid h-11 w-11 place-items-center rounded-2xl bg-[#1d4b34] text-xl font-black text-white">e</span><span><b className="block text-sm text-[#1b3b2a]">eCuisinefoods</b><small className="text-[10px] text-[#849082]">Admin workspace</small></span></a>
         <p className="mb-3 mt-10 text-[9px] font-extrabold uppercase tracking-[.2em] text-[#9aa597]">Workspace</p>
-        <nav className="space-y-1">{navItems.map((item) => { const content = <><item.icon size={16}/>{item.label}{!item.active && !item.href && <span className="ml-auto text-[9px] text-[#a6afa2]">Soon</span>}</>; const cls = `flex items-center gap-3 rounded-xl px-3 py-3 text-xs font-semibold ${item.active ? "bg-[#eaf2e8] text-[#245b39]" : item.href ? "text-[#52705a] hover:bg-[#f2f6ef]" : "text-[#7b887c]"}`; return item.href ? <Link key={item.label} href={item.href} className={cls}>{content}</Link> : <div key={item.label} className={cls}>{content}</div>; })}</nav>
-        <div className="mt-auto rounded-2xl bg-[#f0f5ee] p-4"><div className="flex items-center gap-2 text-xs font-bold text-[#315b3e]"><ShieldCheck size={15}/> Owner access</div><p className="mt-2 text-[10px] leading-5 text-[#738271]">Your role controls what you can view and change across the business.</p></div>
+        <nav className="space-y-1">{navItems.filter((item) => !item.roles || item.roles.includes(profile.role)).map((item) => { const content = <><item.icon size={16}/>{item.label}{!item.active && !item.href && <span className="ml-auto text-[9px] text-[#a6afa2]">Soon</span>}</>; const cls = `flex items-center gap-3 rounded-xl px-3 py-3 text-xs font-semibold ${item.active ? "bg-[#eaf2e8] text-[#245b39]" : item.href ? "text-[#52705a] hover:bg-[#f2f6ef]" : "text-[#7b887c]"}`; return item.href ? <Link key={item.label} href={item.href} className={cls}>{content}</Link> : <div key={item.label} className={cls}>{content}</div>; })}</nav>
+        <div className="mt-auto rounded-2xl bg-[#f0f5ee] p-4"><div className="flex items-center gap-2 text-xs font-bold text-[#315b3e]"><ShieldCheck size={15}/> Role-based access</div><p className="mt-2 text-[10px] leading-5 text-[#738271]">Your {profile.role.replaceAll("_"," ")} role controls what you can view and change across the business.</p></div>
       </aside>
 
       <section className="lg:pl-64">
