@@ -30,7 +30,7 @@ export default async function HomePage() {
           <nav className="hidden items-center gap-8 text-sm font-semibold text-[#435348] md:flex">
             <Link href="#shop" className="hover:text-[#245b42]">Shop</Link><Link href="#story" className="hover:text-[#245b42]">Our story</Link><Link href="#pickup" className="hover:text-[#245b42]">Pickup locations</Link>
           </nav>
-          <Link href="#shop" className="flex items-center gap-2 rounded-full bg-[#245b42] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#173e2d]"><ShoppingBag size={16}/> Shop <span className="hidden sm:inline">products</span></Link>
+          <Link href="/shop" className="flex items-center gap-2 rounded-full bg-[#245b42] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#173e2d]"><ShoppingBag size={16}/> Shop <span className="hidden sm:inline">products</span></Link>
         </div>
       </header>
 
