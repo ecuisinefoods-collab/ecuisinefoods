@@ -19,7 +19,11 @@ export const dynamic = "force-dynamic";
 export default async function HomePage() {
   let products: Product[] = [];
   let pickupLocations: { city: string; location_name: string }[] = [];
+  const defaults = { announcement: "Fresh from eCuisinefoods · Good food, better living", hero_eyebrow: "Fresh picks. Better living.", hero_title: "Nourish your day.", hero_highlight: "Live a little better.", hero_description: "{siteConfig.hero_description}", hero_primary_cta: "Shop our products", hero_secondary_cta: "Our story", promise_title: "Good food is where better living begins.", promise_description: "{siteConfig.promise_description}", quote: "We believe every family deserves thoughtful food choices and a brand they can trust.", quote_attribution: "The eCuisinefoods vision", brand_primary: "#245b42", brand_dark: "#173e2d", brand_accent: "#8a744b", brand_background: "#f7f3e9", brand_surface: "#fbfaf7", brand_text: "#26352b", font_family: "Arial, Helvetica, sans-serif" };
+  let siteConfig = { ...defaults };
   if (supabase) {
+    const { data: settings } = await supabase.from("site_settings").select("setting_value").eq("setting_key", "storefront_config").maybeSingle();
+    if (settings?.setting_value) { try { siteConfig = { ...defaults, ...JSON.parse(settings.setting_value) }; } catch { /* retain safe defaults */ } }
     const { data } = await supabase.from("products").select("id,name,slug,category,description,image_url,is_featured,product_variants(id,pack_size,price,stock_quantity)").eq("is_active", true).order("is_featured", { ascending: false }).limit(50);
     products = (data ?? []) as Product[];
     const { data: pickupData } = await supabase.from("pickup_locations").select("city,location_name").eq("is_active", true).order("city").order("location_name");
@@ -28,18 +32,18 @@ export default async function HomePage() {
   const featured = products.slice(0, 8);
 
   return (
-    <main className="overflow-hidden bg-white text-[#26352b]">
-      <div className="bg-[#173e2d] px-4 py-2 text-center text-[11px] font-semibold tracking-wide text-white sm:text-xs">Fresh from eCuisinefoods · Good food, better living</div>
+    <main className="overflow-hidden bg-white text-[#26352b]" style={{ backgroundColor: siteConfig.brand_surface, color: siteConfig.brand_text, fontFamily: siteConfig.font_family } as React.CSSProperties}>
+      <div className="bg-[#173e2d] px-4 py-2 text-center text-[11px] font-semibold tracking-wide text-white sm:text-xs">{siteConfig.announcement}</div>
       <SiteHeader />
 
       <section className="hero-motion relative overflow-hidden bg-[#f7f3e9]">
         <div className="absolute -right-20 -top-24 h-80 w-80 rounded-full bg-[#e7d8b8]/60 blur-3xl" />
         <div className="mx-auto grid max-w-7xl items-center gap-8 px-5 py-12 sm:py-16 md:grid-cols-[1fr_1fr] md:py-20">
           <div className="relative z-10 max-w-xl">
-            <p className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#d8e1d2] bg-white/80 px-4 py-2 text-xs font-bold text-[#326348]"><Leaf size={15}/> Fresh picks. Better living.</p>
-            <h1 className="text-[2.65rem] font-semibold leading-[1.05] tracking-[-.045em] text-[#173e2d] sm:text-6xl">Nourish your day.<br/><span className="text-[#8a744b]">Live a little better.</span></h1>
+            <p className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#d8e1d2] bg-white/80 px-4 py-2 text-xs font-bold text-[#326348]"><Leaf size={15}/> {siteConfig.hero_eyebrow}</p>
+            <h1 className="text-[2.65rem] font-semibold leading-[1.05] tracking-[-.045em] text-[#173e2d] sm:text-6xl">{siteConfig.hero_title}<br/><span style={{ color: siteConfig.brand_accent }}>{siteConfig.hero_highlight}</span></h1>
             <p className="mt-6 max-w-lg text-base leading-7 text-[#657064] sm:text-lg">Discover thoughtful food choices from eCuisinefoods. We are bringing wholesome everyday goodness closer to homes in Jos, Bauchi and beyond.</p>
-            <div className="mt-8 flex flex-wrap gap-3"><Link href="#shop" className="inline-flex items-center gap-3 rounded-full bg-[#245b42] px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-[#245b42]/15 transition hover:-translate-y-0.5 hover:bg-[#173e2d]">Shop our products <ArrowRight size={16}/></Link><Link href="/about" className="rounded-full border border-[#cbd5c5] bg-white/70 px-6 py-3.5 text-sm font-bold text-[#315b43] hover:bg-white">Our story</Link></div>
+            <div className="mt-8 flex flex-wrap gap-3"><Link href="#shop" className="inline-flex items-center gap-3 rounded-full bg-[#245b42] px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-[#245b42]/15 transition hover:-translate-y-0.5 hover:bg-[#173e2d]">{siteConfig.hero_primary_cta} <ArrowRight size={16}/></Link><Link href="/about" className="rounded-full border border-[#cbd5c5] bg-white/70 px-6 py-3.5 text-sm font-bold text-[#315b43] hover:bg-white">{siteConfig.hero_secondary_cta}</Link></div>
             <div className="mt-8 flex flex-wrap gap-x-5 gap-y-2 text-xs font-semibold text-[#68776a]"><span className="inline-flex items-center gap-2"><ShieldCheck size={15}/> Quality-minded</span><span className="inline-flex items-center gap-2"><Sprout size={15}/> Made with purpose</span></div>
           </div>
           <div className="relative mx-auto w-full max-w-[570px]">
@@ -78,8 +82,8 @@ export default async function HomePage() {
 
       <section className="bg-[#f6f4ed] py-14">
         <div className="mx-auto grid max-w-7xl gap-8 px-5 md:grid-cols-[.85fr_1.15fr] md:items-center">
-          <div><p className="text-[10px] font-extrabold uppercase tracking-[.2em] text-[#8a987e]">The eCuisinefoods promise</p><h2 className="mt-3 text-3xl font-semibold leading-tight tracking-tight text-[#173e2d] sm:text-4xl">Good food is where better living begins.</h2><p className="mt-4 max-w-md text-sm leading-6 text-[#6e796e]">We are building a food brand grounded in quality, nutrition, trust, innovation and natural ingredients. Thank you for being part of our journey.</p><Link href="/about" className="mt-6 inline-flex items-center gap-2 rounded-full bg-[#245b42] px-5 py-3 text-xs font-bold text-white">Get to know us <ArrowRight size={15}/></Link></div>
-          <div className="rounded-[1.7rem] border border-white bg-white p-6 shadow-sm sm:p-8"><div className="flex items-center gap-1 text-[#d39d36]">{[0,1,2,3,4].map(i=><Star key={i} size={16} fill="currentColor"/>)}</div><p className="mt-4 text-xl font-semibold leading-8 text-[#294332] sm:text-2xl">“We believe every family deserves thoughtful food choices and a brand they can trust.”</p><p className="mt-4 text-xs font-bold uppercase tracking-widest text-[#82907f]">The eCuisinefoods vision</p><div className="mt-6 flex flex-wrap gap-2"><span className="rounded-full bg-[#edf3e9] px-3 py-2 text-[10px] font-bold text-[#42654a]">Quality</span><span className="rounded-full bg-[#f5eee0] px-3 py-2 text-[10px] font-bold text-[#876b3c]">Nutrition</span><span className="rounded-full bg-[#f3e9e7] px-3 py-2 text-[10px] font-bold text-[#95685e]">Trust</span><span className="rounded-full bg-[#e9eef4] px-3 py-2 text-[10px] font-bold text-[#536d8a]">Innovation</span><span className="rounded-full bg-[#edf3e9] px-3 py-2 text-[10px] font-bold text-[#42654a]">Natural ingredients</span></div></div>
+          <div><p className="text-[10px] font-extrabold uppercase tracking-[.2em] text-[#8a987e]">The eCuisinefoods promise</p><h2 className="mt-3 text-3xl font-semibold leading-tight tracking-tight text-[#173e2d] sm:text-4xl">{siteConfig.promise_title}</h2><p className="mt-4 max-w-md text-sm leading-6 text-[#6e796e]">We are building a food brand grounded in quality, nutrition, trust, innovation and natural ingredients. Thank you for being part of our journey.</p><Link href="/about" className="mt-6 inline-flex items-center gap-2 rounded-full bg-[#245b42] px-5 py-3 text-xs font-bold text-white">Get to know us <ArrowRight size={15}/></Link></div>
+          <div className="rounded-[1.7rem] border border-white bg-white p-6 shadow-sm sm:p-8"><div className="flex items-center gap-1 text-[#d39d36]">{[0,1,2,3,4].map(i=><Star key={i} size={16} fill="currentColor"/>)}</div><p className="mt-4 text-xl font-semibold leading-8 text-[#294332] sm:text-2xl">“{siteConfig.quote}”</p><p className="mt-4 text-xs font-bold uppercase tracking-widest text-[#82907f]">{siteConfig.quote_attribution}</p><div className="mt-6 flex flex-wrap gap-2"><span className="rounded-full bg-[#edf3e9] px-3 py-2 text-[10px] font-bold text-[#42654a]">Quality</span><span className="rounded-full bg-[#f5eee0] px-3 py-2 text-[10px] font-bold text-[#876b3c]">Nutrition</span><span className="rounded-full bg-[#f3e9e7] px-3 py-2 text-[10px] font-bold text-[#95685e]">Trust</span><span className="rounded-full bg-[#e9eef4] px-3 py-2 text-[10px] font-bold text-[#536d8a]">Innovation</span><span className="rounded-full bg-[#edf3e9] px-3 py-2 text-[10px] font-bold text-[#42654a]">Natural ingredients</span></div></div>
         </div>
       </section>
 
