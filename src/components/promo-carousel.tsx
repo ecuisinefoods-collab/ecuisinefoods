@@ -61,7 +61,7 @@ export function PromoCarousel() {
   const effect = current?.animation_effect ?? "fade";
 
   return (
-    <section className="mx-auto max-w-7xl px-5 pb-8">
+    <section id="promotions" className="mx-auto max-w-7xl scroll-mt-28 px-5 pb-8">
       <div key={current?.id ?? "promo"} className={`promo-stage promo-${effect} relative isolate overflow-hidden rounded-[1.6rem] bg-gradient-to-r from-[#153b2b] via-[#245b42] to-[#315f43] px-6 py-7 text-white shadow-lg sm:px-10 sm:py-9`} style={{ transitionDuration: `${current?.transition_duration_ms ?? 600}ms` }}>
         {current?.image_url && <div className="absolute inset-0 -z-10 bg-cover bg-center opacity-25" style={{ backgroundImage: `url("${current.image_url}")` }} />}
         <div className="absolute -right-8 -top-16 -z-10 h-56 w-56 rounded-full border-[24px] border-white/5" />
