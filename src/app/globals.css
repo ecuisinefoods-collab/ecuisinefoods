@@ -29,3 +29,20 @@ button, input { font: inherit; }
 @media (prefers-reduced-motion: reduce) {
   .hero-motion *, .promo-stage { animation: none !important; transition: none !important; }
 }
+
+
+/* Premium dimensional storefront motion */
+.site-header { box-shadow: 0 8px 30px rgba(32,53,34,.045); }
+.brand-emblem { position:relative; transform-style:preserve-3d; animation: brand-bob 5s ease-in-out infinite; }
+.brand-emblem:after { content:""; position:absolute; inset:-5px; border:1px solid rgba(208,166,57,.5); border-radius:50%; transform:translateZ(-8px); }
+.nav-link { position:relative; transition:color .2s ease; }
+.nav-link:hover { color:#b08429; }
+.nav-link:after { content:""; position:absolute; left:0; right:100%; bottom:-7px; height:2px; background:#c49a39; transition:right .25s ease; }
+.nav-link:hover:after { right:0; }
+.hero-motion { isolation:isolate; }
+.hero-motion:before { content:""; position:absolute; inset:0; pointer-events:none; opacity:.18; background-image:radial-gradient(#a98c50 0.7px,transparent .7px); background-size:22px 22px; mask-image:linear-gradient(90deg,black,transparent 70%); }
+@keyframes brand-bob { 0%,100% { transform:translateY(0) rotate(0); } 50% { transform:translateY(-3px) rotate(-3deg); } }
+@keyframes soft-orbit { 0%,100% { transform:translate3d(0,0,0) rotate(0deg); } 50% { transform:translate3d(0,-10px,0) rotate(4deg); } }
+.hero-motion .absolute.rounded-full { animation:soft-orbit 8s ease-in-out infinite; }
+.promo-stage { box-shadow:0 24px 60px rgba(26,63,42,.16); }
+@media (prefers-reduced-motion:reduce) { .brand-emblem,.hero-motion .absolute.rounded-full { animation:none !important; } }
