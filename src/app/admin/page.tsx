@@ -30,7 +30,7 @@ const money = (value: number) =>
 
 const navItems: { label: string; icon: typeof LayoutDashboard; active?: boolean; href?: string }[] = [
   { label: "Overview", icon: LayoutDashboard, active: true },
-  { label: "Orders", icon: ClipboardList },
+  { label: "Orders", icon: ClipboardList, href: "/admin/orders" },
   { label: "Storefront editor", icon: LayoutDashboard, href: "/admin/storefront" },
   { label: "Products & stock", icon: Package, href: "/admin/products" },
   { label: "Promotions & banners", icon: Megaphone, href: "/admin/promotions" },
