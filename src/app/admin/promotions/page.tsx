@@ -69,6 +69,18 @@ export default function PromotionsPage() {
     event.preventDefault();
     if (!supabase || !authorized) return;
     setSaving(true); setError(""); setMessage("");
+    let uploadedUrl = draft.image_url.trim();
+    let mediaType = draft.media_type;
+    if (mediaFile) {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { setError("Please sign in again before uploading."); setSaving(false); return; }
+      const safeName = mediaFile.name.replace(/[^a-zA-Z0-9._-]/g, "-");
+      const path = `${user.id}/${Date.now()}-${safeName}`;
+      const { error: uploadError } = await supabase.storage.from("promotion-media").upload(path, mediaFile, { contentType: mediaFile.type, upsert: false });
+      if (uploadError) { setError(uploadError.message); setSaving(false); return; }
+      uploadedUrl = supabase.storage.from("promotion-media").getPublicUrl(path).data.publicUrl;
+      mediaType = mediaFile.type.startsWith("video/") ? "video" : "image";
+    }
     const payload = {
       title: draft.title.trim(), subtitle: draft.subtitle.trim() || null,
       image_url: uploadedUrl || null, media_type: mediaType, target_url: draft.target_url.trim() || "/shop",
