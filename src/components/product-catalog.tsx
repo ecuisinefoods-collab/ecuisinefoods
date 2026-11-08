@@ -2,20 +2,21 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { Search, ShoppingBag, Plus, Minus, Trash2, SlidersHorizontal } from "lucide-react";
+import { Search, ShoppingBag, Plus, Minus, Trash2, SlidersHorizontal, Sparkles, Tag } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { getEffectivePrice, getDiscountPercent } from "@/lib/product-pricing";
 
 type Variant = { id: string; pack_size: string; price: number; sale_price: number | null; sale_starts_at: string | null; sale_ends_at: string | null; stock_quantity: number };
-type Product = { id: string; name: string; slug: string; category: string; short_description?: string | null; description: string | null; image_url: string | null; product_variants?: Variant[] };
+type Product = { id: string; name: string; slug: string; category: string; short_description?: string | null; description: string | null; ingredients?: string | null; highlights?: string[] | null; image_url: string | null; is_featured?: boolean; created_at?: string; product_variants?: Variant[] };
 type CartItem = { variant_id: string; product_id: string; name: string; pack_size: string; price: number; original_price?: number; qty: number; stock_quantity?: number };
 const KEY = "ecuisinefoods-cart-v1";
 function readCart(): CartItem[] { try { return JSON.parse(localStorage.getItem(KEY) || "[]") as CartItem[]; } catch { return []; } }
 const money = (n:number) => "₦" + n.toLocaleString("en-NG");
 
-export function ProductCatalog({ products }: { products: Product[] }) {
+export function ProductCatalog({ products, initialCategory = "All products" }: { products: Product[]; initialCategory?: string }) {
   const [cart,setCart]=useState<CartItem[]>([]);
-  const [filter,setFilter]=useState("All products");
+  const [filter,setFilter]=useState(initialCategory);
+  const [availability,setAvailability]=useState<"all"|"in-stock"|"on-sale">("all");
   const [search,setSearch]=useState("");
   const [sort,setSort]=useState("featured");
   const [notice,setNotice]=useState("");
@@ -29,34 +30,54 @@ export function ProductCatalog({ products }: { products: Product[] }) {
     window.setTimeout(()=>setNotice(""),2200);
   }
   const categories=["All products",...Array.from(new Set(products.map(p=>p.category).filter(Boolean)))];
+  const safeFilter=categories.includes(filter)?filter:"All products";
   const shown=useMemo(()=>{
     const q=search.trim().toLowerCase();
-    const list=products.filter(p=>(filter==="All products"||p.category===filter)&&(!q||[p.name,p.category,p.description||""].join(" ").toLowerCase().includes(q)));
+    const list=products.filter(p=>{
+      const variants=p.product_variants??[];
+      const categoryMatch=filter==="All products"||p.category===filter;
+      const availabilityMatch=availability==="all"||(availability==="in-stock"?variants.some(v=>v.stock_quantity>0):variants.some(v=>getDiscountPercent(v)>0));
+      const searchable=[p.name,p.category,p.short_description||"",p.description||"",p.ingredients||"",...(p.highlights||[])].join(" ").toLowerCase();
+      return categoryMatch&&availabilityMatch&&(!q||searchable.includes(q));
+    });
     if(sort==="name")list.sort((a,b)=>a.name.localeCompare(b.name));
+    if(sort==="newest")list.sort((a,b)=>new Date(b.created_at||0).getTime()-new Date(a.created_at||0).getTime());
     if(sort==="price-low")list.sort((a,b)=>Math.min(...(a.product_variants??[]).map(v=>getEffectivePrice(v)),Infinity)-Math.min(...(b.product_variants??[]).map(v=>getEffectivePrice(v)),Infinity));
     if(sort==="price-high")list.sort((a,b)=>Math.min(...(b.product_variants??[]).map(v=>getEffectivePrice(v)),Infinity)-Math.min(...(a.product_variants??[]).map(v=>getEffectivePrice(v)),Infinity));
+    if(sort==="featured")list.sort((a,b)=>Number(Boolean(b.is_featured))-Number(Boolean(a.is_featured))||new Date(b.created_at||0).getTime()-new Date(a.created_at||0).getTime());
     return list;
-  },[products,filter,search,sort]);
+  },[products,filter,availability,search,sort]);
   const totalQty=cart.reduce((s,x)=>s+x.qty,0);
+  const saleLabel=(product:Product)=>Math.max(0,...(product.product_variants??[]).map(getDiscountPercent));
+
   return <div>
     <div className="mt-7 grid gap-3 md:grid-cols-[1fr_auto_auto]">
       <label className="flex items-center gap-3 rounded-full border border-[#e0e5db] bg-white px-4 py-3"><Search size={17} className="text-[#849184]"/><input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search products, ingredients or categories" aria-label="Search products" className="w-full bg-transparent text-sm text-[#203329] outline-none placeholder:text-[#9aa397]"/></label>
-      <label className="flex items-center gap-2 rounded-full border border-[#e0e5db] bg-white px-4 py-3 text-xs font-semibold text-[#657266]"><SlidersHorizontal size={15}/><select value={sort} onChange={e=>setSort(e.target.value)} aria-label="Sort products" className="bg-transparent outline-none"><option value="featured">Default order</option><option value="name">Name: A–Z</option><option value="price-low">Price: low to high</option><option value="price-high">Price: high to low</option></select></label>
+      <label className="flex items-center gap-2 rounded-full border border-[#e0e5db] bg-white px-4 py-3 text-xs font-semibold text-[#657266]"><SlidersHorizontal size={15}/><select value={sort} onChange={e=>setSort(e.target.value)} aria-label="Sort products" className="bg-transparent outline-none"><option value="featured">Featured first</option><option value="newest">Newest first</option><option value="name">Name: A–Z</option><option value="price-low">Price: low to high</option><option value="price-high">Price: high to low</option></select></label>
       <Link href="/cart" className="inline-flex items-center justify-center gap-2 rounded-full border border-[#dce3d7] bg-white px-5 py-3 text-sm font-bold text-[#245b42]"><ShoppingBag size={16}/> Cart {totalQty>0&&<span className="rounded-full bg-[#245b42] px-2 py-0.5 text-xs text-white">{totalQty}</span>}</Link>
     </div>
-    <div className="mt-4 flex gap-2 overflow-x-auto pb-1">{categories.map(category=><button key={category} onClick={()=>setFilter(category)} className={`shrink-0 rounded-full border px-4 py-2 text-xs font-semibold transition ${filter===category?"border-[#245b42] bg-[#245b42] text-white":"border-[#e0e5db] bg-white text-[#657266] hover:border-[#a8b8a4]"}`}>{category}</button>)}</div>
+    <div className="mt-4 flex gap-2 overflow-x-auto pb-1">{categories.map(category=><button key={category} onClick={()=>setFilter(category)} aria-pressed={safeFilter===category} className={"shrink-0 rounded-full border px-4 py-2 text-xs font-semibold transition "+(safeFilter===category?"border-[#245b42] bg-[#245b42] text-white":"border-[#e0e5db] bg-white text-[#657266] hover:border-[#a8b8a4]")}>{category}</button>)}</div>
+    <div className="mt-3 flex flex-wrap items-center gap-2">
+      <span className="mr-1 inline-flex items-center gap-1 text-[10px] font-extrabold uppercase tracking-wider text-[#879184]"><SlidersHorizontal size={12}/> Availability</span>
+      {([{id:"all",label:"All products"},{id:"in-stock",label:"In stock"},{id:"on-sale",label:"On offer"}] as const).map(option=><button key={option.id} onClick={()=>setAvailability(option.id)} aria-pressed={availability===option.id} className={"rounded-full px-3 py-2 text-[11px] font-bold transition "+(availability===option.id?"bg-[#eaf1e6] text-[#245b42] ring-1 ring-[#cbd9c5]":"bg-white text-[#788477] ring-1 ring-[#e6eae2] hover:bg-[#f5f7f2]")}>{option.label}</button>)}
+      {(filter!=="All products"||availability!=="all"||search)&&<button onClick={()=>{setSearch("");setFilter("All products");setAvailability("all");}} className="ml-auto text-[11px] font-bold text-[#8b6f44]">Clear all</button>}
+    </div>
     {notice&&<p role="status" className="mt-3 rounded-xl bg-[#eaf2e5] px-4 py-2 text-sm font-semibold text-[#245b42]">{notice}</p>}
-    <p className="mt-4 text-xs text-[#899288]">{shown.length} {shown.length===1?"product":"products"}{search? ` matching “${search}”`:" available in the catalogue"}</p>
+    <div className="mt-4 flex items-center justify-between"><p className="text-xs text-[#899288]">{shown.length} {shown.length===1?"product":"products"}{search?" matching your search":" in this collection"}</p><p className="text-[10px] font-semibold text-[#9a9f94]">{shown.reduce((n,p)=>n+(p.product_variants||[]).filter(v=>v.stock_quantity>0).length,0)} pack options available</p></div>
     {shown.length?<div className="mt-4 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">{shown.map(product=>{
       const variants=product.product_variants??[];
       const available=variants.some(v=>v.stock_quantity>0);
+      const discount=saleLabel(product);
       return <article key={product.id} className="product-card group overflow-hidden rounded-[1.35rem] border border-[#e8e9e1] bg-white shadow-[0_8px_24px_rgba(34,53,37,.06)] transition duration-500 hover:-translate-y-2 hover:shadow-[0_24px_48px_rgba(34,53,37,.14)]">
-        <Link href={`/products/${product.slug}`} className="product-card-media relative flex aspect-[4/3] items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_50%_38%,#fffdf5,#eee8d8)] p-5">{product.image_url?<img src={product.image_url} alt={product.name} className="h-full w-full object-contain drop-shadow-[0_18px_14px_rgba(30,25,18,.2)] transition duration-500 group-hover:scale-105"/>:<div className="text-center"><div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-[#dfe8d7] text-[#245b42]"><ShoppingBag size={26}/></div><p className="mt-3 text-xs font-bold uppercase tracking-widest text-[#6e8167]">eCuisinefoods</p></div>}</Link>
-        <div className="p-5"><p className="text-[10px] font-bold uppercase tracking-widest text-[#8a9689]">{product.category}</p><h3 className="mt-2 font-bold text-[#203329]">{product.name}</h3><p className="mt-2 line-clamp-2 text-sm leading-5 text-[#778176]">{product.short_description||product.description||"Discover product details and available pack sizes."}</p><Link href={`/products/${product.slug}`} className="mt-3 inline-flex text-xs font-bold text-[#245b42]">View product details →</Link>
-          {variants.length?<div className="mt-4 space-y-2">{variants.map(v=><div key={v.id} className="flex items-center justify-between gap-2 rounded-xl bg-[#fbfaf7] px-3 py-2"><div><p className="text-xs font-semibold text-[#405044]">{v.pack_size}</p><p className="text-xs font-bold text-[#245b42]">{money(getEffectivePrice(v))}{getDiscountPercent(v)>0&&<span className="ml-2 text-[10px] text-[#b45a3c]">{getDiscountPercent(v)}% OFF</span>}</p>{getDiscountPercent(v)>0&&<p className="text-[10px] text-[#899288] line-through">{money(Number(v.price))}</p>}<p className={`mt-0.5 text-[10px] ${v.stock_quantity>0?"text-[#648064]":"text-[#a34b42]"}`}>{v.stock_quantity>0?"Available":"Out of stock"}</p></div><button disabled={v.stock_quantity<=0} onClick={()=>add(product,v)} aria-label={`Add ${product.name} ${v.pack_size} to cart`} className="grid h-9 w-9 place-items-center rounded-full bg-[#245b42] text-white shadow-md transition hover:scale-110 hover:bg-[#173e2d] disabled:cursor-not-allowed disabled:bg-gray-300"><Plus size={15}/></button></div>)}</div>:<p className="mt-4 text-xs text-[#899288]">Pack sizes and pricing will be announced soon.</p>}
-          
+        <Link href={"/products/"+product.slug} className="product-card-media relative flex aspect-[4/3] items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_50%_38%,#fffdf5,#eee8d8)] p-5">
+          {product.image_url?<img src={product.image_url} alt={product.name} className="h-full w-full object-contain drop-shadow-[0_18px_14px_rgba(30,25,18,.2)] transition duration-500 group-hover:scale-105"/>:<div className="text-center"><div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-[#dfe8d7] text-[#245b42]"><ShoppingBag size={26}/></div><p className="mt-3 text-xs font-bold uppercase tracking-widest text-[#6e8167]">eCuisinefoods</p></div>}
+          <div className="absolute left-3 top-3 flex flex-col items-start gap-2">{product.is_featured&&<span className="inline-flex items-center gap-1 rounded-full bg-white/95 px-3 py-1.5 text-[9px] font-extrabold text-[#6e633b] shadow-sm"><Sparkles size={11}/> Featured</span>}{discount>0&&<span className="inline-flex items-center gap-1 rounded-full bg-[#a64e30] px-3 py-1.5 text-[9px] font-extrabold text-white shadow-sm"><Tag size={11}/> Up to {discount}% off</span>}</div>
+          {!available&&<span className="absolute bottom-3 right-3 rounded-full bg-[#536052]/90 px-3 py-1.5 text-[9px] font-bold text-white">Currently unavailable</span>}
+        </Link>
+        <div className="p-5"><p className="text-[10px] font-bold uppercase tracking-widest text-[#8a9689]">{product.category}</p><h3 className="mt-2 font-bold text-[#203329]">{product.name}</h3><p className="mt-2 line-clamp-2 text-sm leading-5 text-[#778176]">{product.short_description||product.description||"Discover product details and available pack sizes."}</p><Link href={"/products/"+product.slug} className="mt-3 inline-flex text-xs font-bold text-[#245b42]">Explore product →</Link>
+          {variants.length?<div className="mt-4 space-y-2">{variants.map(v=><div key={v.id} className="flex items-center justify-between gap-2 rounded-xl bg-[#fbfaf7] px-3 py-2"><div><p className="text-xs font-semibold text-[#405044]">{v.pack_size}</p><p className="text-xs font-bold text-[#245b42]">{money(getEffectivePrice(v))}{getDiscountPercent(v)>0&&<span className="ml-2 text-[10px] text-[#b45a3c]">{getDiscountPercent(v)}% OFF</span>}</p>{getDiscountPercent(v)>0&&<p className="text-[10px] text-[#899288] line-through">{money(Number(v.price))}</p>}<p className={"mt-0.5 text-[10px] "+(v.stock_quantity>0?"text-[#648064]":"text-[#a34b42]")}>{v.stock_quantity>0?"Available":"Out of stock"}</p></div><button disabled={v.stock_quantity<=0} onClick={()=>add(product,v)} aria-label={"Add "+product.name+" "+v.pack_size+" to cart"} className="grid h-9 w-9 place-items-center rounded-full bg-[#245b42] text-white shadow-md transition hover:scale-110 hover:bg-[#173e2d] disabled:cursor-not-allowed disabled:bg-gray-300"><Plus size={15}/></button></div>)}</div>:<p className="mt-4 text-xs text-[#899288]">Pack sizes and pricing will be announced soon.</p>}
         </div></article>;
-    })}</div>:<div className="mt-8 rounded-2xl border border-dashed border-[#d9dfd3] bg-white p-8 text-center"><p className="font-semibold text-[#526052]">No matching products found.</p><p className="mt-2 text-sm text-[#899288]">Try another search or choose a different category.</p><button onClick={()=>{setSearch("");setFilter("All products");}} className="mt-4 text-sm font-bold text-[#245b42]">Clear filters</button></div>}
+    })}</div>:<div className="mt-8 rounded-2xl border border-dashed border-[#d9dfd3] bg-white p-8 text-center"><p className="font-semibold text-[#526052]">No products match these filters.</p><p className="mt-2 text-sm text-[#899288]">Try another search, category or availability setting.</p><button onClick={()=>{setSearch("");setFilter("All products");setAvailability("all");}} className="mt-4 text-sm font-bold text-[#245b42]">Reset catalogue</button></div>}
   </div>;
 }
 
