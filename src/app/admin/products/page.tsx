@@ -4,6 +4,7 @@ import { FormEvent, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, Eye, EyeOff, LoaderCircle, Package, Pencil, Plus, Save, Trash2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { BrandLogoUploader } from "@/components/brand-logo-uploader";
 
 type Variant = { id: string; product_id: string; pack_size: "Small" | "Medium" | "Large" | "Bulk / Wholesale"; price: number; stock_quantity: number };
 type Product = { id: string; name: string; slug: string; category: string; description: string | null; ingredients: string | null; image_url: string | null; is_featured: boolean; is_active: boolean; product_variants: Variant[] };
@@ -112,6 +113,7 @@ export default function ProductsAdminPage() {
   return <main className="min-h-screen bg-[#f5f7f3] px-4 py-7 text-[#26392c] sm:px-8"><div className="mx-auto max-w-6xl">
     <Link href="/admin" className="inline-flex items-center gap-2 text-xs font-bold text-[#65806a]"><ArrowLeft size={14}/> Admin overview</Link>
     <div className="mt-5 flex flex-wrap items-end justify-between gap-4"><div><p className="text-[10px] font-extrabold uppercase tracking-[.2em] text-[#8b9986]">Store management</p><h1 className="mt-1 text-3xl font-semibold tracking-tight text-[#1c3c29]">Products & stock</h1><p className="mt-2 text-sm text-[#7d897a]">Create products, maintain pack sizes and prices, and control what customers can see.</p></div><span className="rounded-full bg-[#eaf3e8] px-3 py-2 text-xs font-bold text-[#386344]">{products.length} products</span></div>
+    <div className="mt-6"><BrandLogoUploader /></div>
     {error && <p role="alert" className="mt-5 rounded-xl bg-red-50 p-3 text-xs text-red-700">{error}</p>}
     {message && <p role="status" className="mt-5 rounded-xl bg-[#eaf3e8] p-3 text-xs text-[#386344]">{message}</p>}
     <div className="mt-7 grid gap-6 lg:grid-cols-[.9fr_1.1fr]">
