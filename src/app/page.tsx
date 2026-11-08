@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight, Leaf, ShieldCheck, ShoppingBag, Sprout, Truck } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { ProductCatalog } from "@/components/product-catalog";
+import { SiteHeader } from "@/components/site-header";
 
 type Product = { id: string; name: string; slug: string; category: string; description: string | null; image_url: string | null; is_featured: boolean; variants?: { id: string; pack_size: string; price: number; stock_quantity: number }[] };
 
@@ -21,18 +22,7 @@ export default async function HomePage() {
       <div className="bg-[#173e2d] px-4 py-2 text-center text-xs font-medium tracking-wide text-white sm:text-sm">
         Nourishing choices for everyday living · Welcome to eCuisinefoods
       </div>
-      <header className="sticky top-0 z-20 border-b border-[#e7e8df] bg-white/95 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4">
-          <Link href="/" className="flex items-center gap-2" aria-label="eCuisinefoods home">
-            <span className="grid h-10 w-10 place-items-center rounded-xl bg-[#245b42] text-lg font-bold text-white">e</span>
-            <span><span className="block text-lg font-bold tracking-tight text-[#173e2d]">Cuisinefoods</span><span className="block text-[10px] font-semibold uppercase tracking-[.19em] text-[#7b8276]">Good food, better living</span></span>
-          </Link>
-          <nav className="hidden items-center gap-8 text-sm font-semibold text-[#435348] md:flex">
-            <Link href="#shop" className="hover:text-[#245b42]">Shop</Link><Link href="#story" className="hover:text-[#245b42]">Our story</Link><Link href="#pickup" className="hover:text-[#245b42]">Pickup locations</Link>
-          </nav>
-          <Link href="/shop" className="flex items-center gap-2 rounded-full bg-[#245b42] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#173e2d]"><ShoppingBag size={16}/> Shop <span className="hidden sm:inline">products</span></Link>
-        </div>
-      </header>
+      <SiteHeader/>
 
       <section className="overflow-hidden bg-[#f7f4ec]">
         <div className="mx-auto grid max-w-7xl items-center gap-10 px-5 py-14 md:grid-cols-[1.05fr_.95fr] md:py-20">
