@@ -97,8 +97,9 @@ export default function PromotionsPage() {
     const next = [...banners]; const target = index + direction;
     if (target < 0 || target >= next.length) return;
     [next[index], next[target]] = [next[target], next[index]];
-    if (!supabase) return;
-    const updates = await Promise.all(next.map((banner, sort_order) => supabase.from("promotional_banners").update({ sort_order }).eq("id", banner.id)));
+    const client = supabase;
+    if (!client) return;
+    const updates = await Promise.all(next.map((banner, sort_order) => client.from("promotional_banners").update({ sort_order }).eq("id", banner.id)));
     if (updates.some((item) => item.error)) setError("Could not save the new slide order."); else setBanners(next.map((banner, sort_order) => ({ ...banner, sort_order })));
   };
 
