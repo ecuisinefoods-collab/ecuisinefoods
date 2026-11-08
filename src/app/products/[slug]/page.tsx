@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabase";
 import { SiteHeader } from "@/components/site-header";
 import { ProductPurchasePanel } from "@/components/product-purchase-panel";
 import { ProductCatalog } from "@/components/product-catalog";
+import { CustomerReviews } from "@/components/customer-reviews";
 
 export const dynamic = "force-dynamic";
 
@@ -43,7 +44,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           <h1 className="mt-3 text-3xl font-semibold tracking-tight text-[#173e2d] sm:text-4xl">{product.name}</h1>
           {product.short_description&&<p className="mt-3 text-base font-medium leading-7 text-[#425d49]">{product.short_description}</p>}
           <p className="mt-4 whitespace-pre-line text-sm leading-7 text-[#68766b]">{product.description || "Product details will be updated soon."}</p>
-          <ProductPurchasePanel productId={product.id} productName={product.name} variants={variants}/>
+          <ProductPurchasePanel productId={product.id} productName={product.name} variants={variants}/>\n          <div id="reviews"><CustomerReviews productId={product.id}/></div>
         </div>
       </div>
 
