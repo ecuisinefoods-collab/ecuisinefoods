@@ -46,3 +46,15 @@ button, input { font: inherit; }
 .hero-motion .absolute.rounded-full { animation:soft-orbit 8s ease-in-out infinite; }
 .promo-stage { box-shadow:0 24px 60px rgba(26,63,42,.16); }
 @media (prefers-reduced-motion:reduce) { .brand-emblem,.hero-motion .absolute.rounded-full { animation:none !important; } }
+
+
+/* Storefront product presentation */
+.store-hero-stage { transform-style:preserve-3d; }
+.store-product-image { transform:perspective(1000px) rotateY(-7deg) rotateX(2deg); animation:product-float 6s ease-in-out infinite; transition:transform .5s ease; }
+.store-product-image:hover { transform:perspective(1000px) rotateY(0) rotateX(0) translateY(-8px); }
+.product-card { transform-style:preserve-3d; }
+.product-card-media { perspective:900px; }
+.product-card-media img { transform:rotateY(-4deg); }
+.product-card:hover .product-card-media img { transform:rotateY(0deg) translateY(-5px); }
+@keyframes product-float { 0%,100% { transform:perspective(1000px) rotateY(-7deg) translateY(0); } 50% { transform:perspective(1000px) rotateY(-3deg) translateY(-9px); } }
+@media (prefers-reduced-motion:reduce) { .store-product-image { animation:none; } .product-card,.product-card-media img { transition:none; } }
