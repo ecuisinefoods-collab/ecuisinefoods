@@ -14,16 +14,18 @@ const comingSoon = [
   { name: "Family Food Packs", category: "Coming soon", note: "Stay close for product updates", icon: PackageCheck, tint: "from-sky-100 to-cyan-50", mark: "🥣" },
 ];
 
+export const dynamic = "force-dynamic";
+
 export default async function HomePage() {
   let products: Product[] = [];
   let pickupLocations: { city: string; location_name: string }[] = [];
   if (supabase) {
-    const { data } = await supabase.from("products").select("id,name,slug,category,description,image_url,is_featured,product_variants(id,pack_size,price,stock_quantity)").eq("is_active", true).order("is_featured", { ascending: false }).limit(8);
+    const { data } = await supabase.from("products").select("id,name,slug,category,description,image_url,is_featured,product_variants(id,pack_size,price,stock_quantity)").eq("is_active", true).order("is_featured", { ascending: false }).limit(50);
     products = (data ?? []) as Product[];
     const { data: pickupData } = await supabase.from("pickup_locations").select("city,location_name").eq("is_active", true).order("city").order("location_name");
     pickupLocations = pickupData ?? [];
   }
-  const featured = products.slice(0, 4);
+  const featured = products.slice(0, 8);
 
   return (
     <main className="overflow-hidden bg-white text-[#26352b]">
