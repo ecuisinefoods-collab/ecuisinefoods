@@ -58,3 +58,17 @@ button, input { font: inherit; }
 .product-card:hover .product-card-media img { transform:rotateY(0deg) translateY(-5px); }
 @keyframes product-float { 0%,100% { transform:perspective(1000px) rotateY(-7deg) translateY(0); } 50% { transform:perspective(1000px) rotateY(-3deg) translateY(-9px); } }
 @media (prefers-reduced-motion:reduce) { .store-product-image { animation:none; } .product-card,.product-card-media img { transition:none; } }
+
+
+/* Live brand controls from the admin storefront editor */
+:root { --brand-primary:#245b42; --brand-dark:#173e2d; --brand-accent:#8a744b; --brand-background:#f7f3e9; --brand-surface:#fbfaf7; --brand-text:#26352b; }
+body { color:var(--brand-text); }
+.site-header { border-color:color-mix(in srgb,var(--brand-primary) 14%,white); }
+.nav-link:hover { color:var(--brand-accent); }
+[class~="bg-[#245b42]"] { background-color:var(--brand-primary)!important; }
+[class~="bg-[#173e2d]"] { background-color:var(--brand-dark)!important; }
+[class~="text-[#245b42]"] { color:var(--brand-primary)!important; }
+[class~="text-[#173e2d]"] { color:var(--brand-dark)!important; }
+[class~="text-[#8a744b]"] { color:var(--brand-accent)!important; }
+[class~="bg-[#f7f3e9]"] { background-color:var(--brand-background)!important; }
+[class~="bg-[#fbfaf7]"] { background-color:var(--brand-surface)!important; }
