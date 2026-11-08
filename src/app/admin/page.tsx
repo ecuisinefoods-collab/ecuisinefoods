@@ -44,6 +44,8 @@ export default function AdminPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [stats, setStats] = useState({ revenue: 0, orders: 0, products: 0, income: 0, expenses: 0 });
   const [loading, setLoading] = useState(true);
+  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [notice, setNotice] = useState("");
   const [working, setWorking] = useState(false);
   const [error, setError] = useState("");
 
@@ -106,9 +108,24 @@ export default function AdminPage() {
     if (!supabase) return;
     setWorking(true);
     setError("");
-    const { data, error: signInError } = await supabase.auth.signInWithPassword({ email, password });
-    if (signInError) setError(signInError.message);
-    else if (data.user) await loadDashboard(data.user.id);
+    if (mode === "signup") {
+      if (email.trim().toLowerCase() !== "ecuisinefoods@gmail.com") {
+        setError("The first owner account must use ecuisinefoods@gmail.com.");
+        setWorking(false);
+        return;
+      }
+      const { error: signUpError } = await supabase.auth.signUp({
+        email: email.trim().toLowerCase(),
+        password,
+        options: { emailRedirectTo: typeof window !== "undefined" ? window.location.origin + "/admin" : undefined },
+      });
+      if (signUpError) setError(signUpError.message);
+      else setNotice("Check ecuisinefoods@gmail.com and confirm the verification email. The owner role is assigned automatically only after email verification.");
+    } else {
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+      if (signInError) setError(signInError.message);
+      else if (data.user) await loadDashboard(data.user.id);
+    }
     setWorking(false);
   };
 
@@ -119,6 +136,8 @@ export default function AdminPage() {
     setPassword("");
   };
 
+  if (loading && !profile) return <main className="grid min-h-screen place-items-center bg-[#f4f6f1] text-sm font-semibold text-[#42694b]">Loading secure workspace…</main>;
+
   if (!profile) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-[#f4f6f1] px-4 py-10">
@@ -128,16 +147,16 @@ export default function AdminPage() {
             <div><p className="text-lg font-extrabold tracking-tight text-[#1b3b2a]">eCuisinefoods</p><p className="text-xs text-[#7b887c]">Business control centre</p></div>
           </div>
           <p className="text-xs font-bold uppercase tracking-[.18em] text-[#8b9a85]">Secure administrator access</p>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-[#193b2a]">Welcome back.</h1>
-          <p className="mt-2 text-sm leading-6 text-[#738071]">Sign in with your approved admin account to manage the eCuisinefoods business.</p>
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-[#193b2a]">{mode === "signup" ? "Set up your owner access." : "Welcome back."}</h1>
+          <p className="mt-2 text-sm leading-6 text-[#738071]">{mode === "signup" ? "Create the first owner login. Your role activates only after the email address is verified." : "Sign in with your approved admin account to manage the eCuisinefoods business."}</p>
           <form onSubmit={signIn} className="mt-7 space-y-4">
-            <label className="block text-xs font-bold text-[#405443]">Admin email<input type="email" autoComplete="username" required value={email} onChange={(e) => setEmail(e.target.value)} className="mt-2 w-full rounded-xl border border-[#dfe6dc] bg-[#fbfcfa] px-4 py-3 text-sm outline-none focus:border-[#4c805b]" /></label>
+            <label className="block text-xs font-bold text-[#405443]">Admin email<input type="email" autoComplete="username" required value={email} onChange={(e) => setEmail(e.target.value)} readOnly={mode === "signup"} className="mt-2 w-full rounded-xl border border-[#dfe6dc] bg-[#fbfcfa] px-4 py-3 text-sm outline-none focus:border-[#4c805b] read-only:text-[#758574]" /></label>
             <label className="block text-xs font-bold text-[#405443]">Password<input type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} className="mt-2 w-full rounded-xl border border-[#dfe6dc] bg-[#fbfcfa] px-4 py-3 text-sm outline-none focus:border-[#4c805b]" /></label>
-            {error && <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-xs leading-5 text-red-700">{error}</p>}
-            <button disabled={working} className="w-full rounded-xl bg-[#1d4b34] px-5 py-3.5 text-sm font-bold text-white transition hover:bg-[#143a28] disabled:opacity-60">{working ? "Signing in..." : "Sign in to dashboard"}</button>
+            {error && <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-xs leading-5 text-red-700">{error}</p>}{notice && <p role="status" className="rounded-xl bg-[#edf5e9] px-4 py-3 text-xs leading-5 text-[#3d6947]">{notice}</p>}
+            <button disabled={working} className="w-full rounded-xl bg-[#1d4b34] px-5 py-3.5 text-sm font-bold text-white transition hover:bg-[#143a28] disabled:opacity-60">{working ? "Please wait..." : mode === "signup" ? "Create owner account" : "Sign in to dashboard"}</button>
           </form>
           <div className="mt-6 flex items-start gap-2 rounded-xl bg-[#f1f5ee] p-3 text-[11px] leading-5 text-[#687968]"><ShieldCheck size={16} className="mt-0.5 shrink-0 text-[#3d704b]"/> Access is granted by the secure admin role stored in the database. A normal customer account cannot enter this dashboard.</div>
-          <a href="/" className="mt-6 inline-flex text-xs font-semibold text-[#42694b] hover:underline">← Back to storefront</a>
+          <button type="button" onClick={() => { setMode(mode === "signin" ? "signup" : "signin"); setError(""); setNotice(""); setEmail("ecuisinefoods@gmail.com"); }} className="mt-5 block text-xs font-bold text-[#42694b] hover:underline">{mode === "signin" ? "First time? Set up the owner account" : "Already set up? Sign in"}</button><a href="/" className="mt-4 inline-flex text-xs font-semibold text-[#42694b] hover:underline">← Back to storefront</a>
         </section>
       </main>
     );
