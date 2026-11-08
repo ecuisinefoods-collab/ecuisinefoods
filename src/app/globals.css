@@ -180,3 +180,26 @@ body{background:radial-gradient(ellipse at 7% 5%,rgba(222,237,218,.68),transpare
  .storefront-glass .product-card{border-radius:1.25rem}
 }
 @media(prefers-reduced-motion:reduce){.storefront-glass .hero-pack{animation:none!important}}
+
+/* 2026 fintech-inspired storefront polish */
+:root{--fin-ink:#10291f;--fin-muted:#64756b;--fin-line:rgba(24,64,43,.10);--fin-green:#087f5b;--fin-green-dark:#07543f;--fin-mint:#dff5e9}
+body{font-feature-settings:"ss01" on;-webkit-font-smoothing:antialiased}
+.storefront-glass{background:radial-gradient(ellipse at 8% 0%,rgba(193,235,211,.48),transparent 34%),radial-gradient(ellipse at 94% 8%,rgba(222,232,255,.48),transparent 28%),linear-gradient(145deg,#f8fbf8 0%,#f4f8f4 48%,#f9faf7 100%)}
+.storefront-glass .store-hero{background:linear-gradient(125deg,#f3faf5 0%,#edf6f0 52%,#f7f9f4 100%)}
+.storefront-glass .hero-product-scene{border-radius:2.25rem;background:radial-gradient(circle at 48% 35%,#fff 0%,#e6f2e9 58%,#d6e6dc 100%);box-shadow:0 28px 75px rgba(16,63,42,.13),inset 0 1px 0 white}
+.storefront-glass .hero-product-scene:after{content:"";position:absolute;inset:12px;border:1px solid rgba(255,255,255,.6);border-radius:1.7rem;pointer-events:none}
+.storefront-glass .site-header{border-radius:0 0 1.5rem 1.5rem;background:rgba(255,255,255,.82);box-shadow:0 14px 36px rgba(18,55,37,.07)}
+.storefront-glass .product-card{border:1px solid rgba(24,64,43,.07);background:rgba(255,255,255,.9);box-shadow:0 10px 30px rgba(16,56,36,.055)}
+.storefront-glass .product-card:hover{border-color:rgba(8,127,91,.2);box-shadow:0 22px 44px rgba(16,56,36,.12)}
+.storefront-glass a[class*="rounded-xl"],.storefront-glass a[class*="rounded-full"]{transition:transform .2s ease,box-shadow .2s ease,background-color .2s ease}
+.storefront-glass a[class*="rounded-xl"]:hover,.storefront-glass a[class*="rounded-full"]:hover{box-shadow:0 10px 24px rgba(8,76,52,.12)}
+.storefront-glass section{scroll-margin-top:6rem}
+.storefront-glass input,.storefront-glass select,.storefront-glass textarea{border-radius:14px}
+.storefront-glass :focus-visible{outline:3px solid rgba(8,127,91,.35);outline-offset:3px}
+.admin-glass-shell{background:radial-gradient(ellipse at 10% 0%,rgba(205,239,219,.5),transparent 34%),linear-gradient(145deg,#f7faf7,#eef4ef 58%,#f8faf7)}
+.admin-glass-shell aside{background:rgba(255,255,255,.86);backdrop-filter:blur(20px);border-color:rgba(20,70,45,.09)}
+.admin-glass-shell button:not(:disabled){transition:transform .18s ease,box-shadow .18s ease,background .18s ease}
+.admin-glass-shell button:not(:disabled):hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(13,72,47,.12)}
+.admin-glass-shell input,.admin-glass-shell select,.admin-glass-shell textarea{border-radius:13px}
+@media(max-width:640px){.storefront-glass .hero-product-scene{min-height:300px;border-radius:1.5rem}.storefront-glass .hero-product-scene:after{inset:8px;border-radius:1.1rem}.storefront-glass .product-card{border-radius:1rem}}
+@media(prefers-reduced-motion:reduce){.storefront-glass *,.admin-glass-shell *{animation:none!important;transition:none!important}}
