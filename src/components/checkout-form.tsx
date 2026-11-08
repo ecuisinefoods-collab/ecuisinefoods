@@ -36,7 +36,10 @@ export function CheckoutForm({ locations, deliveryZones }: { locations: Location
   const [deliveryZoneId,setDeliveryZoneId]=useState("");
   const [street,setStreet]=useState("");
   const [landmark,setLandmark]=useState("");
-  const [notes,setNotes]=useState("");\n  const [couponCode,setCouponCode]=useState("");\n  const [appliedCoupon,setAppliedCoupon]=useState<{code:string;discount:number}|null>(null);\n  const [couponMessage,setCouponMessage]=useState("");
+  const [notes,setNotes]=useState("");
+  const [couponCode,setCouponCode]=useState("");
+  const [appliedCoupon,setAppliedCoupon]=useState<{code:string;discount:number}|null>(null);
+  const [couponMessage,setCouponMessage]=useState("");
   const [submitting,setSubmitting]=useState(false);
   const [error,setError]=useState("");
   const [order,setOrder]=useState<OrderCreated|null>(null);
