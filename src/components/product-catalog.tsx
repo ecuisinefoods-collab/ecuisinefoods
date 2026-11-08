@@ -3,10 +3,11 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Search, ShoppingBag, Plus, Minus, Trash2, SlidersHorizontal } from "lucide-react";
+import { supabase } from "@/lib/supabase";
 
 type Variant = { id: string; pack_size: string; price: number; stock_quantity: number };
 type Product = { id: string; name: string; slug: string; category: string; description: string | null; image_url: string | null; product_variants?: Variant[] };
-type CartItem = { variant_id: string; product_id: string; name: string; pack_size: string; price: number; qty: number };
+type CartItem = { variant_id: string; product_id: string; name: string; pack_size: string; price: number; qty: number; stock_quantity?: number };
 const KEY = "ecuisinefoods-cart-v1";
 function readCart(): CartItem[] { try { return JSON.parse(localStorage.getItem(KEY) || "[]") as CartItem[]; } catch { return []; } }
 const money = (n:number) => "₦" + n.toLocaleString("en-NG");
@@ -22,7 +23,7 @@ export function ProductCatalog({ products }: { products: Product[] }) {
   function add(product:Product,variant:Variant){
     if(variant.stock_quantity<=0)return;
     const found=cart.find(x=>x.variant_id===variant.id);
-    save(found?cart.map(x=>x.variant_id===variant.id?{...x,qty:Math.min(x.qty+1,variant.stock_quantity)}:x):[...cart,{variant_id:variant.id,product_id:product.id,name:product.name,pack_size:variant.pack_size,price:Number(variant.price),qty:1}]);
+    save(found?cart.map(x=>x.variant_id===variant.id?{...x,qty:Math.min(x.qty+1,variant.stock_quantity),stock_quantity:variant.stock_quantity}:x):[...cart,{variant_id:variant.id,product_id:product.id,name:product.name,pack_size:variant.pack_size,price:Number(variant.price),qty:1,stock_quantity:variant.stock_quantity}]);
     setNotice(product.name+" added to your cart");
     window.setTimeout(()=>setNotice(""),2200);
   }
@@ -60,8 +61,42 @@ export function ProductCatalog({ products }: { products: Product[] }) {
 
 export function CartPage(){
  const [items,setItems]=useState<CartItem[]>([]);
- useEffect(()=>{setItems(readCart());},[]);
+ const [stockChecked,setStockChecked]=useState(false);
+ const [stockError,setStockError]=useState("");
+ const [notice,setNotice]=useState("");
+ useEffect(()=>{
+   let active=true;
+   const load=async()=>{
+     const saved=readCart();
+     if(!active)return;
+     setItems(saved);
+     if(!saved.length){setStockChecked(true);return;}
+     if(!supabase){setStockError("Stock could not be checked. Please refresh or contact our team.");setStockChecked(true);return;}
+     const ids=saved.map(item=>item.variant_id);
+     const {data,error}=await supabase.from("product_variants").select("id,pack_size,price,stock_quantity").in("id",ids);
+     if(!active)return;
+     if(error){setStockError("We could not verify the latest stock. Please refresh this page before checkout.");setStockChecked(true);return;}
+     const rows=new Map((data??[]).map((v:any)=>[v.id,v]));
+     let adjusted=false;
+     const refreshed=saved.map(item=>{
+       const variant=rows.get(item.variant_id) as {id:string;pack_size:string;price:number;stock_quantity:number}|undefined;
+       if(!variant)return {...item,stock_quantity:0};
+       const available=Math.max(0,Number(variant.stock_quantity)||0);
+       const qty=available>0?Math.min(item.qty,available):item.qty;
+       if(qty!==item.qty)adjusted=true;
+       return {...item,pack_size:variant.pack_size,price:Number(variant.price),stock_quantity:available,qty};
+     });
+     setItems(refreshed);
+     localStorage.setItem(KEY,JSON.stringify(refreshed));
+     if(adjusted)setNotice("Your cart quantity was adjusted to match the latest available stock.");
+     if(refreshed.some(item=>!item.stock_quantity))setNotice("Some cart items are out of stock. Remove them before continuing.");
+     setStockChecked(true);
+   };
+   void load();
+   return ()=>{active=false;};
+ },[]);
  function save(next:CartItem[]){setItems(next);localStorage.setItem(KEY,JSON.stringify(next));}
  const total=items.reduce((s,x)=>s+x.price*x.qty,0);
- return <main className="storefront-glass min-h-screen bg-[#fbfaf7] px-5 py-10"><div className="mx-auto max-w-4xl"><Link href="/" className="text-sm font-semibold text-[#245b42]">← Continue shopping</Link><h1 className="mt-5 text-3xl font-semibold text-[#173e2d]">Your cart</h1>{items.length?<><div className="mt-6 space-y-3">{items.map(item=><article key={item.variant_id} className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[#e8e9e1] bg-white p-4"><div><h2 className="font-bold text-[#203329]">{item.name}</h2><p className="mt-1 text-sm text-[#7b857a]">{item.pack_size} · {money(item.price)}</p></div><div className="flex items-center gap-2"><button onClick={()=>save(item.qty===1?items.filter(x=>x.variant_id!==item.variant_id):items.map(x=>x.variant_id===item.variant_id?{...x,qty:x.qty-1}:x))} className="grid h-8 w-8 place-items-center rounded-full border border-[#dce3d7]" aria-label="Decrease quantity"><Minus size={14}/></button><span className="w-6 text-center text-sm font-bold">{item.qty}</span><button onClick={()=>save(items.map(x=>x.variant_id===item.variant_id?{...x,qty:x.qty+1}:x))} className="grid h-8 w-8 place-items-center rounded-full border border-[#dce3d7]" aria-label="Increase quantity"><Plus size={14}/></button><button onClick={()=>save(items.filter(x=>x.variant_id!==item.variant_id))} className="ml-2 grid h-8 w-8 place-items-center rounded-full text-[#a34b42]" aria-label="Remove item"><Trash2 size={14}/></button></div><p className="w-full text-right text-sm font-bold text-[#245b42]">{money(item.price*item.qty)}</p></article>)}</div><div className="mt-6 rounded-2xl bg-[#173e2d] p-5 text-white"><div className="flex justify-between text-sm"><span>Subtotal</span><strong>{money(total)}</strong></div><p className="mt-2 text-xs text-[#cbd8ca]">Delivery fees, if applicable, are confirmed separately.</p><Link href="/checkout" className="mt-5 block w-full rounded-full bg-white px-5 py-3 text-center text-sm font-bold text-[#173e2d] transition hover:bg-[#edf3e9]">Continue to WhatsApp checkout</Link><p className="mt-3 text-center text-[10px] text-[#dce8dc]">Online payments · Coming soon</p></div></>:<div className="mt-6 rounded-2xl border border-[#e8e9e1] bg-white p-8 text-center"><ShoppingBag className="mx-auto text-[#8a9689]"/><p className="mt-3 font-semibold text-[#526052]">Your cart is empty</p><Link href="/#shop" className="mt-4 inline-block rounded-full bg-[#245b42] px-5 py-3 text-sm font-bold text-white">Browse products</Link></div>}</div></main>;
+ const canCheckout=stockChecked&&!stockError&&items.length>0&&items.every(x=>Number(x.stock_quantity)>0&&Number(x.stock_quantity)>=x.qty);
+ return <main className="storefront-glass min-h-screen bg-[#fbfaf7] px-5 py-10"><div className="mx-auto max-w-4xl"><Link href="/" className="text-sm font-semibold text-[#245b42]">← Continue shopping</Link><h1 className="mt-5 text-3xl font-semibold text-[#173e2d]">Your cart</h1>{items.length?<><div className="mt-6 space-y-3">{items.map(item=><article key={item.variant_id} className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[#e8e9e1] bg-white p-4"><div className="min-w-0"><h2 className="font-bold text-[#203329]">{item.name}</h2><p className="mt-1 text-sm text-[#7b857a]">{item.pack_size} · {money(item.price)}</p><p className={Number(item.stock_quantity)>0?"mt-1 text-xs text-[#648064]":"mt-1 text-xs font-semibold text-[#a34b42]"}>{Number(item.stock_quantity)>0?Number(item.stock_quantity)+" available":"Out of stock or unavailable"}</p></div><div className="flex items-center gap-2"><button onClick={()=>save(item.qty===1?items.filter(x=>x.variant_id!==item.variant_id):items.map(x=>x.variant_id===item.variant_id?{...x,qty:x.qty-1}:x))} className="grid h-8 w-8 place-items-center rounded-full border border-[#dce3d7]" aria-label="Decrease quantity"><Minus size={14}/></button><span className="w-6 text-center text-sm font-bold">{item.qty}</span><button disabled={item.qty>=Number(item.stock_quantity||0)} onClick={()=>save(items.map(x=>x.variant_id===item.variant_id?{...x,qty:Math.min(x.qty+1,Number(x.stock_quantity||0))}:x))} className="grid h-8 w-8 place-items-center rounded-full border border-[#dce3d7] disabled:cursor-not-allowed disabled:opacity-30" aria-label="Increase quantity"><Plus size={14}/></button><button onClick={()=>save(items.filter(x=>x.variant_id!==item.variant_id))} className="ml-2 grid h-8 w-8 place-items-center rounded-full text-[#a34b42]" aria-label="Remove item"><Trash2 size={14}/></button></div><p className="w-full text-right text-sm font-bold text-[#245b42]">{money(item.price*item.qty)}</p></article>)}</div>{notice&&<p role="status" className="mt-4 rounded-xl bg-[#fff7e8] px-4 py-3 text-sm text-[#795b21]">{notice}</p>}{stockError&&<p role="alert" className="mt-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{stockError}</p>}<div className="mt-6 rounded-2xl bg-[#173e2d] p-5 text-white"><div className="flex justify-between text-sm"><span>Subtotal</span><strong>{money(total)}</strong></div><p className="mt-2 text-xs text-[#cbd8ca]">Delivery fees, if applicable, are confirmed separately.</p>{canCheckout?<Link href="/checkout" className="mt-5 block w-full rounded-full bg-white px-5 py-3 text-center text-sm font-bold text-[#173e2d] transition hover:bg-[#edf3e9]">Continue to WhatsApp checkout</Link>:<button disabled className="mt-5 block w-full cursor-not-allowed rounded-full bg-white/50 px-5 py-3 text-center text-sm font-bold text-[#173e2d]">{!stockChecked?"Checking stock…":stockError?"Checkout unavailable":"Remove unavailable items to continue"}</button>}<p className="mt-3 text-center text-[10px] text-[#dce8dc]">Online payments · Coming soon</p></div></>:<div className="mt-6 rounded-2xl border border-[#e8e9e1] bg-white p-8 text-center"><ShoppingBag className="mx-auto text-[#8a9689]"/><p className="mt-3 font-semibold text-[#526052]">Your cart is empty</p><Link href="/#shop" className="mt-4 inline-block rounded-full bg-[#245b42] px-5 py-3 text-sm font-bold text-white">Browse products</Link></div>}</div></main>;
 }
