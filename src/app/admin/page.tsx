@@ -119,7 +119,7 @@ export default function AdminPage() {
       const { error: signUpError } = await supabase.auth.signUp({
         email: email.trim().toLowerCase(),
         password,
-        options: { emailRedirectTo: typeof window !== "undefined" ? window.location.origin + "/admin" : undefined },
+        options: { emailRedirectTo: "https://ecuisinefoods.onrender.com/admin" },
       });
       if (signUpError) setError(signUpError.message);
       else setNotice("Check ecuisinefoods@gmail.com and confirm the verification email. The owner role is assigned automatically only after email verification.");
