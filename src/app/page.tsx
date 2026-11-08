@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { ArrowRight, Leaf, ShieldCheck, ShoppingBag, Sprout, Truck } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { ProductCatalog } from "@/components/product-catalog";
 
 type Product = { id: string; name: string; slug: string; category: string; description: string | null; image_url: string | null; is_featured: boolean; variants?: { id: string; pack_size: string; price: number; stock_quantity: number }[] };
 
-const categories = ["Tom Brown & Cereal", "Grains & Flour", "Other Food Products", "New Arrivals", "Best Sellers"];
 
 export default async function HomePage() {
   let products: Product[] = [];
@@ -70,8 +70,7 @@ export default async function HomePage() {
       <section id="shop" className="bg-[#fbfaf7] py-14 sm:py-20">
         <div className="mx-auto max-w-7xl px-5">
           <div className="flex flex-wrap items-end justify-between gap-4"><div><p className="text-xs font-bold uppercase tracking-[.18em] text-[#78906b]">Shop eCuisinefoods</p><h2 className="mt-2 text-3xl font-semibold tracking-tight text-[#173e2d] sm:text-4xl">Find your everyday goodness</h2></div><span className="text-sm text-[#7b857a]">Explore our food range</span></div>
-          <div className="mt-7 flex gap-2 overflow-x-auto pb-2">{categories.map((category,i)=><span key={category} className={`shrink-0 rounded-full border px-4 py-2 text-xs font-semibold ${i===0?"border-[#245b42] bg-[#245b42] text-white":"border-[#e0e5db] bg-white text-[#657266]"}`}>{category}</span>)}</div>
-          {products.length ? <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">{products.map((product)=><article key={product.id} className="overflow-hidden rounded-2xl border border-[#e8e9e1] bg-white"><div className="flex aspect-[4/3] items-center justify-center bg-[#f1eee5] p-5">{product.image_url?<img src={product.image_url} alt={product.name} className="h-full w-full object-contain"/>:<div className="text-center"><div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-[#dfe8d7] text-[#245b42]"><Leaf size={28}/></div><p className="mt-3 text-xs font-bold uppercase tracking-widest text-[#6e8167]">eCuisinefoods</p></div>}</div><div className="p-5"><p className="text-[10px] font-bold uppercase tracking-widest text-[#8a9689]">{product.category}</p><h3 className="mt-2 font-bold text-[#203329]">{product.name}</h3><p className="mt-2 line-clamp-2 text-sm leading-5 text-[#778176]">{product.description || "Wholesome food, thoughtfully made."}</p><Link href={`/products/${product.slug}`} className="mt-4 inline-flex items-center gap-2 text-sm font-bold text-[#245b42]">View product <ArrowRight size={14}/></Link></div></article>)}</div> : <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4"><article className="overflow-hidden rounded-2xl border border-[#e8e9e1] bg-white"><div className="flex aspect-[4/3] items-center justify-center bg-[#f1eee5] p-5"><div className="flex h-full w-[60%] flex-col items-center justify-center rounded-xl border border-[#e4d6b6] bg-gradient-to-br from-[#fffdf4] to-[#e5d1a5]"><span className="grid h-9 w-9 place-items-center rounded-full bg-[#245b42] font-bold text-white">e</span><span className="mt-3 text-[10px] font-bold uppercase tracking-widest text-[#245b42]">eCuisinefoods</span><span className="mt-2 text-center text-xl font-semibold text-[#654a2d]">Tom Brown</span><span className="text-[9px] uppercase tracking-widest text-[#88704b]">Multigrain cereal</span></div></div><div className="p-5"><p className="text-[10px] font-bold uppercase tracking-widest text-[#8a9689]">Tom Brown & cereal</p><h3 className="mt-2 font-bold text-[#203329]">Multigrain Tom Brown</h3><p className="mt-2 text-sm leading-5 text-[#778176]">Our first featured product. Pack sizes, pricing and product details will appear here when added.</p><span className="mt-4 inline-flex items-center gap-2 text-sm font-bold text-[#245b42]">Coming soon <ArrowRight size={14}/></span></div></article></div>}
+          <ProductCatalog products={products as unknown as Parameters<typeof ProductCatalog>[0]["products"]} />
           <div className="mt-9 text-center"><p className="text-sm text-[#7b857a]">More products will be available as we expand our range.</p></div>
         </div>
       </section>
