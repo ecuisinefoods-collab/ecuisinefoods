@@ -121,3 +121,14 @@ input,select,textarea{accent-color:var(--brand-primary)}
 .product-card-media img{transition:transform .6s cubic-bezier(.2,.8,.2,1),filter .6s ease}
 .product-card:hover .product-card-media img{transform:scale(1.08) translateY(-4px);filter:drop-shadow(0 12px 10px rgba(33,44,31,.15))}
 @media(prefers-reduced-motion:reduce){.storefront-wave,.storefront-peeker,.peeker-eye i,.storefront-sparkle,.hero-pack{animation:none!important}.storefront-peeker{transform:translateY(0)}}
+
+
+/* The little eCuisinefoods discount runner — clickable and keyboard accessible */
+.discount-mascot{animation:ec-discount-run 18s ease-in-out infinite;will-change:transform}
+.discount-mascot-runner{display:inline-block;font-size:27px;transform-origin:50% 80%;animation:ec-run-cycle .42s ease-in-out infinite alternate}
+.discount-mascot:hover,.discount-mascot:focus-visible{animation-play-state:paused}
+.discount-mascot:hover .discount-mascot-runner,.discount-mascot:focus-visible .discount-mascot-runner{animation-play-state:paused;transform:scale(1.18) rotate(-8deg)}
+@keyframes ec-discount-run{0%,100%{transform:translateX(0)}45%{transform:translateX(min(62vw,760px))}55%{transform:translateX(min(62vw,760px))}90%{transform:translateX(0)}}
+@keyframes ec-run-cycle{from{transform:translateY(0) rotate(-8deg)}to{transform:translateY(-5px) rotate(8deg)}}
+@media(max-width:640px){.discount-mascot{animation-duration:22s}.discount-mascot span:nth-child(2){max-width:104px}}
+@media(prefers-reduced-motion:reduce){.discount-mascot,.discount-mascot-runner{animation:none!important}}
