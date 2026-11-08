@@ -50,7 +50,19 @@ export default function ProductsAdminPage() {
     setDraft({ name: product.name, slug: product.slug, category: product.category, description: product.description ?? "", ingredients: product.ingredients ?? "", image_url: product.image_url ?? "", is_featured: product.is_featured, is_active: product.is_active });
     setMessage(""); setError("");
   };
-  const uploadProductImage = async (file?: File) => {\n    if (!supabase || !file) return;\n    if (!file.type.startsWith("image/") || file.size > 5 * 1024 * 1024) { setError("Choose an image under 5 MB."); return; }\n    setUploadingImage(true); setError("");\n    const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";\n    const path = `products/${crypto.randomUUID()}.${ext}`;\n    const { error: uploadError } = await supabase.storage.from("product-images").upload(path, file, { cacheControl: "3600", upsert: false, contentType: file.type });\n    if (uploadError) setError(uploadError.message);\n    else { const { data } = supabase.storage.from("product-images").getPublicUrl(path); setDraft(current => ({ ...current, image_url: data.publicUrl })); setMessage("Image uploaded. Save the product to publish it."); }\n    setUploadingImage(false);\n  };\n\n  const saveProduct = async (event: FormEvent<HTMLFormElement>) => {
+  const uploadProductImage = async (file?: File) => {
+    if (!supabase || !file) return;
+    if (!file.type.startsWith("image/") || file.size > 5 * 1024 * 1024) { setError("Choose an image under 5 MB."); return; }
+    setUploadingImage(true); setError("");
+    const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+    const path = `products/${crypto.randomUUID()}.${ext}`;
+    const { error: uploadError } = await supabase.storage.from("product-images").upload(path, file, { cacheControl: "3600", upsert: false, contentType: file.type });
+    if (uploadError) setError(uploadError.message);
+    else { const { data } = supabase.storage.from("product-images").getPublicUrl(path); setDraft(current => ({ ...current, image_url: data.publicUrl })); setMessage("Image uploaded. Save the product to publish it."); }
+    setUploadingImage(false);
+  };
+
+  const saveProduct = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!supabase || !authorized) return;
     setSaving(true); setError(""); setMessage("");
