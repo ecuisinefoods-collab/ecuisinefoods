@@ -3,10 +3,12 @@ name: Dependency security audit
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - security-audit-summary.md
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   audit:
@@ -26,20 +28,33 @@ jobs:
           node -e '
             const fs = require("fs");
             const report = JSON.parse(fs.readFileSync("npm-audit.json", "utf8"));
-            console.log("Vulnerability totals:", JSON.stringify(report.metadata?.vulnerabilities ?? {}));
+            const totals = report.metadata?.vulnerabilities ?? {};
+            const lines = [
+              "# Dependency security audit",
+              "",
+              "Generated automatically by GitHub Actions.",
+              "",
+              "| Severity | Count |",
+              "|---|---:|",
+              ...["critical","high","moderate","low","info"].map(k => `| ${k} | ${totals[k] ?? 0} |`),
+              "",
+              "| Package | Severity | Direct? | Affected range | Fix available? | Advisory |",
+              "|---|---|---:|---|---|---|"
+            ];
             for (const [name, item] of Object.entries(report.vulnerabilities ?? {})) {
-              console.log(JSON.stringify({
-                package: name,
-                severity: item.severity,
-                direct: item.isDirect,
-                range: item.range,
-                fixAvailable: item.fixAvailable,
-                via: item.via.map(v => typeof v === "string" ? v : {
-                  name: v.name, title: v.title, url: v.url, range: v.range
-                })
-              }));
+              const advisories = item.via.map(v => typeof v === "string" ? v : `${v.title} (${v.url})`).join("; ");
+              lines.push(`| ${name} | ${item.severity} | ${item.isDirect ? "Yes" : "No"} | ${item.range} | ${JSON.stringify(item.fixAvailable)} | ${advisories.replaceAll("|","\\|")} |`);
             }
+            fs.writeFileSync("security-audit-summary.md", lines.join("\\n") + "\\n");
+            console.log(lines.join("\\n"));
           '
+      - name: Publish audit summary
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add security-audit-summary.md
+          git diff --cached --quiet || git commit -m "Publish dependency security audit"
+          git push
       - name: Upload full audit report
         uses: actions/upload-artifact@v4
         with:
