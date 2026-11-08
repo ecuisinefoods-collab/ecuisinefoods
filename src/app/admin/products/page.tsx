@@ -20,6 +20,7 @@ export default function ProductsAdminPage() {
   const [variantDraft, setVariantDraft] = useState<VariantDraft>(blankVariant);
   const [editing, setEditing] = useState<string | null>(null);
   const [editingVariant, setEditingVariant] = useState<string | null>(null);
+  const [editingVariantProductId, setEditingVariantProductId] = useState<string | null>(null);
   const [authorized, setAuthorized] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -68,15 +69,16 @@ export default function ProductsAdminPage() {
     if (!Number.isFinite(price) || price < 0 || !Number.isInteger(stock) || stock < 0) { setError("Enter a valid price and a whole-number stock quantity (zero or more)."); return; }
     setSaving(true); setError(""); setMessage("");
     const payload = { product_id: productId, pack_size: variantDraft.pack_size, price, stock_quantity: stock };
-    const result = editingVariant
-      ? await supabase.from("product_variants").update({ pack_size: payload.pack_size, price, stock_quantity: stock }).eq("id", editingVariant)
+    const updateVariantId = editingVariantProductId === productId ? editingVariant : null;
+    const result = updateVariantId
+      ? await supabase.from("product_variants").update({ pack_size: payload.pack_size, price, stock_quantity: stock }).eq("id", updateVariantId)
       : await supabase.from("product_variants").insert(payload);
     if (result.error) setError(result.error.message);
-    else { setMessage(editingVariant ? "Pack size, price and stock updated." : "Pack size added."); setVariantDraft(blankVariant); setEditingVariant(null); await load(); }
+    else { setMessage(editingVariant ? "Pack size, price and stock updated." : "Pack size added."); setVariantDraft(blankVariant); setEditingVariant(null); setEditingVariantProductId(null); await load(); }
     setSaving(false);
   };
   const editVariant = (variant: Variant) => {
-    setEditingVariant(variant.id);
+    setEditingVariant(variant.id); setEditingVariantProductId(variant.product_id);
     setVariantDraft({ pack_size: variant.pack_size, price: String(variant.price), stock_quantity: String(variant.stock_quantity) });
     setError(""); setMessage("");
   };
@@ -120,7 +122,7 @@ export default function ProductsAdminPage() {
           </div>
           <div className="mt-4 border-t border-[#edf0eb] pt-4"><div className="mb-3 flex items-center justify-between"><h4 className="text-xs font-bold text-[#405744]">Pack sizes, prices & stock</h4><span className="text-[10px] text-[#899487]">{product.product_variants?.length ?? 0} variants</span></div>
             {product.product_variants?.length ? <div className="space-y-2">{product.product_variants.map(v=><div key={v.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-[#f8faf6] px-3 py-2"><div><p className="text-xs font-semibold text-[#405044]">{v.pack_size}</p><p className="mt-1 text-[10px] text-[#7b887c]">{money(Number(v.price))} · {v.stock_quantity} in stock</p></div><div className="flex gap-2"><button onClick={()=>editVariant(v)} className="rounded-lg border border-[#e1e8de] px-2.5 py-1.5 text-[10px] font-bold text-[#42664a]">Edit</button><button onClick={()=>void deleteVariant(v.id)} aria-label="Delete pack size" className="rounded-lg border border-[#f0dfdc] p-1.5 text-[#a05f54]"><Trash2 size={12}/></button></div></div>)}</div>:<p className="text-xs text-[#899487]">No pack sizes yet. Add one below to make this product purchasable.</p>}
-            <form onSubmit={e=>void saveVariant(e,product.id)} className="mt-3 grid gap-2 rounded-xl border border-dashed border-[#dce5d8] p-3 sm:grid-cols-[1fr_1fr_1fr_auto]"><select value={editingVariant && products.some(p=>p.product_variants.some(v=>v.id===editingVariant))?variantDraft.pack_size:variantDraft.pack_size} onChange={e=>setVariantDraft({...variantDraft,pack_size:e.target.value as VariantDraft["pack_size"]})} className="rounded-lg border border-[#dfe7dc] bg-white px-2 py-2 text-xs"><option>Small</option><option>Medium</option><option>Large</option><option>Bulk / Wholesale</option></select><input required type="number" min="0" step="1" value={variantDraft.price} onChange={e=>setVariantDraft({...variantDraft,price:e.target.value})} placeholder="Price (₦)" className="min-w-0 rounded-lg border border-[#dfe7dc] px-2 py-2 text-xs"/><input required type="number" min="0" step="1" value={variantDraft.stock_quantity} onChange={e=>setVariantDraft({...variantDraft,stock_quantity:e.target.value})} placeholder="Stock qty" className="min-w-0 rounded-lg border border-[#dfe7dc] px-2 py-2 text-xs"/><button disabled={saving} className="inline-flex items-center justify-center gap-1 rounded-lg bg-[#245b42] px-3 py-2 text-[10px] font-bold text-white"><Plus size={12}/>{editingVariant?"Update":"Add"}</button>{editingVariant && <button type="button" onClick={()=>{setEditingVariant(null);setVariantDraft(blankVariant)}} className="text-[10px] font-bold text-[#738071] sm:col-span-4 sm:text-right">Cancel variant edit</button>}</form>
+            <form onSubmit={e=>void saveVariant(e,product.id)} className="mt-3 grid gap-2 rounded-xl border border-dashed border-[#dce5d8] p-3 sm:grid-cols-[1fr_1fr_1fr_auto]"><select value={editingVariant && products.some(p=>p.product_variants.some(v=>v.id===editingVariant))?variantDraft.pack_size:variantDraft.pack_size} onChange={e=>setVariantDraft({...variantDraft,pack_size:e.target.value as VariantDraft["pack_size"]})} className="rounded-lg border border-[#dfe7dc] bg-white px-2 py-2 text-xs"><option>Small</option><option>Medium</option><option>Large</option><option>Bulk / Wholesale</option></select><input required type="number" min="0" step="1" value={variantDraft.price} onChange={e=>setVariantDraft({...variantDraft,price:e.target.value})} placeholder="Price (₦)" className="min-w-0 rounded-lg border border-[#dfe7dc] px-2 py-2 text-xs"/><input required type="number" min="0" step="1" value={variantDraft.stock_quantity} onChange={e=>setVariantDraft({...variantDraft,stock_quantity:e.target.value})} placeholder="Stock qty" className="min-w-0 rounded-lg border border-[#dfe7dc] px-2 py-2 text-xs"/><button disabled={saving} className="inline-flex items-center justify-center gap-1 rounded-lg bg-[#245b42] px-3 py-2 text-[10px] font-bold text-white"><Plus size={12}/>{editingVariantProductId===product.id && editingVariant?"Update":"Add"}</button>{editingVariantProductId===product.id && editingVariant && <button type="button" onClick={()=>{setEditingVariant(null);setEditingVariantProductId(null);setVariantDraft(blankVariant)}} className="text-[10px] font-bold text-[#738071] sm:col-span-4 sm:text-right">Cancel variant edit</button>}</form>
           </div>
         </article>)}
       </section>
