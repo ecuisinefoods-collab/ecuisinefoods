@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowLeft, CheckCircle2, CreditCard, MapPin, MessageCircle, PackageCheck, ShoppingBag, Truck } from "lucide-react";
 import { NIGERIAN_STATES } from "@/lib/nigerian-states";
 import { supabase } from "@/lib/supabase";
+import { getEffectivePrice } from "@/lib/product-pricing";
 
 type Location = {
   id:string; city:string; location_name:string; instructions:string|null;
@@ -14,7 +15,7 @@ type DeliveryZone = {
   id:string; state:string; city:string; area_name:string; delivery_fee:number;
   minimum_order_amount:number; estimated_days:string|null; instructions:string|null;
 };
-type Item = { variant_id:string; product_id:string; name:string; pack_size:string; price:number; qty:number; stock_quantity?:number };
+type Item = { variant_id:string; product_id:string; name:string; pack_size:string; price:number; original_price?:number; qty:number; stock_quantity?:number };
 type OrderCreated = { order_number:number; tracking_code:string; subtotal:number; delivery_fee:number; total:number };
 
 const CART_KEY="ecuisinefoods-cart-v1";
@@ -51,18 +52,18 @@ export function CheckoutForm({ locations, deliveryZones }: { locations: Location
       setCart(saved);
       if(!saved.length){setStockChecked(true);return;}
       if(!supabase){setStockIssue("We could not verify product stock. Please contact our team before placing this order.");setStockChecked(true);return;}
-      const {data,error}=await supabase.from("product_variants").select("id,pack_size,price,stock_quantity").in("id",saved.map(item=>item.variant_id));
+      const {data,error}=await supabase.from("product_variants").select("id,pack_size,price,sale_price,sale_starts_at,sale_ends_at,stock_quantity").in("id",saved.map(item=>item.variant_id));
       if(!active)return;
       if(error){setStockIssue("We could not verify the latest stock. Please refresh this page and try again.");setStockChecked(true);return;}
       const rows=new Map((data??[]).map((variant:any)=>[variant.id,variant]));
       let adjusted=false;
       const refreshed=saved.map(item=>{
-        const variant=rows.get(item.variant_id) as {id:string;pack_size:string;price:number;stock_quantity:number}|undefined;
+        const variant=rows.get(item.variant_id) as {id:string;pack_size:string;price:number;sale_price:number|null;sale_starts_at:string|null;sale_ends_at:string|null;stock_quantity:number}|undefined;
         if(!variant)return {...item,stock_quantity:0};
         const available=Math.max(0,Number(variant.stock_quantity)||0);
         const qty=available>0?Math.min(item.qty,available):item.qty;
         if(qty!==item.qty)adjusted=true;
-        return {...item,pack_size:variant.pack_size,price:Number(variant.price),stock_quantity:available,qty};
+        return {...item,pack_size:variant.pack_size,price:getEffectivePrice(variant),original_price:Number(variant.price),stock_quantity:available,qty};
       });
       setCart(refreshed);
       localStorage.setItem(CART_KEY,JSON.stringify(refreshed));
@@ -146,7 +147,7 @@ export function CheckoutForm({ locations, deliveryZones }: { locations: Location
         <div className="flex items-center gap-3"><span className="grid h-12 w-12 place-items-center rounded-2xl bg-[#eaf4e7] text-[#267045]"><CheckCircle2 size={26}/></span><div><p className="text-[10px] font-bold uppercase tracking-[.18em] text-[#7f927e]">Order request saved</p><h2 className="text-2xl font-bold text-[#173e2d]">Thank you. Order #{order.order_number}</h2></div></div>
         <p className="mt-4 max-w-2xl text-sm leading-6 text-[#68766b]">Your order has been saved as unpaid and is awaiting confirmation. WhatsApp should open with your order details so you can complete checkout with our team. If it does not open automatically, use the WhatsApp button below.</p>
         <div className="mt-6 grid gap-3 sm:grid-cols-3"><div className="rounded-2xl bg-white/80 p-4"><p className="text-[10px] font-bold uppercase text-[#879286]">Order subtotal</p><p className="mt-1 text-lg font-bold">{money(order.subtotal)}</p></div><div className="rounded-2xl bg-white/80 p-4"><p className="text-[10px] font-bold uppercase text-[#879286]">Delivery fee</p><p className="mt-1 text-lg font-bold">{money(order.delivery_fee)}</p></div><div className="rounded-2xl bg-[#edf5ea] p-4"><p className="text-[10px] font-bold uppercase text-[#55725a]">Total so far</p><p className="mt-1 text-lg font-bold text-[#245b42]">{money(order.total)}</p></div></div>
-        <h3 className="mt-6 font-bold text-[#203329]">Items submitted</h3><div className="mt-2 space-y-2">{submittedItems.map(item=><div key={item.variant_id} className="flex justify-between gap-3 rounded-xl bg-white/70 p-3 text-sm"><span>{item.name} · {item.pack_size} × {item.qty}</span><b>{money(item.price*item.qty)}</b></div>)}</div>
+        <h3 className="mt-6 font-bold text-[#203329]">Items submitted</h3><div className="mt-2 space-y-2">{submittedItems.map(item=><div key={item.variant_id} className="flex justify-between gap-3 rounded-xl bg-white/70 p-3 text-sm"><span>{item.name} · {item.pack_size} × {item.qty}{item.original_price!=null&&item.original_price>item.price&&<small className="ml-2 line-through text-[#899288]">{money(item.original_price*item.qty)}</small>}</span><b>{money(item.price*item.qty)}</b></div>)}</div>
         <div className="mt-7 flex flex-col gap-3 sm:flex-row"><a href={whatsappUrl} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-2 rounded-full bg-[#1f9d55] px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-[#1f9d55]/20"><MessageCircle size={16}/> Open WhatsApp to complete checkout</a><Link href={"/track?code="+encodeURIComponent(order.tracking_code)} className="inline-flex items-center justify-center gap-2 rounded-full border border-[#cbd8c8] bg-white/75 px-6 py-3.5 text-sm font-bold text-[#245b42]"><PackageCheck size={16}/> Track this order</Link></div>
         <div className="mt-5 rounded-xl bg-[#f5f4eb] p-4"><p className="text-[10px] font-bold uppercase tracking-wider text-[#8b8b72]">Private tracking code</p><p className="mt-1 break-all font-mono text-sm font-semibold text-[#344b38]">{order.tracking_code}</p><p className="mt-1 text-xs text-[#829080]">Keep this code safe. It is required to view your order progress.</p></div>
       </section>:!cart.length?<div className="mt-6 rounded-2xl border border-[#e8e9e1] bg-white/75 p-8 text-center shadow-xl backdrop-blur-xl"><ShoppingBag className="mx-auto text-[#8a9689]"/><p className="mt-3 font-semibold text-[#526052]">Your cart is empty</p><Link href="/shop" className="mt-4 inline-block rounded-full bg-[#245b42] px-5 py-3 text-sm font-bold text-white">Browse products</Link></div>:<div className="mt-6 grid gap-6 lg:grid-cols-[1.15fr_.85fr]">
