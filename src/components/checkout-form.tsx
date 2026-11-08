@@ -24,7 +24,7 @@ export function CheckoutForm({ locations }: { locations: Location[] }) {
   useEffect(()=>{try{setCart(JSON.parse(localStorage.getItem(CART_KEY)||"[]"));}catch{setCart([]);}},[]);
   const subtotal=useMemo(()=>cart.reduce((sum,item)=>sum+item.price*item.qty,0),[cart]);
   const cityLocations=locations.filter(x=>x.city===city && x.id);
-  const canContinue=cart.length>0 && name.trim() && phone.trim() && (method==="pickup"?!!pickup:!!state.trim()&&!!deliveryCity.trim()&&!!street.trim());
+  const canContinue=Boolean(cart.length>0 && name.trim() && phone.trim() && (method==="pickup"?!!pickup:!!state.trim()&&!!deliveryCity.trim()&&!!street.trim()));
   return <main className="min-h-screen bg-[#fbfaf7] px-5 py-10"><div className="mx-auto max-w-5xl">
     <Link href="/cart" className="inline-flex items-center gap-2 text-sm font-semibold text-[#245b42]"><ArrowLeft size={15}/> Back to cart</Link>
     <h1 className="mt-5 text-3xl font-semibold tracking-tight text-[#173e2d]">Checkout</h1>
