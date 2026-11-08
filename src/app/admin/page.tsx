@@ -28,7 +28,7 @@ type Order = {
 const money = (value: number) =>
   new Intl.NumberFormat("en-NG", { style: "currency", currency: "NGN", maximumFractionDigits: 0 }).format(value || 0);
 
-const navItems = [
+const navItems: { label: string; icon: typeof LayoutDashboard; active?: boolean; href?: string }[] = [
   { label: "Overview", icon: LayoutDashboard, active: true },
   { label: "Orders", icon: ClipboardList },
   { label: "Products & stock", icon: Package, href: "/admin/products" },
