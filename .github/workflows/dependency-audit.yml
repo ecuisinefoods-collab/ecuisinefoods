@@ -45,7 +45,7 @@ jobs:
               const advisories = item.via.map(v => typeof v === "string" ? v : `${v.title} (${v.url})`).join("; ");
               lines.push(`| ${name} | ${item.severity} | ${item.isDirect ? "Yes" : "No"} | ${item.range} | ${JSON.stringify(item.fixAvailable)} | ${advisories.replaceAll("|","\\|")} |`);
             }
-            fs.writeFileSync("security-audit-summary.md", lines.join("\\n") + "\\n");
+            fs.writeFileSync("security-audit-summary.md", lines.join("\n") + "\n");
             console.log(lines.join("\\n"));
           '
       - name: Publish audit summary
