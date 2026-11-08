@@ -66,8 +66,10 @@ export default function AdminPage() {
     }
     setProfile(admin as AdminProfile);
 
-    const [orderResult, productResult, financeResult] = await Promise.all([
+    const [orderResult, orderCountResult, completedResult, productResult, financeResult] = await Promise.all([
       supabase.from("orders").select("id,order_number,customer_name,total,status,created_at").order("created_at", { ascending: false }).limit(8),
+      supabase.from("orders").select("id", { count: "exact", head: true }),
+      supabase.from("orders").select("total").eq("status", "Completed"),
       supabase.from("products").select("id", { count: "exact", head: true }),
       supabase.from("financial_transactions").select("transaction_type,amount"),
     ]);
@@ -78,8 +80,8 @@ export default function AdminPage() {
     const expenses = financialRows.filter((row) => row.transaction_type === "expense").reduce((sum, row) => sum + Number(row.amount), 0);
     setOrders(orderRows);
     setStats({
-      revenue: orderRows.filter((order) => order.status === "Completed").reduce((sum, order) => sum + Number(order.total), 0),
-      orders: orderRows.length,
+      revenue: (completedResult.data ?? []).reduce((sum, order) => sum + Number(order.total), 0),
+      orders: orderCountResult.count ?? 0,
       products: productResult.count ?? 0,
       income,
       expenses,
