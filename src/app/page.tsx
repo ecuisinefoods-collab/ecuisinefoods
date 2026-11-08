@@ -8,9 +8,12 @@ type Product = { id: string; name: string; slug: string; category: string; descr
 
 export default async function HomePage() {
   let products: Product[] = [];
+  let pickupLocations: { city: string; location_name: string }[] = [];
   if (supabase) {
     const { data } = await supabase.from("products").select("id,name,slug,category,description,image_url,is_featured,product_variants(id,pack_size,price,stock_quantity)").eq("is_active", true).order("is_featured", { ascending: false }).limit(4);
     products = (data ?? []) as Product[];
+    const { data: pickupData } = await supabase.from("pickup_locations").select("city,location_name").eq("is_active", true).order("city").order("location_name");
+    pickupLocations = pickupData ?? [];
   }
 
   return (
@@ -80,7 +83,7 @@ export default async function HomePage() {
         <div><p className="text-base leading-7 text-[#68766b]">At eCuisinefoods, we believe good food can make everyday living better. Our name stands for efficacy—the ability to produce a desired effect—and reflects our commitment to useful, quality-minded food products.</p><p className="mt-4 text-base leading-7 text-[#68766b]">We are growing from our roots in Bauchi and Jos with a vision to bring nourishing food choices to more communities.</p><Link href="#pickup" className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-[#245b42]">Find a pickup location <ArrowRight size={15}/></Link></div>
       </section>
 
-      <section id="pickup" className="bg-[#173e2d] py-12 text-white sm:py-16"><div className="mx-auto flex max-w-7xl flex-col gap-5 px-5 sm:flex-row sm:items-center sm:justify-between"><div><p className="text-xs font-bold uppercase tracking-[.18em] text-[#b8cbb0]">Pickup in Jos & Bauchi</p><h2 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">Your local eCuisinefoods pickup points</h2><p className="mt-2 text-sm text-[#d0ddd0]">Choose your location during checkout. Please wait for order confirmation before visiting.</p></div><Link href="/contact" className="inline-flex items-center gap-2 self-start rounded-full bg-white px-5 py-3 text-sm font-bold text-[#173e2d] transition hover:bg-[#edf3e9]">Contact us <ArrowRight size={15}/></Link></div></section>
+      <section id="pickup" className="bg-[#173e2d] py-12 text-white sm:py-16"><div className="mx-auto flex max-w-7xl flex-col gap-5 px-5 sm:flex-row sm:items-center sm:justify-between"><div><p className="text-xs font-bold uppercase tracking-[.18em] text-[#b8cbb0]">Pickup in Jos & Bauchi</p><h2 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">Your local eCuisinefoods pickup points</h2><p className="mt-2 text-sm text-[#d0ddd0]">Choose your location during checkout. Please wait for order confirmation before visiting.</p><div className="mt-4 flex flex-wrap gap-2">{pickupLocations.map((location,i)=><span key={i} className="rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-semibold">{location.city} · {location.location_name}</span>)}</div></div><Link href="/contact" className="inline-flex items-center gap-2 self-start rounded-full bg-white px-5 py-3 text-sm font-bold text-[#173e2d] transition hover:bg-[#edf3e9]">Contact us <ArrowRight size={15}/></Link></div></section>
 
       <footer className="border-t border-[#e7e8df] bg-white"><div className="mx-auto flex max-w-7xl flex-col gap-5 px-5 py-8 sm:flex-row sm:items-center sm:justify-between"><div><p className="font-bold text-[#173e2d]">eCuisinefoods</p><p className="mt-1 text-xs text-[#879187]">Good food, better living.</p></div><div className="flex flex-wrap gap-5 text-xs font-semibold text-[#69766b]"><Link href="#shop">Shop</Link><Link href="#story">About</Link><Link href="#pickup">Pickup</Link><Link href="/contact">Contact</Link></div><p className="text-xs text-[#9aa39a]">© {new Date().getFullYear()} eCuisinefoods</p></div></footer>
     </main>
