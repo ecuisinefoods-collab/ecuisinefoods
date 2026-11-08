@@ -20,7 +20,8 @@ export default function AdminOrdersPage() {
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [allowed, setAllowed] = useState(false);\n  const [role, setRole] = useState("");
+  const [allowed, setAllowed] = useState(false);
+  const [role, setRole] = useState("");
   const [saving, setSaving] = useState("");
 
   const load = useCallback(async () => {
@@ -31,7 +32,8 @@ export default function AdminOrdersPage() {
     if (profileError || !profile?.is_active || !["owner", "store_manager", "order_officer", "finance_officer", "analyst"].includes(profile.role)) {
       setError("Your account does not have permission to view customer orders."); setLoading(false); return;
     }
-    setAllowed(true);\n    setRole(profile.role);
+    setAllowed(true);
+    setRole(profile.role);
     const { data, error: orderError } = await supabase.from("orders").select("*").order("created_at", { ascending: false }).limit(150);
     if (orderError) { setError(orderError.message); setLoading(false); return; }
     const rows = (data || []) as Order[];
@@ -54,7 +56,8 @@ export default function AdminOrdersPage() {
     setSaving("");
   }
 
-  function downloadOrders(){const cols=["order_number","customer_name","phone","email","fulfillment_method","delivery_state","delivery_city","street_address","house_number_landmark","order_notes","status","subtotal","delivery_fee","total","created_at"];const safe=(v:unknown)=>{let x=String(v??"");if(/^[=+@-]/.test(x))x="'"+x;return '"'+x.replace(/"/g,'""')+'"';};const body=[cols.join(","),...orders.map(o=>cols.map(k=>safe((o as unknown as Record<string,unknown>)[k])).join(","))].join("\\r\\n");const url=URL.createObjectURL(new Blob(["\\uFEFF"+body],{type:"text/csv;charset=utf-8"}));const a=document.createElement("a");a.href=url;a.download="ecuisinefoods-orders-"+new Date().toISOString().slice(0,10)+".csv";a.click();URL.revokeObjectURL(url);}
+  function downloadOrders(){const cols=["order_number","customer_name","phone","email","fulfillment_method","delivery_state","delivery_city","street_address","house_number_landmark","order_notes","status","subtotal","delivery_fee","total","created_at"];const safe=(v:unknown)=>{let x=String(v??"");if(/^[=+@-]/.test(x))x="'"+x;return '"'+x.replace(/"/g,'""')+'"';};const body=[cols.join(","),...orders.map(o=>cols.map(k=>safe((o as unknown as Record<string,unknown>)[k])).join(","))].join("\\r\
+");const url=URL.createObjectURL(new Blob(["\\uFEFF"+body],{type:"text/csv;charset=utf-8"}));const a=document.createElement("a");a.href=url;a.download="ecuisinefoods-orders-"+new Date().toISOString().slice(0,10)+".csv";a.click();URL.revokeObjectURL(url);}
   async function editOrder(order:Order){if(!supabase||!["owner","store_manager","order_officer"].includes(role))return;const customer_name=window.prompt("Customer name",order.customer_name);if(customer_name===null)return;const phone=window.prompt("Phone number",order.phone);if(phone===null)return;const email=window.prompt("Email (leave blank if none)",order.email||"");if(email===null)return;const order_notes=window.prompt("Order notes",order.order_notes||"");if(order_notes===null)return;setSaving(order.id);const {error:e}=await supabase.from("orders").update({customer_name:customer_name.trim(),phone:phone.trim(),email:email.trim()||null,order_notes:order_notes.trim()||null,updated_at:new Date().toISOString()}).eq("id",order.id);if(e)setError(e.message);else await load();setSaving("");}
   async function deleteOrder(order:Order){if(!supabase||role!=="owner")return;if(!window.confirm("Permanently erase order #"+order.order_number+" and its associated line items if database rules permit? This cannot be undone and affects sales reports."))return;setSaving(order.id);const {error:e}=await supabase.from("orders").delete().eq("id",order.id);if(e)setError(e.message);else await load();setSaving("");}
   return <main className="min-h-screen bg-[#f5f7f3] px-4 py-8 text-[#25392b] sm:px-8">
