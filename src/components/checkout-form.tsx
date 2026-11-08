@@ -16,7 +16,7 @@ type DeliveryZone = {
   minimum_order_amount:number; estimated_days:string|null; instructions:string|null;
 };
 type Item = { variant_id:string; product_id:string; name:string; pack_size:string; price:number; original_price?:number; qty:number; stock_quantity?:number };
-type OrderCreated = { order_number:number; tracking_code:string; subtotal:number; delivery_fee:number; total:number };
+type OrderCreated = { order_number:number; tracking_code:string; subtotal:number; delivery_fee:number; discount_amount:number; coupon_code:string|null; total:number };
 
 const CART_KEY="ecuisinefoods-cart-v1";
 const money=(n:number)=>"₦"+Number(n||0).toLocaleString("en-NG");
@@ -36,7 +36,7 @@ export function CheckoutForm({ locations, deliveryZones }: { locations: Location
   const [deliveryZoneId,setDeliveryZoneId]=useState("");
   const [street,setStreet]=useState("");
   const [landmark,setLandmark]=useState("");
-  const [notes,setNotes]=useState("");
+  const [notes,setNotes]=useState("");\n  const [couponCode,setCouponCode]=useState("");\n  const [appliedCoupon,setAppliedCoupon]=useState<{code:string;discount:number}|null>(null);\n  const [couponMessage,setCouponMessage]=useState("");
   const [submitting,setSubmitting]=useState(false);
   const [error,setError]=useState("");
   const [order,setOrder]=useState<OrderCreated|null>(null);
@@ -180,7 +180,7 @@ export function CheckoutForm({ locations, deliveryZones }: { locations: Location
           <button type="submit" disabled={!canContinue||submitting} className="w-full rounded-full bg-[#245b42] px-5 py-3.5 text-sm font-bold text-white shadow-lg shadow-[#245b42]/20 transition hover:bg-[#173e2d] disabled:cursor-not-allowed disabled:opacity-40">{submitting?"Saving your order…":"Place order & continue to WhatsApp"}</button>
           <p className="text-xs leading-5 text-[#899288]">Your order request is saved first and given an order number. It remains unpaid and unconfirmed until our team replies. Product prices, stock availability and delivery fees are checked again when the order is saved.</p>
         </form>
-        <aside className="h-fit rounded-3xl border border-white/70 bg-white/70 p-5 shadow-xl shadow-[#506f56]/10 backdrop-blur-2xl sm:p-7"><h2 className="font-bold text-[#203329]">Order summary</h2><div className="mt-4 space-y-3">{cart.map(item=><div key={item.variant_id} className="flex justify-between gap-3 text-sm"><div><p className="font-semibold text-[#405044]">{item.name}</p><p className="mt-1 text-xs text-[#899288]">{item.pack_size} × {item.qty}</p></div><span className="font-semibold text-[#405044]">{money(item.price*item.qty)}</span></div>)}</div><div className="mt-5 border-t border-[#edf0e9] pt-4"><div className="flex justify-between text-sm"><span className="text-[#68766b]">Estimated subtotal</span><strong className="text-[#203329]">{money(subtotal)}</strong></div><div className="mt-2 flex justify-between text-sm"><span className="text-[#68766b]">Delivery fee</span><span className="text-[#899288]">{method==="delivery"&&selectedZone?money(deliveryFee):money(0)}</span></div><div className="mt-4 flex justify-between border-t border-[#edf0e9] pt-4"><strong className="text-[#203329]">Estimated total</strong><strong className="text-lg text-[#245b42]">{money(subtotal+(method==="delivery"?deliveryFee:0))}</strong></div><p className="mt-3 text-[10px] leading-5 text-[#929b90]">Final totals are revalidated against the database when you submit your order.</p></div></aside>
+        <aside className="h-fit rounded-3xl border border-white/70 bg-white/70 p-5 shadow-xl shadow-[#506f56]/10 backdrop-blur-2xl sm:p-7"><h2 className="font-bold text-[#203329]">Order summary</h2><div className="mt-4 space-y-3">{cart.map(item=><div key={item.variant_id} className="flex justify-between gap-3 text-sm"><div><p className="font-semibold text-[#405044]">{item.name}</p><p className="mt-1 text-xs text-[#899288]">{item.pack_size} × {item.qty}</p></div><span className="font-semibold text-[#405044]">{money(item.price*item.qty)}</span></div>)}</div><div className="mt-5 border-t border-[#edf0e9] pt-4"><div className="flex justify-between text-sm"><span className="text-[#68766b]">Estimated subtotal</span><strong className="text-[#203329]">{money(subtotal)}</strong></div><div className="mt-2 flex justify-between text-sm"><span className="text-[#68766b]">Coupon discount</span><span className="text-[#16834a]">{money(appliedCoupon?.discount||0)}</span></div><div className="mt-2 flex justify-between text-sm"><span className="text-[#68766b]">Delivery fee</span><span className="text-[#899288]">{method==="delivery"&&selectedZone?money(deliveryFee):money(0)}</span></div><div className="mt-4 flex justify-between border-t border-[#edf0e9] pt-4"><strong className="text-[#203329]">Estimated total</strong><strong className="text-lg text-[#245b42]">{money(Math.max(0,subtotal+(method==="delivery"?deliveryFee:0)-(appliedCoupon?.discount||0)))}</strong></div><p className="mt-3 text-[10px] leading-5 text-[#929b90]">Final totals are revalidated against the database when you submit your order.</p></div></aside>
       </div>}
     </div>
   </main>;
