@@ -1,5 +1,14 @@
-import { SiteHeader } from "@/components/site-header"; import { ProductCatalog } from "@/components/product-catalog"; import { supabase } from "@/lib/supabase";
+import { SiteHeader } from "@/components/site-header";
+import { ProductCatalog } from "@/components/product-catalog";
+import { supabase } from "@/lib/supabase";
+import { ArrowLeft, Leaf, ShieldCheck } from "lucide-react";
+import Link from "next/link";
 type Product={id:string;name:string;slug:string;category:string;description:string|null;image_url:string|null;product_variants?:{id:string;pack_size:string;price:number;stock_quantity:number}[]};
-export const dynamic = "force-dynamic";
-
-export default async function ShopPage(){let products:Product[]=[];if(supabase){const {data}=await supabase.from("products").select("id,name,slug,category,description,image_url,product_variants(id,pack_size,price,stock_quantity)").eq("is_active",true).order("name");products=(data??[]) as Product[];}return <main className="min-h-screen bg-[#fbfaf7]"><div className="bg-[#173e2d] px-4 py-2 text-center text-xs text-white">Good food, better living</div><SiteHeader/><section className="mx-auto max-w-7xl px-5 py-12 sm:py-16"><p className="text-xs font-bold uppercase tracking-[.18em] text-[#78906b]">The eCuisinefoods range</p><h1 className="mt-2 text-4xl font-semibold tracking-tight text-[#173e2d]">Shop all products</h1><p className="mt-4 max-w-2xl leading-7 text-[#68766b]">Browse our food range, choose a pack size, and add items to your cart.</p><ProductCatalog products={products as unknown as Parameters<typeof ProductCatalog>[0]["products"]}/></section></main>;}
+export const dynamic="force-dynamic";
+export default async function ShopPage(){
+ let products:Product[]=[];
+ if(supabase){const {data}=await supabase.from("products").select("id,name,slug,category,description,image_url,product_variants(id,pack_size,price,stock_quantity)").eq("is_active",true).order("name");products=(data||[]) as Product[];}
+ return <main className="min-h-screen bg-[#fbfaf7]"><div className="bg-[#173e2d] px-4 py-2 text-center text-[10px] font-bold tracking-widest text-white">GOOD FOOD · BETTER LIVING</div><SiteHeader/>
+ <section className="relative overflow-hidden bg-[#f4f0e5]"><div className="mx-auto max-w-7xl px-5 py-12 sm:py-16"><Link href="/" className="inline-flex items-center gap-2 text-xs font-bold text-[#61765f]"><ArrowLeft size={14}/> Home</Link><div className="mt-6 grid gap-6 md:grid-cols-[1fr_auto] md:items-end"><div><p className="inline-flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-[.2em] text-[#78906b]"><Leaf size={14}/> The eCuisinefoods range</p><h1 className="mt-3 text-4xl font-semibold tracking-tight text-[#173e2d] sm:text-5xl">Shop good food.</h1><p className="mt-4 max-w-xl text-sm leading-7 text-[#68766b]">Explore our current products, compare pack sizes, check live availability, and add your favourites to your cart.</p></div><div className="flex gap-2"><span className="inline-flex items-center gap-2 rounded-full border border-[#dce5d6] bg-white/80 px-4 py-2 text-[10px] font-bold text-[#42654a]"><ShieldCheck size={14}/> Live catalogue</span><span className="rounded-full border border-[#dce5d6] bg-white/80 px-4 py-2 text-[10px] font-bold text-[#42654a]">{products.length} products</span></div></div></div></section>
+ <section className="mx-auto max-w-7xl px-5 py-10 sm:py-14"><ProductCatalog products={products as unknown as Parameters<typeof ProductCatalog>[0]["products"]}/></section></main>;
+}
