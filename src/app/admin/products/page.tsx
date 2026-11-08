@@ -96,7 +96,14 @@ export default function ProductsAdminPage() {
     setVariantDraft({ pack_size: variant.pack_size, price: String(variant.price), stock_quantity: String(variant.stock_quantity) });
     setError(""); setMessage("");
   };
-  const toggleVariantAvailability = async (variant: Variant) => {\n    if (!supabase || !authorized) return;\n    const nextStock = variant.stock_quantity > 0 ? 0 : 1;\n    const { error: updateError } = await supabase.from("product_variants").update({ stock_quantity: nextStock }).eq("id", variant.id);\n    if (updateError) setError(updateError.message);\n    else { setMessage(nextStock > 0 ? "Pack size marked Available." : "Pack size marked Out of stock."); await load(); }\n  };\n  const deleteVariant = async (id: string) => {
+  const toggleVariantAvailability = async (variant: Variant) => {
+    if (!supabase || !authorized) return;
+    const nextStock = variant.stock_quantity > 0 ? 0 : 1;
+    const { error: updateError } = await supabase.from("product_variants").update({ stock_quantity: nextStock }).eq("id", variant.id);
+    if (updateError) setError(updateError.message);
+    else { setMessage(nextStock > 0 ? "Pack size marked Available." : "Pack size marked Out of stock."); await load(); }
+  };
+  const deleteVariant = async (id: string) => {
     if (!supabase || !window.confirm("Delete this pack size? Existing order records may prevent deletion.")) return;
     const { error: deleteError } = await supabase.from("product_variants").delete().eq("id", id);
     if (deleteError) setError(deleteError.message); else { setMessage("Pack size deleted."); await load(); }
