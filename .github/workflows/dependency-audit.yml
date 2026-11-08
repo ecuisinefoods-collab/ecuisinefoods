@@ -3,8 +3,9 @@ name: Dependency security audit
 on:
   push:
     branches: [main]
-    paths-ignore:
-      - security-audit-summary.md
+    paths:
+      - package.json
+      - .github/workflows/dependency-audit.yml
   workflow_dispatch:
 
 permissions:
@@ -22,6 +23,8 @@ jobs:
           node-version: 22
       - name: Resolve dependencies and generate lockfile
         run: npm install --package-lock-only --ignore-scripts --no-audit
+      - name: Apply safe, non-major dependency fixes
+        run: npm audit fix --ignore-scripts || echo "Some findings require further review; continuing."
       - name: Run npm security audit
         run: |
           npm audit --json > npm-audit.json || true
@@ -45,16 +48,23 @@ jobs:
               const advisories = item.via.map(v => typeof v === "string" ? v : `${v.title} (${v.url})`).join("; ");
               lines.push(`| ${name} | ${item.severity} | ${item.isDirect ? "Yes" : "No"} | ${item.range} | ${JSON.stringify(item.fixAvailable)} | ${advisories.replaceAll("|","\\|")} |`);
             }
-            fs.writeFileSync("security-audit-summary.md", lines.join("\n") + "\n");
-            console.log(lines.join("\\n"));
+            const summary = lines.join("\\n") + "\\n";
+            fs.writeFileSync("security-audit-summary.md", summary);
+            fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, summary);
+            console.log(summary);
           '
-      - name: Publish audit summary
+      - name: Commit lockfile and audit results
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add security-audit-summary.md
-          git diff --cached --quiet || git commit -m "Publish dependency security audit"
-          git push
+          git add package.json package-lock.json security-audit-summary.md
+          if git diff --cached --quiet; then
+            echo "No dependency or audit report changes to commit."
+          else
+            git commit -m "Apply safe dependency updates and publish audit"
+            git pull --rebase origin main
+            git push
+          fi
       - name: Upload full audit report
         uses: actions/upload-artifact@v4
         with:
