@@ -1,10 +1,10 @@
 import Link from "next/link";
-import { ArrowLeft, Mail, MessageCircle } from "lucide-react";
+import { Mail, MessageCircle } from "lucide-react";
+import { SiteHeader } from "@/components/site-header";
 
 export default function ContactPage() {
-  return <main className="min-h-screen bg-[#f7f4ec] px-5 py-12">
+  return <main className="min-h-screen bg-[#fbfaf7]"><div className="bg-[#173e2d] px-4 py-2 text-center text-xs text-white">Good food, better living</div><SiteHeader/><section className="px-5 py-12">
     <div className="mx-auto max-w-3xl">
-      <Link href="/" className="inline-flex items-center gap-2 text-sm font-semibold text-[#245b42]"><ArrowLeft size={15}/> Back to home</Link>
       <div className="mt-8 rounded-3xl border border-[#e4e7dd] bg-white p-7 sm:p-10">
         <p className="text-xs font-bold uppercase tracking-[.18em] text-[#78906b]">We are here to help</p>
         <h1 className="mt-3 text-3xl font-semibold tracking-tight text-[#173e2d] sm:text-4xl">Contact eCuisinefoods</h1>
@@ -16,5 +16,5 @@ export default function ContactPage() {
         <p className="mt-8 rounded-xl bg-[#f7f4ec] p-4 text-sm leading-6 text-[#68766b]">For pickup orders, please wait for your order confirmation before visiting your selected location.</p>
       </div>
     </div>
-  </main>;
+  </section></main>;
 }
