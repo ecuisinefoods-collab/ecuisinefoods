@@ -3,6 +3,7 @@ import { ArrowLeft, Leaf } from "lucide-react";
 import { notFound } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { SiteHeader } from "@/components/site-header";
+import { ProductPurchasePanel } from "@/components/product-purchase-panel";
 
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -23,9 +24,8 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           <p className="mt-5 whitespace-pre-line leading-7 text-[#68766b]">{product.description || "Product details will be updated soon."}</p>
           {product.ingredients && <section className="mt-6"><h2 className="font-bold text-[#203329]">Ingredients</h2><p className="mt-2 text-sm leading-6 text-[#68766b]">{product.ingredients}</p></section>}
           {product.nutrition_info && <section className="mt-6"><h2 className="font-bold text-[#203329]">Nutrition information</h2><pre className="mt-2 whitespace-pre-wrap text-sm leading-6 text-[#68766b]">{JSON.stringify(product.nutrition_info,null,2)}</pre></section>}
-          <div className="mt-7 border-t border-[#e8e9e1] pt-5"><h2 className="font-bold text-[#203329]">Available pack sizes</h2>{variants.length ? <ul className="mt-3 space-y-2">{variants.map(v=><li key={v.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-[#fbfaf7] px-4 py-3 text-sm"><span className="font-semibold text-[#405044]">{v.pack_size}</span><span className="font-bold text-[#245b42]">₦{Number(v.price).toLocaleString("en-NG")}</span><span className="text-xs text-[#7b857a]">{v.stock_quantity>0?"In stock":"Out of stock"}</span></li>)}</ul>:<p className="mt-2 text-sm text-[#7b857a]">Pack sizes and pricing will be added soon.</p>}</div>
-          <p className="mt-6 rounded-xl bg-[#f7f4ec] p-4 text-sm leading-6 text-[#68766b]">Online ordering is being prepared. Please contact us for current availability.</p>
-          <Link href="/contact" className="mt-5 inline-flex rounded-full bg-[#245b42] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#173e2d]">Contact us about this product</Link>
+          <ProductPurchasePanel productId={product.id} productName={product.name} variants={variants}/>
+
         </div>
       </div>
     </section>
