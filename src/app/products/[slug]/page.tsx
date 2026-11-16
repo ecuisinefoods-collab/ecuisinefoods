@@ -77,7 +77,7 @@ export default async function ProductPage({params}:{params:Promise<{slug:string}
 
           <div className="mt-5 grid grid-cols-2 gap-3">
             <div className="ec-product-promise rounded-xl p-3"><PackageCheck size={17}/><p className="mt-2 text-[10px] font-extrabold text-[#36523c]">Stock checked</p><p className="mt-1 text-[9px] leading-4 text-[#829083]">{totalStock>0?totalStock+" unit"+(totalStock===1?"":"s")+" currently listed":"Stock will be updated when available"}</p></div>
-            <div className="ec-product-promise rounded-xl p-3"><Truck size={17}/><p className="mt-2 text-[10px] font-extrabold text-[#36523c]">Pickup options</p><p className="mt-1 text-[9px] leading-4 text-[#829083]">Jos and Bauchi, Nigeria</p></div>
+            <div className="ec-product-promise rounded-xl p-3"><Truck size={17}/><p className="mt-2 text-[10px] font-extrabold text-[#36523c]">Delivery & collection</p><p className="mt-1 text-[9px] leading-4 text-[#829083]">See available options during checkout</p></div>
           </div>
         </div>
       </div>
