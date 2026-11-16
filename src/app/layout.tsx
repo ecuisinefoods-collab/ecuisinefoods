@@ -8,6 +8,7 @@ import { AssistantWidget } from "@/components/assistant-widget";
 import { BrandLoadingFallback, BrandLoadingScreen } from "@/components/brand-loading-screen";
 import { supabase } from "@/lib/supabase";
 import { ThemeProvider } from "@/components/theme-provider";
+import { ReferralTracker } from "@/components/referral-tracker";
 
 export const metadata: Metadata = {
   title: "eCuisine | Good food, better living",
@@ -37,6 +38,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         <Suspense fallback={<BrandLoadingFallback logoUrl={brandLogoUrl} />}>
           <BrandLoadingScreen initialLogoUrl={brandLogoUrl} />
         </Suspense>
+        <ReferralTracker />
         {children}
         <MobileStoreNav />
         <FloatingWhatsApp />
