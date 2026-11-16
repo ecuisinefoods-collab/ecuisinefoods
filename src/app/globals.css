@@ -244,3 +244,11 @@ body{font-feature-settings:"ss01" on;-webkit-font-smoothing:antialiased}
  .floating-whatsapp{bottom:88px}
 }
 @media(prefers-reduced-motion:reduce){.floating-whatsapp,.mobile-store-nav{transition:none}}
+
+.storefront-brand-mobile-fallback{display:none;z-index:0}
+@media(max-width:640px){
+ .storefront-brand-mobile-fallback{display:block;filter:brightness(.55)}
+ .store-hero:has(.storefront-brand-mobile-fallback) .mx-auto{position:relative;z-index:2}
+ .store-hero:has(.storefront-brand-mobile-fallback) h1,.store-hero:has(.storefront-brand-mobile-fallback) p{color:#fff;text-shadow:0 2px 18px rgba(0,0,0,.3)}
+ .store-hero:has(.storefront-brand-mobile-fallback) .hero-product-scene{background:rgba(255,255,255,.16)}
+}
