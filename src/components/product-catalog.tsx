@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { ArrowRight, BadgePercent, Check, PackageCheck, Plus, Search, ShoppingBag, SlidersHorizontal, Sparkles, Tag, Trash2, Minus } from "lucide-react";
+import { ArrowRight, Check, PackageCheck, Plus, Search, ShoppingBag, SlidersHorizontal, Sparkles, Tag, Trash2, Minus } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { getEffectivePrice, getDiscountPercent } from "@/lib/product-pricing";
 
