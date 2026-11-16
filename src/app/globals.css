@@ -254,3 +254,72 @@ body{font-feature-settings:"ss01" on;-webkit-font-smoothing:antialiased}
 }
 
 @media(max-width:640px){.discount-mascot{bottom:88px!important;left:10px!important;transform:scale(.86);transform-origin:bottom left}.discount-mascot:hover{transform:scale(.9)}}
+
+
+/* eCuisinefoods complete storefront home — bright, welcoming supermarket palette */
+.ec-announcement{background:#f6c944;color:#183b27}
+.ec-home-hero{min-height:620px;background:radial-gradient(circle at 78% 20%,#fff1bb 0,#fff8e1 30%,#e2f0dc 75%,#d4e9d7 100%)}
+.ec-home-hero--video{background:#092c1f;color:#fff}
+.ec-hero-video,.ec-hero-fallback,.ec-hero-overlay{z-index:-2}
+.ec-hero-video{object-position:center}
+.ec-hero-fallback{z-index:-3;background-position:center;background-size:cover}
+.ec-hero-overlay{z-index:-1;background:linear-gradient(90deg,rgba(4,42,27,.95) 0%,rgba(7,65,42,.76) 48%,rgba(7,65,42,.28) 100%)}
+.ec-home-hero:not(.ec-home-hero--video) .ec-hero-overlay{background:transparent}
+.ec-home-hero:not(.ec-home-hero--video) .ec-hero-fallback{display:none}
+.ec-hero-orb{z-index:0;pointer-events:none;background:rgba(246,201,68,.23);filter:blur(3px)}
+.ec-hero-orb-two{background:rgba(8,127,91,.13)}
+.ec-hero-eyebrow{border-color:#d5e3d1;background:rgba(255,255,255,.84);color:#087f5b}
+.ec-hero-title{color:#07543f}
+.ec-hero-highlight{color:#e6a900}
+.ec-hero-description{color:#617365}
+.ec-hero-proof{color:#5c705f}
+.ec-home-hero--video .ec-hero-eyebrow{border-color:rgba(255,255,255,.35);background:rgba(255,255,255,.13);color:#fff}
+.ec-home-hero--video .ec-hero-title{color:#fff}
+.ec-home-hero--video .ec-hero-highlight{color:#ffd65e}
+.ec-home-hero--video .ec-hero-description,.ec-home-hero--video .ec-hero-proof{color:#f0f6ec}
+.ec-primary-cta{background:#087f5b;color:#fff}
+.ec-primary-cta:hover{background:#07543f}
+.ec-secondary-cta{border-color:#b9cbb7;background:rgba(255,255,255,.75);color:#245b42}
+.ec-home-hero--video .ec-secondary-cta{border-color:rgba(255,255,255,.55);background:rgba(255,255,255,.12);color:#fff}
+.ec-product-glow{background:rgba(244,199,71,.5)}
+.ec-product-stage{border-color:rgba(255,255,255,.8);background:radial-gradient(circle at 50% 35%,#fffef8 0%,#f5e7c6 58%,#e8d7af 100%)}
+.ec-featured-caption{border-color:#e8ebdf}
+.ec-hero-product-image{filter:drop-shadow(0 25px 22px rgba(46,38,20,.22));animation:ec-home-product-float 6.5s ease-in-out infinite}
+@keyframes ec-home-product-float{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-8px) rotate(1deg)}}
+.ec-benefit-card{border-color:#edf0e7;box-shadow:0 8px 22px rgba(29,69,42,.045)}
+.ec-benefit-icon{background:#edf6e8;color:#087f5b}
+.ec-kicker{font-size:10px;font-weight:900;letter-spacing:.19em;text-transform:uppercase;color:#9a792e}
+.ec-category-section{background:linear-gradient(180deg,#fff9e6 0%,#fff 100%)}
+.ec-category-tile{border-color:#e8ebdf;background:#fff;color:#294b35;box-shadow:0 8px 22px rgba(38,65,39,.04)}
+.ec-category-tile:hover{border-color:#b6ceb1;background:#f3f8ef;box-shadow:0 16px 30px rgba(38,65,39,.1)}
+.ec-category-icon{background:#edf5e7;color:#087f5b}
+.ec-category-coming{background:linear-gradient(145deg,#fff,#fff8e7);border-style:dashed}
+.ec-category-coming .ec-category-icon{background:#fff0bf;color:#946c12}
+.ec-offer-section{background:#fff}
+.ec-offer-banner{background:linear-gradient(110deg,#07543f 0%,#087f5b 56%,#e0a51a 145%);color:#fff;box-shadow:0 22px 50px rgba(7,84,63,.15)}
+.ec-offer-banner p{color:#eaf4e7}
+.ec-offer-decoration{border-color:rgba(255,255,255,.12)}
+.ec-discount-section{background:#fff9e9}
+.ec-home-empty{display:flex;min-height:180px;flex-direction:column;align-items:center;justify-content:center;gap:10px;border:1px dashed #d5dfd1;border-radius:22px;background:#fff;padding:24px;text-align:center;color:#087f5b}
+.ec-home-empty strong{font-size:15px;color:#294b35}
+.ec-home-empty span{font-size:12px;color:#829083}
+.ec-home-empty a{display:inline-flex;align-items:center;gap:8px;margin-top:4px;font-size:12px;font-weight:800}
+.ec-why-section{background:linear-gradient(135deg,#f2f7ee,#fff7df)}
+.ec-why-card{border-color:#e7ede3;box-shadow:0 8px 22px rgba(34,65,39,.045)}
+.ec-why-icon{background:#edf5e7;color:#087f5b}
+.ec-review-promo{border-color:#e7e9df;background:linear-gradient(105deg,#fff9e8,#f1f7ed)}
+.ec-pickup-section{background:#07543f;color:#fff}
+.ec-location-chip{border-color:rgba(255,255,255,.25);background:rgba(255,255,255,.1);color:#fff}
+.ec-pickup-card{border-color:#e4ecdf;background:#fff;color:#23432e;box-shadow:0 20px 42px rgba(0,0,0,.12)}
+.ec-store-footer{background:#102f22}
+@media(max-width:767px){
+ .ec-home-hero{min-height:unset}
+ .ec-home-hero--video{min-height:720px}
+ .ec-hero-video{display:none}
+ .ec-home-hero--video .ec-hero-fallback{display:block}
+ .ec-home-hero--video .ec-hero-overlay{background:linear-gradient(180deg,rgba(4,42,27,.92),rgba(7,65,42,.7) 62%,rgba(7,65,42,.3))}
+ .ec-home-hero .ec-hero-product{max-width:420px}
+ .ec-home-hero--video .ec-hero-product{margin-top:0}
+ .ec-home-hero--video .ec-product-stage{min-height:250px}
+}
+@media(prefers-reduced-motion:reduce){.ec-hero-product-image{animation:none}.ec-category-tile,.ec-primary-cta{transition:none}}
