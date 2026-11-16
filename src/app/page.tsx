@@ -30,7 +30,7 @@ type StoreConfig = {
 export const dynamic = "force-dynamic";
 
 const defaults: StoreConfig = {
-  announcement: "Welcome to eCuisinefoods · Good food, better living",
+  announcement: "Welcome to eCuisine · Good food, better living",
   hero_eyebrow: "A brighter way to shop for food",
   hero_title: "Good Food.",
   hero_highlight: "Better Living.",
@@ -42,7 +42,7 @@ const defaults: StoreConfig = {
   promise_title: "Good food is where better living begins.",
   promise_description: "We are building a food brand grounded in quality, nutrition, trust, innovation and natural ingredients.",
   quote: "We believe every family deserves thoughtful food choices and a brand they can trust.",
-  quote_attribution: "The eCuisinefoods vision",
+  quote_attribution: "The eCuisine vision",
   social_facebook: "https://www.facebook.com/share/1Dwqaoq7hd/",
   social_instagram: "https://www.instagram.com/ecuisine_official",
   social_tiktok: "https://www.tiktok.com/@ecuisine_official",
@@ -216,7 +216,7 @@ export default async function HomePage() {
         <div className="mx-auto max-w-7xl px-5">
           <div className="ec-offer-banner relative overflow-hidden rounded-[1.8rem] p-6 sm:p-9">
             <div className="relative z-10 grid items-center gap-6 md:grid-cols-[1fr_auto]">
-              <div><p className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[.2em]"><BadgePercent size={15} /> Special offers</p><h2 className="mt-3 max-w-2xl text-3xl font-black leading-tight sm:text-4xl">Good choices. Great finds.</h2><p className="mt-3 max-w-xl text-sm leading-6">Keep an eye on this space for active discounts, new deals and seasonal offers from eCuisinefoods.</p></div>
+              <div><p className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[.2em]"><BadgePercent size={15} /> Special offers</p><h2 className="mt-3 max-w-2xl text-3xl font-black leading-tight sm:text-4xl">Good choices. Great finds.</h2><p className="mt-3 max-w-xl text-sm leading-6">Keep an eye on this space for active discounts, new deals and seasonal offers from eCuisine.</p></div>
               <Link href="/shop" className="inline-flex w-fit items-center gap-3 rounded-xl bg-white px-6 py-3.5 text-xs font-extrabold text-[#07543f] shadow-lg">See current offers <ArrowRight size={15} /></Link>
             </div>
             <span className="ec-offer-decoration absolute -right-8 -top-12 h-64 w-64 rounded-full border-[35px]" />
@@ -227,7 +227,7 @@ export default async function HomePage() {
       <section className="bg-[#fff] py-12 sm:py-16">
         <div className="mx-auto max-w-7xl px-5">
           <div className="ec-section-intro flex items-end justify-between gap-4">
-            <div><p className="ec-kicker">Fresh from the catalogue</p><h2 className="mt-2 text-3xl font-black tracking-tight sm:text-4xl">New arrivals</h2><p className="mt-2 text-sm text-[#748277]">See what's new at eCuisinefoods.</p></div>
+            <div><p className="ec-kicker">Fresh from the catalogue</p><h2 className="mt-2 text-3xl font-black tracking-tight sm:text-4xl">New arrivals</h2><p className="mt-2 text-sm text-[#748277]">See what's new at eCuisine.</p></div>
             <Link href="/shop" className="hidden items-center gap-2 text-xs font-extrabold text-[#087f5b] sm:inline-flex">Explore all <ArrowRight size={14} /></Link>
           </div>
           {latest.length ? <div className="mt-6"><ProductCatalog products={catalog(latest)} /></div> : <div className="ec-home-empty mt-6"><Sparkles size={25} /><strong>New products are on the way.</strong><span>We'll show new arrivals here as soon as they are available.</span></div>}
@@ -246,7 +246,7 @@ export default async function HomePage() {
 
       <section className="ec-why-section py-14 sm:py-20">
         <div className="mx-auto grid max-w-7xl gap-9 px-5 md:grid-cols-[.95fr_1.05fr] md:items-center">
-          <div><p className="ec-kicker">Why eCuisinefoods</p><h2 className="mt-3 text-3xl font-black leading-tight tracking-tight sm:text-4xl">{config.promise_title}</h2><p className="mt-4 max-w-xl text-sm leading-7 text-[#68786c]">{config.promise_description}</p><Link href="/about" className="ec-primary-cta mt-6 inline-flex items-center gap-2 rounded-xl px-5 py-3 text-xs font-extrabold">Our vision & story <ArrowRight size={15} /></Link></div>
+          <div><p className="ec-kicker">Why eCuisine</p><h2 className="mt-3 text-3xl font-black leading-tight tracking-tight sm:text-4xl">{config.promise_title}</h2><p className="mt-4 max-w-xl text-sm leading-7 text-[#68786c]">{config.promise_description}</p><Link href="/about" className="ec-primary-cta mt-6 inline-flex items-center gap-2 rounded-xl px-5 py-3 text-xs font-extrabold">Our vision & story <ArrowRight size={15} /></Link></div>
           <div className="grid grid-cols-2 gap-3">
             {[
               { icon: CheckCircle2, title: "Thoughtful choices", detail: "We put care into the products we bring to the store." },
@@ -276,7 +276,7 @@ export default async function HomePage() {
 
       <footer className="ec-store-footer text-white">
         <div className="mx-auto grid max-w-7xl gap-9 px-5 py-12 sm:grid-cols-2 lg:grid-cols-4">
-          <div><p className="text-2xl font-black tracking-tight">eCuisinefoods</p><p className="mt-2 text-xs font-bold text-[#f5ca4e]">Good food, better living.</p><p className="mt-4 max-w-xs text-xs leading-6 text-[#c5d5c8]">Thoughtful food choices, made with purpose and care.</p><a href="https://wa.me/2348080942328" target="_blank" rel="noreferrer" className="mt-4 inline-flex items-center gap-2 text-xs font-bold text-[#f5ca4e]">WhatsApp: +234 808 094 2328 <ArrowRight size={13} /></a></div>
+          <div><p className="text-2xl font-black tracking-tight">eCuisine</p><p className="mt-2 text-xs font-bold text-[#f5ca4e]">Good food, better living.</p><p className="mt-4 max-w-xs text-xs leading-6 text-[#c5d5c8]">Thoughtful food choices, made with purpose and care.</p><a href="https://wa.me/2348080942328" target="_blank" rel="noreferrer" className="mt-4 inline-flex items-center gap-2 text-xs font-bold text-[#f5ca4e]">WhatsApp: +234 808 094 2328 <ArrowRight size={13} /></a></div>
           <div><h3 className="text-xs font-black uppercase tracking-widest">Shop & explore</h3><div className="mt-4 flex flex-col gap-3 text-xs text-[#c5d5c8]"><Link href="/shop">Shop all products</Link><Link href="/cart">Shopping cart</Link><Link href="/checkout">Checkout</Link><Link href="/about">Our story & vision</Link></div></div>
           <div><h3 className="text-xs font-black uppercase tracking-widest">Customer care</h3><div className="mt-4 flex flex-col gap-3 text-xs text-[#c5d5c8]"><Link href="/track">Track an order</Link><Link href="/faq">FAQs</Link><Link href="/reviews">Customer reviews</Link><Link href="/contact">Contact us</Link></div></div>
           <div><h3 className="text-xs font-black uppercase tracking-widest">Follow the journey</h3><div className="mt-4 flex flex-col gap-3 text-xs text-[#c5d5c8]">{[
@@ -285,7 +285,7 @@ export default async function HomePage() {
             { url: config.social_youtube, label: "YouTube" }, { url: config.social_whatsapp, label: "WhatsApp" }
           ].filter(item => item.url?.trim()).map(item => <a key={item.label} href={item.url} target="_blank" rel="noreferrer">{item.label}</a>)}</div></div>
         </div>
-        <div className="border-t border-white/10 px-5 py-5 text-center text-[10px] text-[#a9bcad]">© {new Date().getFullYear()} eCuisinefoods. All rights reserved.</div>
+        <div className="border-t border-white/10 px-5 py-5 text-center text-[10px] text-[#a9bcad]">© {new Date().getFullYear()} eCuisine. All rights reserved.</div>
       </footer>
     </main>
   );
