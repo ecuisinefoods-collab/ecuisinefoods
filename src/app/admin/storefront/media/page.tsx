@@ -2,10 +2,10 @@
 
 import { useEffect, useState, type ChangeEvent } from "react";
 import Link from "next/link";
-import { ArrowLeft, CheckCircle2, Film, ImagePlus, LoaderCircle, Save, UploadCloud } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Film, ImagePlus, LoaderCircle, Save, Trash2, UploadCloud } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
-type StorefrontConfig = Record<string, unknown> & {
+function promotionStoragePath(url: string, bucket: string): string | null {\n  try { const parsed = new URL(url); const marker = `/storage/v1/object/public/${bucket}/`; const index = parsed.pathname.indexOf(marker); return index >= 0 ? decodeURIComponent(parsed.pathname.slice(index + marker.length)) : null; } catch { return null; }\n}\n\ntype StorefrontConfig = Record<string, unknown> & {
   hero_video_url?: string;
   hero_video_fallback_url?: string;
 };
@@ -203,7 +203,7 @@ export default function StorefrontMediaPage() {
           <label className="mt-5 block text-xs font-bold text-[#405443]">Video URL
             <input type="url" value={videoUrl} onChange={event => setVideoUrl(event.target.value)} placeholder="Upload an MP4 or paste its public URL" className="mt-2 w-full rounded-xl border border-[#dfe6dc] bg-white px-4 py-3 text-sm font-normal outline-none focus:border-[#4c805b]" />
           </label>
-          {videoUrl && <div className="mt-4 overflow-hidden rounded-xl border border-[#e4e9e1] bg-[#102f22]"><video src={videoUrl} muted controls playsInline className="max-h-72 w-full object-contain" /><p className="flex items-center gap-2 px-3 py-2 text-[10px] font-semibold text-white"><CheckCircle2 size={13} /> Video URL ready to publish</p></div>}
+          {videoUrl && <div className="mt-4 overflow-hidden rounded-xl border border-[#e4e9e1] bg-[#102f22]"><video src={videoUrl} muted controls playsInline className="max-h-72 w-full object-contain" /><div className="flex items-center justify-between gap-3 px-3 py-2"><p className="flex items-center gap-2 text-[10px] font-semibold text-white"><CheckCircle2 size={13} /> Video ready to publish</p><button type="button" onClick={()=>{setVideoUrl("");setMessage("Video removal is pending. Save homepage media to confirm.");}} className="inline-flex items-center gap-1 rounded-lg bg-white/10 px-3 py-2 text-[10px] font-bold text-white hover:bg-red-500/80"><Trash2 size={12}/> Remove video</button></div></div>}
         </section>
 
         <section className="mt-5 rounded-2xl border border-[#e4e9e1] bg-white p-5 shadow-sm sm:p-7">
@@ -217,7 +217,7 @@ export default function StorefrontMediaPage() {
           <label className="mt-5 block text-xs font-bold text-[#405443]">Fallback image URL
             <input type="url" value={fallbackUrl} onChange={event => setFallbackUrl(event.target.value)} placeholder="Upload an image or paste its public URL" className="mt-2 w-full rounded-xl border border-[#dfe6dc] bg-white px-4 py-3 text-sm font-normal outline-none focus:border-[#4c805b]" />
           </label>
-          {fallbackUrl && <img src={fallbackUrl} alt="Homepage mobile fallback preview" className="mt-4 max-h-64 w-full rounded-xl border border-[#e4e9e1] bg-[#f8faf6] object-contain" />}
+          {fallbackUrl && <div className="mt-4 rounded-xl border border-[#e4e9e1] bg-[#f8faf6] p-3"><img src={fallbackUrl} alt="Homepage mobile fallback preview" className="max-h-64 w-full object-contain"/><button type="button" onClick={()=>{setFallbackUrl("");setMessage("Fallback image removal is pending. Save homepage media to confirm.");}} className="mt-3 inline-flex items-center gap-1 rounded-lg border border-red-200 px-3 py-2 text-[10px] font-bold text-red-700 hover:bg-red-50"><Trash2 size={12}/> Remove fallback image</button></div>}
         </section>
 
         <div className="sticky bottom-3 mt-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#e4e9e1] bg-white/95 p-3 shadow-xl backdrop-blur">
