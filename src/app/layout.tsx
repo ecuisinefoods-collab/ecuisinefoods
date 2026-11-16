@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import "./globals.css";
 import { DiscountMascot } from "@/components/discount-mascot";
 import { MobileStoreNav } from "@/components/mobile-store-nav";
 import { FloatingWhatsApp } from "@/components/floating-whatsapp";
 import { AssistantWidget } from "@/components/assistant-widget";
+import { BrandLoadingFallback, BrandLoadingScreen } from "@/components/brand-loading-screen";
 import { supabase } from "@/lib/supabase";
 
 export const metadata: Metadata = {
@@ -13,13 +15,29 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   let showDiscountMascot = false;
+  let brandLogoUrl: string | null = null;
   if (supabase) {
     const { data } = await supabase
       .from("site_settings")
-      .select("setting_value")
-      .eq("setting_key", "discount_mascot_enabled")
-      .maybeSingle();
-    showDiscountMascot = data?.setting_value === "true";
+      .select("setting_key,setting_value")
+      .in("setting_key", ["discount_mascot_enabled", "store_logo_url"]);
+    showDiscountMascot = data?.find((row) => row.setting_key === "discount_mascot_enabled")?.setting_value === "true";
+    const logo = data?.find((row) => row.setting_key === "store_logo_url")?.setting_value;
+    if (typeof logo === "string" && /^https?:\/\//i.test(logo)) brandLogoUrl = logo;
   }
-  return <html lang="en"><body>{children}<MobileStoreNav/><FloatingWhatsApp/><AssistantWidget/>{showDiscountMascot ? <DiscountMascot /> : null}</body></html>;
+
+  return (
+    <html lang="en">
+      <body>
+        <Suspense fallback={<BrandLoadingFallback logoUrl={brandLogoUrl} />}>
+          <BrandLoadingScreen initialLogoUrl={brandLogoUrl} />
+        </Suspense>
+        {children}
+        <MobileStoreNav />
+        <FloatingWhatsApp />
+        <AssistantWidget />
+        {showDiscountMascot ? <DiscountMascot /> : null}
+      </body>
+    </html>
+  );
 }
