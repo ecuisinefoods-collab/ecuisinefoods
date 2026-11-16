@@ -1,10 +1,11 @@
 name: Storefront build
 
 on:
+  workflow_dispatch:
   pull_request:
     branches: [main]
   push:
-    branches: [main, storefront-complete-redesign]
+    branches: [main, storefront-complete-redesign, remove-homepage-featured-product]
 
 jobs:
   build:
