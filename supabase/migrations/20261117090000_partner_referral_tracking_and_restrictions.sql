@@ -99,3 +99,27 @@ grant execute on function public.attach_partner_referral_to_order(bigint,text,te
 
 comment on table public.partner_referral_clicks is 'Referral click events; no customer personal data is stored.';
 comment on column public.orders.partner_profile_id is 'Partner credited for a valid referral code at checkout.';
+
+-- Partner-facing metrics are returned as counts only; no order/customer rows are exposed.
+create or replace function public.get_my_partner_referral_stats()
+returns jsonb
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_partner_id uuid;
+  v_clicks integer := 0;
+  v_orders integer := 0;
+begin
+  if auth.uid() is null then raise exception 'Sign in to view your partner referral statistics.'; end if;
+  select id into v_partner_id from public.partner_profiles
+  where user_id=auth.uid() and status='active' limit 1;
+  if v_partner_id is null then raise exception 'No active partner profile is linked to this account.'; end if;
+  select count(*) into v_clicks from public.partner_referral_clicks where partner_id=v_partner_id;
+  select count(*) into v_orders from public.orders where partner_profile_id=v_partner_id;
+  return jsonb_build_object('clicks',v_clicks,'orders',v_orders);
+end;
+$$;
+revoke all on function public.get_my_partner_referral_stats() from public, anon;
+grant execute on function public.get_my_partner_referral_stats() to authenticated;
