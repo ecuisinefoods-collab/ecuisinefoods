@@ -1654,3 +1654,28 @@ html[data-theme="dark"] .ec-category-word--coming{background:linear-gradient(135
   .ec-journey-quiet{gap:9px!important;padding:20px 8px 22px!important}
   .ec-journey-quiet__number{font-size:clamp(46px,12vw,58px)!important}
 }
+
+
+/* eCuisine storefront typography motion — subtle, legible and accessible */
+@keyframes ec-type-rise { from { opacity:0; transform:translate3d(0,16px,0); filter:blur(3px); } to { opacity:1; transform:translate3d(0,0,0); filter:blur(0); } }
+@keyframes ec-type-shimmer { 0%,100% { text-shadow:0 0 0 rgba(226,183,53,0); } 50% { text-shadow:0 5px 22px rgba(226,183,53,.22); } }
+.ec-storefront .ec-hero-eyebrow,.ec-storefront .ec-hero-title,.ec-storefront .ec-hero-description,.ec-storefront .ec-hero-proof,.ec-storefront .ec-section-intro .ec-kicker,.ec-storefront .ec-section-intro h2,.ec-storefront .ec-category-word__index,.ec-storefront .ec-category-word__name,.ec-storefront .ec-category-word__description,.ec-storefront .ec-category-word__action,.ec-storefront .ec-why-section h2,.ec-storefront .ec-review-promo h2,.ec-storefront .ec-journey-quiet__eyebrow,.ec-storefront .ec-journey-quiet__title,.ec-storefront .ec-journey-quiet__ticker { animation:ec-type-rise .75s cubic-bezier(.2,.72,.25,1) both; }
+.ec-storefront .ec-hero-title { animation-delay:.1s; } .ec-storefront .ec-hero-description { animation-delay:.2s; } .ec-storefront .ec-hero-proof { animation-delay:.28s; }
+.ec-storefront .ec-section-intro h2 { animation-delay:.12s; } .ec-storefront .ec-category-word__name { animation-delay:.16s; }
+.ec-storefront .ec-category-word:nth-child(2n) .ec-category-word__name { animation-delay:.24s; } .ec-storefront .ec-category-word:nth-child(3n) .ec-category-word__name { animation-delay:.32s; }
+.ec-storefront .ec-journey-quiet__title { animation:ec-type-rise .8s ease both,ec-type-shimmer 5s ease-in-out 1s infinite; }
+.ec-storefront .ec-footer-brand__logo { max-height:68px; max-width:250px; object-fit:contain; object-position:left center; filter:contrast(1.16) saturate(1.14) drop-shadow(0 4px 12px rgba(0,0,0,.26)); transition:filter .25s ease,transform .25s ease; }
+.ec-storefront .ec-footer-brand__lockup { width:fit-content; max-width:100%; }
+.ec-storefront .ec-footer-brand__lockup:hover .ec-footer-brand__logo { filter:contrast(1.24) saturate(1.2) drop-shadow(0 7px 16px rgba(0,0,0,.32)); transform:translateY(-2px); }
+.ec-storefront .ec-footer-group[aria-label="Partnership program"] .ec-footer-links a { color:#e5d49c!important; }
+.ec-storefront .ec-footer-group[aria-label="Partnership program"] .ec-footer-links a:hover { color:#fff1bd!important; }
+@media(prefers-reduced-motion:reduce) { .ec-storefront .ec-hero-eyebrow,.ec-storefront .ec-hero-title,.ec-storefront .ec-hero-description,.ec-storefront .ec-hero-proof,.ec-storefront .ec-section-intro .ec-kicker,.ec-storefront .ec-section-intro h2,.ec-storefront .ec-category-word__index,.ec-storefront .ec-category-word__name,.ec-storefront .ec-category-word__description,.ec-storefront .ec-category-word__action,.ec-storefront .ec-why-section h2,.ec-storefront .ec-review-promo h2,.ec-storefront .ec-journey-quiet__eyebrow,.ec-storefront .ec-journey-quiet__title,.ec-storefront .ec-journey-quiet__ticker { animation:none!important; filter:none!important; } .ec-storefront .ec-footer-brand__logo { transition:none!important; } }
+
+
+/* Extend the same motion language to the shop catalogue and its category labels. */
+.ec-shop-page h1,.ec-shop-page h2,.ec-shop-page .ec-shop-kicker,.ec-shop-page .ec-shop-section-kicker,.ec-shop-page .ec-shop-category span { animation:ec-type-rise .75s cubic-bezier(.2,.72,.25,1) both; }
+.ec-shop-page h1 { animation-delay:.08s; } .ec-shop-page h2 { animation-delay:.14s; }
+.ec-shop-page .ec-shop-category:nth-child(2n) span { animation-delay:.18s; } .ec-shop-page .ec-shop-category:nth-child(3n) span { animation-delay:.26s; }
+.ec-shop-page .ec-shop-category:hover span:first-child { animation:ec-type-shimmer 1.6s ease-in-out infinite; }
+.site-header .nav-link { animation:ec-type-rise .55s ease both; }
+@media(prefers-reduced-motion:reduce) { .ec-shop-page h1,.ec-shop-page h2,.ec-shop-page .ec-shop-kicker,.ec-shop-page .ec-shop-section-kicker,.ec-shop-page .ec-shop-category span,.site-header .nav-link { animation:none!important; } }
