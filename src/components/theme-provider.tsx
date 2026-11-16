@@ -20,6 +20,6 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 }
 
 /* The storefront has moved to a permanently light presentation. */
-export function ThemeToggle() {
+export function ThemeToggle(_props: { className?: string; showLabel?: boolean }) {
   return null;
 }
