@@ -16,6 +16,10 @@ type Application = {
   audience_size: string;
   promotion_channels: string | null;
   motivation: string;
+  skills: string | null;
+  availability: string | null;
+  preferred_activities: string[];
+  deadline_commitment: boolean;
   status: ApplicationStatus;
   created_at: string;
   updated_at: string;
@@ -54,7 +58,7 @@ export default function AffiliateApplicationsPage() {
     setRole(profile.role);
     const { data, error: queryError } = await supabase
       .from("affiliate_applications")
-      .select("id,full_name,email,phone,social_handle,primary_platform,audience_size,promotion_channels,motivation,status,created_at,updated_at")
+      .select("id,full_name,email,phone,social_handle,primary_platform,audience_size,promotion_channels,motivation,skills,availability,preferred_activities,deadline_commitment,status,created_at,updated_at")
       .order("created_at", { ascending: false })
       .limit(200);
     if (queryError) setError(queryError.message);
@@ -152,6 +156,10 @@ export default function AffiliateApplicationsPage() {
                   <p className="text-[9px] font-black uppercase tracking-[.16em] text-[#8c9a8d]">Promotion channels</p>
                   <p className="mt-2 text-sm leading-6 text-[#52695a]">{item.promotion_channels || "Not provided"}</p>
                 </div>
+              </div>
+              <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                <div className="rounded-xl border border-[#e7ece5] bg-[#f8faf7] p-4"><p className="text-[9px] font-black uppercase tracking-[.16em] text-[#8c9a8d]">Skills & experience</p><p className="mt-2 whitespace-pre-wrap text-xs leading-6 text-[#52695a]">{item.skills || "Not provided"}</p></div>
+                <div className="rounded-xl border border-[#e7ece5] bg-[#f8faf7] p-4"><p className="text-[9px] font-black uppercase tracking-[.16em] text-[#8c9a8d]">Weekly availability</p><p className="mt-2 text-xs font-bold text-[#52695a]">{item.availability || "Not provided"}</p><p className="mt-2 text-[10px] leading-5 text-[#6e806f]">Activities: {(item.preferred_activities || []).join(", ") || "Not selected"}</p><p className={`mt-2 text-[10px] font-bold ${item.deadline_commitment ? "text-green-700" : "text-red-700"}`}>{item.deadline_commitment ? "Agrees to meet deadlines" : "Deadline commitment missing"}</p></div>
               </div>
               <div className="mt-3 rounded-2xl border border-[#e7ece5] bg-[#f8faf7] p-4">
                 <p className="text-[9px] font-black uppercase tracking-[.16em] text-[#8c9a8d]">Why they want to join</p>
