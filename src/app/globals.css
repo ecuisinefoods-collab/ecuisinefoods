@@ -1332,3 +1332,67 @@ html[data-theme="dark"] .ec-partnership-form label { color: #bdcdbf !important; 
 html[data-theme="dark"] .ec-partnership-form input,
 html[data-theme="dark"] .ec-partnership-form select,
 html[data-theme="dark"] .ec-partnership-form textarea { color: #eff5ee !important; background: #102118 !important; border-color: #3b5544 !important; }
+
+/* Homepage leadership feature: restrained ceremonial frame and editorial rhythm */
+.ec-home-ceo {
+  background:
+    radial-gradient(ellipse at 4% 20%,rgba(223,199,125,.18),transparent 30%),
+    linear-gradient(115deg,#f7f7ee 0%,#eef4e9 54%,#fbf7ea 100%);
+  border-top: 1px solid rgba(184,151,70,.2);
+  border-bottom: 1px solid rgba(184,151,70,.2);
+}
+.ec-home-ceo__portrait-wrap { perspective: 900px; }
+.ec-home-ceo__portrait-wrap::before {
+  content: ""; position: absolute; inset: -10px; border: 1px solid rgba(183,148,62,.55);
+  border-radius: 2.25rem; transform: rotate(-3deg);
+}
+.ec-home-ceo__portrait {
+  border: 6px solid #fffdf5;
+  background: #dce9d5;
+  box-shadow: 0 26px 55px rgba(23,65,41,.2),0 0 0 1px rgba(191,160,83,.32);
+  transform: rotateY(-3deg);
+}
+.ec-home-ceo__seal {
+  position: absolute; right: -14px; bottom: 20px; display: inline-flex; align-items: center; gap: 7px;
+  border: 1px solid rgba(236,213,144,.65); border-radius: 999px; padding: 10px 14px;
+  background: linear-gradient(110deg,#174c32,#0f3928); color: #f5df9a; font-size: 10px; font-weight: 900;
+  letter-spacing: .08em; box-shadow: 0 10px 24px rgba(13,52,34,.22);
+}
+html[data-theme="dark"] .ec-home-ceo { background: linear-gradient(120deg,#12271b,#183b29 55%,#252f20); }
+html[data-theme="dark"] .ec-home-ceo h2,
+html[data-theme="dark"] .ec-home-ceo p:not(.ec-home-ceo__seal) { color: #eef4e9 !important; }
+html[data-theme="dark"] .ec-home-ceo__portrait { border-color: #263d2d; }
+
+/* Ensure the admin workspace reads as an intentional, lively business console */
+.admin-premium-shell {
+  background:
+    radial-gradient(ellipse at 2% 0%,rgba(99,168,103,.16),transparent 28%),
+    radial-gradient(ellipse at 98% 0%,rgba(229,190,93,.17),transparent 25%),
+    linear-gradient(145deg,#edf5eb 0%,#f9f5e8 52%,#edf4ef 100%) !important;
+}
+.admin-premium-shell header.admin-topbar-premium {
+  border-bottom: 1px solid rgba(184,149,63,.32) !important;
+  background: linear-gradient(100deg,#fffef9 0%,#eff7eb 55%,#fff5dc 100%) !important;
+}
+.admin-premium-shell aside.admin-sidebar-premium {
+  background:
+    radial-gradient(circle at 15% 0%,rgba(89,151,89,.35),transparent 35%),
+    linear-gradient(180deg,#174b32 0%,#103b2a 60%,#0b3022 100%) !important;
+}
+.admin-premium-shell .admin-dashboard-root,
+.admin-premium-shell main.admin-glass-shell {
+  background: transparent !important;
+}
+.admin-premium-shell .admin-module-link {
+  border-color: rgba(66,126,76,.13) !important;
+  background: linear-gradient(120deg,#f1f8ed,#fffef9 82%) !important;
+}
+.admin-premium-shell .admin-module-link:hover {
+  background: linear-gradient(120deg,#e2f2df,#fff0c9) !important;
+}
+html[data-theme="dark"] .admin-premium-shell {
+  background: linear-gradient(145deg,#101f17,#172b20 58%,#1e2a1d) !important;
+}
+html[data-theme="dark"] .admin-premium-shell header.admin-topbar-premium {
+  background: linear-gradient(100deg,#1b3024,#22392a 55%,#3a3320) !important;
+}
