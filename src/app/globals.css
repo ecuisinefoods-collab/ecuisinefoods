@@ -1246,3 +1246,47 @@ html[data-theme="dark"] .admin-premium-shell .bg-green-50 { background: #173e2b 
 @media (prefers-reduced-motion: reduce) {
   .ec-category-art, .ec-category-tile:hover .ec-category-art { transition: none !important; transform: none !important; }
 }
+
+
+/* Dark-mode coverage for public routes that do not use the homepage storefront wrapper. */
+html[data-theme="dark"] body main:not(.admin-glass-shell):not(.admin-premium-shell) {
+  background-color: #101b17 !important;
+  color: #e4eee6 !important;
+}
+html[data-theme="dark"] body main:not(.admin-glass-shell):not(.admin-premium-shell) section.bg-white,
+html[data-theme="dark"] body main:not(.admin-glass-shell):not(.admin-premium-shell) .bg-white:not(.ec-offer-cta) {
+  background-color: #1a2b22 !important;
+  border-color: rgba(222,237,224,.13) !important;
+}
+html[data-theme="dark"] body main:not(.admin-glass-shell):not(.admin-premium-shell) [class*="rounded-2xl"][class*="border"],
+html[data-theme="dark"] body main:not(.admin-glass-shell):not(.admin-premium-shell) [class*="rounded-3xl"][class*="border"],
+html[data-theme="dark"] body main:not(.admin-glass-shell):not(.admin-premium-shell) [class*="rounded-[28px]"][class*="border"] {
+  border-color: rgba(222,237,224,.13) !important;
+}
+html[data-theme="dark"] body main:not(.admin-glass-shell):not(.admin-premium-shell) h1,
+html[data-theme="dark"] body main:not(.admin-glass-shell):not(.admin-premium-shell) h2,
+html[data-theme="dark"] body main:not(.admin-glass-shell):not(.admin-premium-shell) h3,
+html[data-theme="dark"] body main:not(.admin-glass-shell):not(.admin-premium-shell) h4 {
+  color: #eff5ef !important;
+}
+html[data-theme="dark"] body main:not(.admin-glass-shell):not(.admin-premium-shell) p,
+html[data-theme="dark"] body main:not(.admin-glass-shell):not(.admin-premium-shell) label,
+html[data-theme="dark"] body main:not(.admin-glass-shell):not(.admin-premium-shell) small {
+  color: #b0c0b5 !important;
+}
+html[data-theme="dark"] body main:not(.admin-glass-shell):not(.admin-premium-shell) input,
+html[data-theme="dark"] body main:not(.admin-glass-shell):not(.admin-premium-shell) select,
+html[data-theme="dark"] body main:not(.admin-glass-shell):not(.admin-premium-shell) textarea {
+  border-color: rgba(220,237,223,.17) !important;
+  background: #122219 !important;
+  color: #edf5ef !important;
+}
+html[data-theme="dark"] body main:not(.admin-glass-shell):not(.admin-premium-shell) input::placeholder,
+html[data-theme="dark"] body main:not(.admin-glass-shell):not(.admin-premium-shell) textarea::placeholder {
+  color: #8d9e92 !important;
+}
+html[data-theme="dark"] body main:not(.admin-glass-shell):not(.admin-premium-shell) .ec-offer-cta {
+  color: #073d2d !important;
+  background: linear-gradient(180deg,#fffef8,#f7f0db) !important;
+}
+html[data-theme="dark"] .ec-theme-toggle { color: #f0d99f; }
