@@ -1594,3 +1594,52 @@ html[data-theme="dark"] .ec-category-word--coming{background:linear-gradient(135
   .ec-journey-quiet__number{font-size:clamp(42px,11vw,54px)}
 }
 @media(prefers-reduced-motion:reduce){.ec-journey-quiet__ticker{animation:none!important}}
+
+
+/* Bring the story and the sales milestone together at the centre */
+.ec-journey-quiet{
+  flex-direction:column!important;align-items:center!important;justify-content:center!important;
+  gap:10px!important;max-width:900px;margin-inline:auto;padding:25px 12px 28px!important;text-align:center;
+}
+.ec-journey-quiet__story{align-items:center!important;gap:6px!important;text-align:center}
+.ec-journey-quiet__title{font-size:clamp(16px,2vw,22px)!important}
+.ec-journey-quiet__ticker{font-size:10px!important}
+.ec-journey-quiet__milestone{align-items:center!important;gap:5px!important}
+.ec-journey-quiet__number{font-size:clamp(48px,6vw,68px)!important}
+.ec-journey-quiet__sold-label{font-size:10px!important;letter-spacing:.22em}
+
+/* Traditional deep-green footer with clear contrast and warm gold accents */
+.ec-store-footer{
+  color:#eef4ea!important;
+  background:#10271e!important;
+  border-top:1px solid rgba(222,190,105,.3)!important;
+  box-shadow:none!important;
+}
+.ec-store-footer__main{background:transparent!important}
+.ec-store-footer .ec-footer-group h3{color:#e3c46d!important}
+.ec-store-footer .ec-footer-brand p,
+.ec-store-footer .ec-footer-group p{color:#b5c5b8!important}
+.ec-store-footer .ec-footer-links a{color:#d0dbd0!important}
+.ec-store-footer .ec-footer-links a:hover{color:#f1d57f!important}
+.ec-store-footer__bottom{
+  border-top:1px solid rgba(230,239,228,.14)!important;
+  color:#aabaae!important;
+}
+.ec-store-footer__bottom span:last-child{color:#e5ca78!important}
+.ec-store-footer .ec-footer-brand__logo{filter:brightness(0) invert(1)}
+.ec-store-footer .ec-footer-contact{
+  color:#f5dfa0!important;border-color:rgba(231,204,126,.28)!important;
+  background:linear-gradient(120deg,#20563c,#1a4732)!important;
+  box-shadow:0 7px 18px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.1)!important;
+}
+.ec-store-footer .ec-footer-social{
+  background:#1b3b2c!important;border-color:rgba(225,237,224,.16)!important;
+  box-shadow:0 5px 14px rgba(0,0,0,.18)!important;
+}
+.ec-store-footer .ec-footer-social:hover{background:#27513b!important}
+.ec-store-footer .ec-footer-social--x{color:#fff!important}
+.ec-store-footer .ec-footer-social__x{color:#fff!important}
+@media(max-width:640px){
+  .ec-journey-quiet{gap:9px!important;padding:20px 8px 22px!important}
+  .ec-journey-quiet__number{font-size:clamp(46px,12vw,58px)!important}
+}
