@@ -51,7 +51,7 @@ const navGroups: { label: string; items: { label: string; icon: typeof LayoutDas
   { label: "Reports & finance", items: [
     { label: "Analytics", icon: BarChart3, href: "/admin/analytics", roles: ["owner","store_manager","finance_officer","analyst"] },
     { label: "Finances", icon: Wallet, href: "/admin/finance", roles: ["owner","finance_officer","analyst"] },
-    { label: "Download records", icon: ClipboardList, href: "/admin/exports", roles: ["owner"] },
+    { label: "Backups & data management", icon: ClipboardList, href: "/admin/exports", roles: ["owner"] },
   ]},
   { label: "People & AI", items: [
     { label: "Team & permissions", icon: Users, href: "/admin/team", roles: ["owner"] },
