@@ -30,7 +30,7 @@ export default async function HomePage(){
  return <main className="storefront-glass min-h-screen overflow-hidden bg-[var(--brand-surface)] text-[var(--brand-text)]" style={{fontFamily:config.font_family}}>
   <div className="bg-[#153b2a] px-4 py-2 text-center text-[10px] font-bold tracking-[.08em] text-white sm:text-xs">{config.announcement}</div>
   <SiteHeader/>
-  <section className="store-hero relative overflow-hidden bg-[#fff8df]">\n   {config.hero_video_url&&<><video className="storefront-brand-video absolute inset-0 h-full w-full object-cover" src={config.hero_video_url} poster={config.hero_video_fallback_url||undefined} autoPlay muted loop playsInline preload="metadata" aria-hidden="true"/><div className="absolute inset-0 bg-gradient-to-r from-[#063d2c]/90 via-[#07543f]/75 to-[#07543f]/25"/></>}
+  <section className="store-hero relative overflow-hidden bg-[#fff8df]">\n   {config.hero_video_fallback_url&&<div className="storefront-brand-mobile-fallback absolute inset-0 bg-cover bg-center" style={{backgroundImage:`url("${config.hero_video_fallback_url}")`}}/>}{config.hero_video_url&&<><video className="storefront-brand-video absolute inset-0 h-full w-full object-cover" src={config.hero_video_url} poster={config.hero_video_fallback_url||undefined} autoPlay muted loop playsInline preload="metadata" aria-hidden="true"/><div className="absolute inset-0 bg-gradient-to-r from-[#063d2c]/90 via-[#07543f]/75 to-[#07543f]/25"/></>}
    <div className="hero-grain pointer-events-none absolute inset-0"/>
    <div className="mx-auto grid max-w-7xl items-center gap-8 px-5 py-10 sm:py-14 md:grid-cols-[.94fr_1.06fr] md:py-16">
     <div className="relative z-10 max-w-xl">
