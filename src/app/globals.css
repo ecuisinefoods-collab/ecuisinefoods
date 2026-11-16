@@ -1670,3 +1670,12 @@ html[data-theme="dark"] .ec-category-word--coming{background:linear-gradient(135
 .ec-storefront .ec-footer-group[aria-label="Partnership program"] .ec-footer-links a { color:#e5d49c!important; }
 .ec-storefront .ec-footer-group[aria-label="Partnership program"] .ec-footer-links a:hover { color:#fff1bd!important; }
 @media(prefers-reduced-motion:reduce) { .ec-storefront .ec-hero-eyebrow,.ec-storefront .ec-hero-title,.ec-storefront .ec-hero-description,.ec-storefront .ec-hero-proof,.ec-storefront .ec-section-intro .ec-kicker,.ec-storefront .ec-section-intro h2,.ec-storefront .ec-category-word__index,.ec-storefront .ec-category-word__name,.ec-storefront .ec-category-word__description,.ec-storefront .ec-category-word__action,.ec-storefront .ec-why-section h2,.ec-storefront .ec-review-promo h2,.ec-storefront .ec-journey-quiet__eyebrow,.ec-storefront .ec-journey-quiet__title,.ec-storefront .ec-journey-quiet__ticker { animation:none!important; filter:none!important; } .ec-storefront .ec-footer-brand__logo { transition:none!important; } }
+
+
+/* Extend the same motion language to the shop catalogue and its category labels. */
+.ec-shop-page h1,.ec-shop-page h2,.ec-shop-page .ec-shop-kicker,.ec-shop-page .ec-shop-section-kicker,.ec-shop-page .ec-shop-category span { animation:ec-type-rise .75s cubic-bezier(.2,.72,.25,1) both; }
+.ec-shop-page h1 { animation-delay:.08s; } .ec-shop-page h2 { animation-delay:.14s; }
+.ec-shop-page .ec-shop-category:nth-child(2n) span { animation-delay:.18s; } .ec-shop-page .ec-shop-category:nth-child(3n) span { animation-delay:.26s; }
+.ec-shop-page .ec-shop-category:hover span:first-child { animation:ec-type-shimmer 1.6s ease-in-out infinite; }
+.site-header .nav-link { animation:ec-type-rise .55s ease both; }
+@media(prefers-reduced-motion:reduce) { .ec-shop-page h1,.ec-shop-page h2,.ec-shop-page .ec-shop-kicker,.ec-shop-page .ec-shop-section-kicker,.ec-shop-page .ec-shop-category span,.site-header .nav-link { animation:none!important; } }
