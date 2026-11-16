@@ -15,13 +15,13 @@ type Config = {
   social_facebook:string; social_instagram:string; social_tiktok:string; social_x:string; social_youtube:string; social_whatsapp:string; social_linkedin:string; social_threads:string;
 };
 const defaults:Config = {
- announcement:"Fresh from eCuisinefoods · Good food, better living", hero_eyebrow:"Fresh picks. Better living.",
+ announcement:"Fresh from eCuisine · Good food, better living", hero_eyebrow:"Fresh picks. Better living.",
  hero_title:"Nourish your day.", hero_highlight:"Live a little better.",
- hero_description:"Discover thoughtful food choices from eCuisinefoods. We are bringing wholesome everyday goodness closer to homes in Jos, Bauchi and beyond.",
+ hero_description:"Discover thoughtful food choices from eCuisine. We are bringing wholesome everyday goodness closer to homes in Jos, Bauchi and beyond.",
  hero_primary_cta:"Shop our products", hero_secondary_cta:"Our story",
  promise_title:"Good food is where better living begins.",
  promise_description:"We are building a food brand grounded in quality, nutrition, trust, innovation and natural ingredients. Thank you for being part of our journey.",
- quote:"We believe every family deserves thoughtful food choices and a brand they can trust.", quote_attribution:"The eCuisinefoods vision",
+ quote:"We believe every family deserves thoughtful food choices and a brand they can trust.", quote_attribution:"The eCuisine vision",
  brand_primary:"#245b42", brand_dark:"#173e2d", brand_accent:"#8a744b", brand_background:"#f7f3e9", brand_surface:"#fbfaf7", brand_text:"#26352b", font_family:"Arial, Helvetica, sans-serif",
  social_facebook:"https://www.facebook.com/share/1Dwqaoq7hd/", social_instagram:"https://www.instagram.com/ecuisine_official", social_tiktok:"https://www.tiktok.com/@ecuisine_official", social_x:"", social_youtube:"", social_whatsapp:"", social_linkedin:"", social_threads:""
 };
