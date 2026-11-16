@@ -252,3 +252,5 @@ body{font-feature-settings:"ss01" on;-webkit-font-smoothing:antialiased}
  .store-hero:has(.storefront-brand-mobile-fallback) h1,.store-hero:has(.storefront-brand-mobile-fallback) p{color:#fff;text-shadow:0 2px 18px rgba(0,0,0,.3)}
  .store-hero:has(.storefront-brand-mobile-fallback) .hero-product-scene{background:rgba(255,255,255,.16)}
 }
+
+@media(max-width:640px){.discount-mascot{bottom:88px!important;left:10px!important;transform:scale(.86);transform-origin:bottom left}.discount-mascot:hover{transform:scale(.9)}}
