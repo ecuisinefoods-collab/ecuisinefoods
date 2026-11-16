@@ -57,7 +57,8 @@ export function SalesCounter({ total }: { total: number }) {
         </span>
       </div>
       <div className="ec-journey-quiet__milestone" aria-label={`${display}+ products sold`}>
-        <span className="ec-journey-quiet__number">{display}<sup>+</sup></span>
+        <span className="ec-journey-quiet__number">{display}<span className="ec-journey-quiet__plus">+</span></span>
+        <span className="ec-journey-quiet__sold-label">PRODUCTS SOLD</span>
       </div>
     </section>
   );
