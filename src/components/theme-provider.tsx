@@ -9,20 +9,23 @@ const ThemeContext = createContext<ThemeContextValue>({ theme: "light", toggleTh
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>("light");
+  const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
     const stored = window.localStorage.getItem("ecuisine-theme");
     const initial: Theme = stored === "dark" ? "dark" : "light";
-    setTheme(initial);
     document.documentElement.dataset.theme = initial;
     document.documentElement.style.colorScheme = initial;
+    setTheme(initial);
+    setInitialized(true);
   }, []);
 
   useEffect(() => {
+    if (!initialized) return;
     document.documentElement.dataset.theme = theme;
     document.documentElement.style.colorScheme = theme;
     try { window.localStorage.setItem("ecuisine-theme", theme); } catch { /* Storage may be disabled. */ }
-  }, [theme]);
+  }, [theme, initialized]);
 
   const value = useMemo(() => ({
     theme,
