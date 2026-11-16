@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowUpRight, ClipboardList, Mail, MapPin, MessageCircle, PackageCheck, ShieldCheck } from "lucide-react";
+import { ArrowUpRight, ClipboardList, Handshake, Mail, MapPin, MessageCircle, PackageCheck, ShieldCheck } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 
 const supportText = encodeURIComponent("Hello eCuisine, I need help. Please assist me.");
@@ -48,7 +48,7 @@ export default function ContactPage() {
         <div className="mt-9">
           <p className="text-[10px] font-black uppercase tracking-[.17em] text-[#8a9787]">Quick help</p>
           <h2 className="mt-2 text-2xl font-semibold tracking-tight text-[#1c3c29]">Go straight to what you need</h2>
-          <div className="mt-5 grid gap-4 sm:grid-cols-3">
+          <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <Link href="/track" className="group rounded-2xl border border-[#e6ece3] bg-white p-5 transition hover:-translate-y-1 hover:shadow-lg hover:shadow-[#1a3e27]/5">
               <PackageCheck size={22} className="text-[#3e704b]" />
               <h3 className="mt-4 font-bold text-[#2a4732]">Track an order</h3>
@@ -67,6 +67,12 @@ export default function ContactPage() {
               <p className="mt-2 text-sm leading-6 text-[#829080]">Choose an active Jos or Bauchi pickup location at checkout. Wait for confirmation before visiting.</p>
               <span className="mt-5 inline-flex text-xs font-bold text-[#356344]">Jos · Bauchi</span>
             </div>
+            <Link href="/partnerships" className="group rounded-2xl border border-[#e6ece3] bg-white p-5 transition hover:-translate-y-1 hover:shadow-lg hover:shadow-[#1a3e27]/5">
+              <Handshake size={22} className="text-[#3e704b]" />
+              <h3 className="mt-4 font-bold text-[#2a4732]">Partner with eCuisine</h3>
+              <p className="mt-2 text-sm leading-6 text-[#829080]">Explore distribution, corporate supply, brand collaborations and strategic opportunities.</p>
+              <span className="mt-5 inline-flex items-center gap-2 text-xs font-bold text-[#356344]">Partnership enquiries <ArrowUpRight size={14} className="transition group-hover:translate-x-1 group-hover:-translate-y-1"/></span>
+            </Link>
           </div>
         </div>
 
