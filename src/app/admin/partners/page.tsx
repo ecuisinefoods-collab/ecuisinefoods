@@ -7,13 +7,15 @@ import { supabase } from "@/lib/supabase";
 
 type Partner={id:string;partner_code:string;status:"active"|"paused"|"suspended";created_at:string;affiliate_applications:{full_name:string;email:string}|null};
 type Task={id:string;title:string;task_type:string;priority:string;status:string;due_at:string|null;assigned_partner_id:string};
-type Product={id:string;name:string};\ntype Submission={id:string;task_id:string;partner_id:string;submission_text:string;proof_url:string|null;status:string;submitted_at:string;reviewer_note:string|null;partner_profiles:{partner_code:string;affiliate_applications:{full_name:string}|null}|null;partner_tasks:{title:string}|null};
+type Product={id:string;name:string};
+type Submission={id:string;task_id:string;partner_id:string;submission_text:string;proof_url:string|null;status:string;submitted_at:string;reviewer_note:string|null;partner_profiles:{partner_code:string;affiliate_applications:{full_name:string}|null}|null;partner_tasks:{title:string}|null};
 
 const blank={title:"",description:"",task_type:"product_promotion",priority:"normal",due_at:"",partner_id:"",product_id:"",reference_url:""};
 export default function AdminPartnersPage(){
  const [partners,setPartners]=useState<Partner[]>([]);
  const [tasks,setTasks]=useState<Task[]>([]);
- const [products,setProducts]=useState<Product[]>([]);\n const [submissions,setSubmissions]=useState<Submission[]>([]);
+ const [products,setProducts]=useState<Product[]>([]);
+ const [submissions,setSubmissions]=useState<Submission[]>([]);
  const [draft,setDraft]=useState(blank);
  const [loading,setLoading]=useState(true);
  const [saving,setSaving]=useState(false);
@@ -30,11 +32,13 @@ export default function AdminPartnersPage(){
   const [partnerResult,taskResult,productResult,submissionResult]=await Promise.all([
    supabase.from("partner_profiles").select("id,partner_code,status,created_at,affiliate_applications(full_name,email)").order("created_at",{ascending:false}),
    supabase.from("partner_tasks").select("id,title,task_type,priority,status,due_at,assigned_partner_id").order("created_at",{ascending:false}).limit(100),
-   supabase.from("products").select("id,name").eq("is_active",true).order("name"),\n   supabase.from("partner_task_submissions").select("id,task_id,partner_id,submission_text,proof_url,status,submitted_at,reviewer_note,partner_profiles!partner_task_submissions_partner_id_fkey(partner_code,affiliate_applications(full_name)),partner_tasks!partner_task_submissions_task_id_fkey(title)").order("submitted_at",{ascending:false}).limit(100)
+   supabase.from("products").select("id,name").eq("is_active",true).order("name"),
+   supabase.from("partner_task_submissions").select("id,task_id,partner_id,submission_text,proof_url,status,submitted_at,reviewer_note,partner_profiles!partner_task_submissions_partner_id_fkey(partner_code,affiliate_applications(full_name)),partner_tasks!partner_task_submissions_task_id_fkey(title)").order("submitted_at",{ascending:false}).limit(100)
   ]);
   if(partnerResult.error)setError(partnerResult.error.message);else setPartners((partnerResult.data||[]) as unknown as Partner[]);
   if(taskResult.error)setError(taskResult.error.message);else setTasks((taskResult.data||[]) as Task[]);
-  setProducts((productResult.data||[]) as Product[]);\n  if(submissionResult.error)setError(submissionResult.error.message);else setSubmissions((submissionResult.data||[]) as unknown as Submission[]);
+  setProducts((productResult.data||[]) as Product[]);
+  if(submissionResult.error)setError(submissionResult.error.message);else setSubmissions((submissionResult.data||[]) as unknown as Submission[]);
   setLoading(false);
  },[]);
  useEffect(()=>{void load();},[load]);
@@ -45,7 +49,10 @@ export default function AdminPartnersPage(){
   if(saveError)setError(saveError.message);else{setMessage("Activity assigned to the partner.");setDraft(blank);await load();}
   setSaving(false);
  }
- async function reviewSubmission(item:Submission,status:"approved"|"needs_revision"){\n  if(!supabase)return;const note=window.prompt(status==="approved"?"Optional feedback for this completed activity:":"What should the partner improve or resubmit?")||"";const {data:{user}}=await supabase.auth.getUser();const {error:updateError}=await supabase.from("partner_task_submissions").update({status,reviewer_note:note.trim()||null,reviewed_at:new Date().toISOString(),reviewed_by:user?.id||null}).eq("id",item.id);if(updateError)setError(updateError.message);else{setSubmissions(rows=>rows.map(row=>row.id===item.id?{...row,status,reviewer_note:note.trim()||null}:row));setMessage("Submission review saved.");}\n }\n async function updatePartner(id:string,status:Partner["status"]){
+ async function reviewSubmission(item:Submission,status:"approved"|"needs_revision"){
+  if(!supabase)return;const note=window.prompt(status==="approved"?"Optional feedback for this completed activity:":"What should the partner improve or resubmit?")||"";const {data:{user}}=await supabase.auth.getUser();const {error:updateError}=await supabase.from("partner_task_submissions").update({status,reviewer_note:note.trim()||null,reviewed_at:new Date().toISOString(),reviewed_by:user?.id||null}).eq("id",item.id);if(updateError)setError(updateError.message);else{setSubmissions(rows=>rows.map(row=>row.id===item.id?{...row,status,reviewer_note:note.trim()||null}:row));setMessage("Submission review saved.");}
+ }
+ async function updatePartner(id:string,status:Partner["status"]){
   if(!supabase)return;setError("");const {error:updateError}=await supabase.from("partner_profiles").update({status,updated_at:new Date().toISOString()}).eq("id",id);
   if(updateError)setError(updateError.message);else setPartners(rows=>rows.map(p=>p.id===id?{...p,status}:p));
  }
