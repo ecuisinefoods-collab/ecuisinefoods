@@ -23,7 +23,7 @@ export default function AffiliatesPage() {
             <p className="mt-5 max-w-xl text-sm leading-7 text-[#d4e0d5] sm:text-base">Join a working partnership with eCuisine. Partners may promote products, support social media activity, create content, participate in campaigns and help us serve our community—with clear briefs, responsibilities, deadlines and work reviews.</p>
             <div className="mt-8 flex flex-wrap gap-3">
               <a href="#affiliate-application" className="inline-flex items-center gap-2 rounded-xl bg-[#e7c96e] px-5 py-3.5 text-xs font-black text-[#173b2b] shadow-lg transition hover:-translate-y-0.5 hover:bg-[#f4da89]">Apply for partnership <ArrowRight size={15}/></a>
-              <Link href="/about" className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-5 py-3.5 text-xs font-bold text-white transition hover:bg-white/10">Meet eCuisine</Link>
+              <Link href="/about" className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-5 py-3.5 text-xs font-bold text-white transition hover:bg-white/10">Meet eCuisine</Link><Link href="/partner" className="inline-flex items-center gap-2 rounded-xl border border-[#e7c96e]/40 bg-[#e7c96e]/10 px-5 py-3.5 text-xs font-bold text-[#f0d98c] transition hover:bg-[#e7c96e]/20">Partner login <ArrowRight size={14}/></Link>
             </div>
             <p className="mt-5 text-[11px] leading-5 text-[#a9bcae]">No payment is required to submit an application. Commercial terms are shared with accepted affiliates before any promotion starts.</p>
           </div>
