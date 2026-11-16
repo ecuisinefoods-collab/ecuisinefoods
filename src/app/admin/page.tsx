@@ -67,7 +67,7 @@ export default function AdminPage() {
     if (profileError || !admin || !admin.is_active) {
       await supabase.auth.signOut();
       setProfile(null);
-      setError("This account does not have active eCuisinefoods admin access.");
+      setError("This account does not have active eCuisine admin access.");
       setLoading(false);
       return;
     }
@@ -153,11 +153,11 @@ export default function AdminPage() {
         <section className="w-full max-w-md rounded-[2rem] border border-[#e4e9df] bg-white p-7 shadow-xl shadow-[#1b3825]/5 sm:p-9">
           <div className="mb-8 flex items-center gap-3">
             <div className="grid h-12 w-12 place-items-center rounded-2xl bg-[#1d4b34] text-xl font-black text-white">e</div>
-            <div><p className="text-lg font-extrabold tracking-tight text-[#1b3b2a]">eCuisinefoods</p><p className="text-xs text-[#7b887c]">Business control centre</p></div>
+            <div><p className="text-lg font-extrabold tracking-tight text-[#1b3b2a]">eCuisine</p><p className="text-xs text-[#7b887c]">Business control centre</p></div>
           </div>
           <p className="text-xs font-bold uppercase tracking-[.18em] text-[#8b9a85]">Secure administrator access</p>
           <h1 className="mt-2 text-3xl font-semibold tracking-tight text-[#193b2a]">{mode === "signup" ? "Set up your owner access." : "Welcome back."}</h1>
-          <p className="mt-2 text-sm leading-6 text-[#738071]">{mode === "signup" ? "Create the first owner login. Your role activates only after the email address is verified." : "Sign in with your approved admin account to manage the eCuisinefoods business."}</p>
+          <p className="mt-2 text-sm leading-6 text-[#738071]">{mode === "signup" ? "Create the first owner login. Your role activates only after the email address is verified." : "Sign in with your approved admin account to manage the eCuisine business."}</p>
           <form onSubmit={signIn} className="mt-7 space-y-4">
             <label className="block text-xs font-bold text-[#405443]">Admin email<input type="email" autoComplete="username" required value={email} onChange={(e) => setEmail(e.target.value)} readOnly={false} className="mt-2 w-full rounded-xl border border-[#dfe6dc] bg-[#fbfcfa] px-4 py-3 text-sm outline-none focus:border-[#4c805b] read-only:text-[#758574]" /></label>
             <label className="block text-xs font-bold text-[#405443]">Password<input type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} className="mt-2 w-full rounded-xl border border-[#dfe6dc] bg-[#fbfcfa] px-4 py-3 text-sm outline-none focus:border-[#4c805b]" /></label>
@@ -183,7 +183,7 @@ export default function AdminPage() {
   return (
     <main className="admin-glass-shell min-h-screen bg-[#f5f7f3] text-[#25392b]">
       <aside className="fixed inset-y-0 left-0 z-20 hidden w-64 flex-col border-r border-[#e7ece4] bg-white px-5 py-6 lg:flex">
-        <a href="/" className="flex items-center gap-3"><span className="grid h-11 w-11 place-items-center rounded-2xl bg-[#1d4b34] text-xl font-black text-white">e</span><span><b className="block text-sm text-[#1b3b2a]">eCuisinefoods</b><small className="text-[10px] text-[#849082]">Admin workspace</small></span></a>
+        <a href="/" className="flex items-center gap-3"><span className="grid h-11 w-11 place-items-center rounded-2xl bg-[#1d4b34] text-xl font-black text-white">e</span><span><b className="block text-sm text-[#1b3b2a]">eCuisine</b><small className="text-[10px] text-[#849082]">Admin workspace</small></span></a>
         <p className="mb-3 mt-10 text-[9px] font-extrabold uppercase tracking-[.2em] text-[#9aa597]">Workspace</p>
         <nav className="space-y-1">{navItems.filter((item) => !item.roles || item.roles.includes(profile.role)).map((item) => { const content = <><item.icon size={16}/>{item.label}{!item.active && !item.href && <span className="ml-auto text-[9px] text-[#a6afa2]">Soon</span>}</>; const cls = `flex items-center gap-3 rounded-xl px-3 py-3 text-xs font-semibold ${item.active ? "bg-[#eaf2e8] text-[#245b39]" : item.href ? "text-[#52705a] hover:bg-[#f2f6ef]" : "text-[#7b887c]"}`; return item.href ? <Link key={item.label} href={item.href} className={cls}>{content}</Link> : <div key={item.label} className={cls}>{content}</div>; })}</nav>
         <div className="mt-auto rounded-2xl bg-[#f0f5ee] p-4"><div className="flex items-center gap-2 text-xs font-bold text-[#315b3e]"><ShieldCheck size={15}/> Role-based access</div><p className="mt-2 text-[10px] leading-5 text-[#738271]">Your {profile.role.replaceAll("_"," ")} role controls what you can view and change across the business.</p></div>
@@ -191,11 +191,11 @@ export default function AdminPage() {
 
       <section className="lg:pl-64">
         <header className="sticky top-0 z-10 flex items-center justify-between border-b border-[#e8ede5] bg-white/90 px-5 py-4 backdrop-blur sm:px-8">
-          <div><p className="text-[10px] font-bold uppercase tracking-[.18em] text-[#8a9787]">Business overview</p><h1 className="mt-1 text-lg font-bold text-[#203b2a]">Good day, {profile.display_name || "eCuisinefoods Owner"}</h1></div>
+          <div><p className="text-[10px] font-bold uppercase tracking-[.18em] text-[#8a9787]">Business overview</p><h1 className="mt-1 text-lg font-bold text-[#203b2a]">Good day, {profile.display_name || "eCuisine Owner"}</h1></div>
           <div className="flex items-center gap-3"><span className="hidden rounded-full bg-[#eaf2e8] px-3 py-2 text-[10px] font-bold capitalize text-[#376546] sm:inline-flex">{profile.role.replaceAll("_", " ")}</span><button onClick={signOut} className="inline-flex items-center gap-2 rounded-xl border border-[#e4e9e1] px-3 py-2 text-xs font-bold text-[#617060] hover:bg-[#f6f8f4]"><LogOut size={15}/> Sign out</button></div>
         </header>
         <div className="mx-auto max-w-7xl px-5 py-7 sm:px-8 sm:py-9">
-          <div className="mb-7 flex flex-wrap items-end justify-between gap-3"><div><h2 className="text-2xl font-semibold tracking-tight text-[#1e3b29] sm:text-3xl">Your business at a glance</h2><p className="mt-2 text-xs text-[#7b887a]">A live view of the information currently available in your eCuisinefoods database.</p></div><span className="inline-flex items-center gap-2 rounded-full border border-[#e3e9e0] bg-white px-3 py-2 text-[10px] font-semibold text-[#788676]"><Activity size={13} className="text-[#4e8a5d}"/> Connected to Supabase</span></div>
+          <div className="mb-7 flex flex-wrap items-end justify-between gap-3"><div><h2 className="text-2xl font-semibold tracking-tight text-[#1e3b29] sm:text-3xl">Your business at a glance</h2><p className="mt-2 text-xs text-[#7b887a]">A live view of the information currently available in your eCuisine database.</p></div><span className="inline-flex items-center gap-2 rounded-full border border-[#e3e9e0] bg-white px-3 py-2 text-[10px] font-semibold text-[#788676]"><Activity size={13} className="text-[#4e8a5d}"/> Connected to Supabase</span></div>
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">{cards.map((card) => <article key={card.label} className="rounded-2xl border border-[#e7ece4] bg-white p-5 shadow-sm shadow-[#1b3825]/[.025]"><div className="flex items-center justify-between"><p className="text-xs font-semibold text-[#7c897b]">{card.label}</p><span className={`grid h-10 w-10 place-items-center rounded-xl ${card.tone}`}><card.icon size={19}/></span></div><p className="mt-4 text-2xl font-bold tracking-tight text-[#1d3928]">{card.value}</p><p className="mt-2 text-[10px] text-[#929d90]">{card.note}</p></article>)}</div>
           <div className="mt-7 grid gap-5 xl:grid-cols-[1.5fr_1fr]">
             <section className="overflow-hidden rounded-2xl border border-[#e7ece4] bg-white"><div className="flex items-center justify-between border-b border-[#edf0eb] px-5 py-4"><div><h3 className="text-sm font-bold text-[#294332]">Recent orders</h3><p className="mt-1 text-[10px] text-[#899487]">Latest customer activity</p></div><ClipboardList size={18} className="text-[#82917e]"/></div>{orders.length ? <div className="divide-y divide-[#f0f2ee]">{orders.map((order) => <div key={order.id} className="flex flex-wrap items-center justify-between gap-3 px-5 py-4"><div><p className="text-xs font-bold text-[#304936]">#{order.order_number} · {order.customer_name}</p><p className="mt-1 text-[10px] text-[#929d90]">{new Date(order.created_at).toLocaleString("en-NG")}</p></div><div className="text-right"><p className="text-xs font-bold text-[#304936]">{money(Number(order.total))}</p><span className="mt-1 inline-flex rounded-full bg-[#f1f5ee] px-2.5 py-1 text-[9px] font-bold text-[#5e795f]">{order.status}</span></div></div>)}</div> : <div className="px-5 py-12 text-center"><ShoppingBag className="mx-auto text-[#b5c1b1]" size={28}/><p className="mt-3 text-xs font-semibold text-[#687968]">No orders yet</p><p className="mt-1 text-[10px] text-[#9aa497]">New customer orders will appear here.</p></div>}</section>
