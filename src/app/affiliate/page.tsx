@@ -64,8 +64,8 @@ export default function PartnerDashboardPage(){
   if(mode==="signup"){
    const {data,error:authError}=await supabase.auth.signUp({email:email.trim(),password,options:{emailRedirectTo:"https://ecuisinefoods.onrender.com/affiliate"}});
    if(authError)setError(authError.message);
-   else if(data.session){setNotice("Account created. Connecting your approved partner profile…");await load();}
-   else setNotice("Check your email to confirm your partner account, then return here to sign in.");
+   else if(data.session){setNotice("Account created. Connecting your approved affiliate profile…");await load();}
+   else setNotice("Check your email to confirm your affiliate account, then return here to sign in.");
   }else{
    const {error:authError}=await supabase.auth.signInWithPassword({email:email.trim(),password});
    if(authError)setError(authError.message);else{setLoading(true);await load();}
