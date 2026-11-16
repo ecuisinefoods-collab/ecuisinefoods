@@ -5,7 +5,7 @@ import Link from "next/link";
 import { User } from "@supabase/supabase-js";
 import {
   ArrowRight, BadgeCheck, Box, Check, CircleUserRound, Clock3, Headset,
-  LockKeyhole, LogOut, Mail, PackageCheck, RefreshCw, ShieldCheck, ShoppingBag, UserRound
+  LockKeyhole, LogOut, PackageCheck, RefreshCw, ShieldCheck, ShoppingBag, UserRound
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
@@ -447,7 +447,6 @@ export default function AccountPage() {
                           </div>
                           <div className="mt-5 flex flex-wrap gap-3 border-t border-[#edf1ea] pt-4">
                             <a href={"https://wa.me/2348080942328?text=" + waText} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-full bg-[#edf5ea] px-4 py-2.5 text-xs font-bold text-[#356344]"><Headset size={14} /> Get order help</a>
-                            <Link href="/track" className="inline-flex items-center gap-2 rounded-full border border-[#e5ebe2] px-4 py-2.5 text-xs font-bold text-[#637762]">Track with code <ArrowRight size={13} /></Link>
                           </div>
                         </article>
                       );
