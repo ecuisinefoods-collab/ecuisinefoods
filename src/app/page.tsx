@@ -32,7 +32,7 @@ const defaults: StoreConfig = {
   hero_eyebrow: "A brighter way to shop for food",
   hero_title: "Good Food.",
   hero_highlight: "Better Living.",
-  hero_description: "Discover thoughtful food choices, shop your favourites and enjoy convenient pickup in Jos and Bauchi.",
+  hero_description: "Discover thoughtful food choices, shop your favourites and enjoy home delivery across Jos and Bauchi metropolis, with convenient pickup options.",
   hero_video_url: "",
   hero_video_fallback_url: "",
   hero_primary_cta: "Shop the collection",
@@ -77,12 +77,13 @@ export default async function HomePage() {
   let products: Product[] = [];
   let locations: { city: string; location_name: string }[] = [];
   let completedProductUnits = 0;
+  let storeLogoUrl: string | null = null;
   let config: StoreConfig = { ...defaults };
 
   if (supabase) {
     const [settingsResult, productsResult, locationsResult, salesResult] = await Promise.all([
       supabase.from("site_settings").select("setting_key,setting_value")
-        .in("setting_key", ["storefront_config"]),
+        .in("setting_key", ["storefront_config", "store_logo_url"]),
       supabase.from("products")
         .select("id,name,slug,category,short_description,description,ingredients,highlights,image_url,is_featured,created_at,product_variants(id,pack_size,price,sale_price,sale_starts_at,sale_ends_at,stock_quantity)")
         .eq("is_active", true).order("created_at", { ascending: false }).limit(60),
@@ -92,6 +93,8 @@ export default async function HomePage() {
     ]);
 
     const raw = settingsResult.data?.find(row => row.setting_key === "storefront_config")?.setting_value;
+    const logo = settingsResult.data?.find(row => row.setting_key === "store_logo_url")?.setting_value;
+    if (typeof logo === "string" && /^https?:\/\//i.test(logo)) storeLogoUrl = logo;
     if (raw) {
       try { config = { ...defaults, ...JSON.parse(raw) }; } catch { config = { ...defaults }; }
     }
@@ -121,10 +124,6 @@ export default async function HomePage() {
         <Sparkles size={14} /> {config.announcement}
       </div>
       <SiteHeader />
-
-      <section className="mx-auto w-full max-w-7xl px-5 py-1 sm:py-1.5" aria-label="eCuisine all-time sales milestone">
-        <SalesCounter total={completedProductUnits} />
-      </section>
 
       <section className={`ec-home-hero relative isolate overflow-hidden ${videoEnabled ? "ec-home-hero--video" : ""}`}>
         {config.hero_video_fallback_url && (
@@ -169,16 +168,29 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="ec-benefit-strip mx-auto grid max-w-7xl grid-cols-2 gap-3 px-5 py-6 sm:grid-cols-4 sm:py-8">
+      <section className="mx-auto w-full max-w-7xl px-5" aria-label="eCuisine all-time sales milestone">
+        <SalesCounter total={completedProductUnits} />
+      </section>
+
+      <section className="ec-benefit-strip mx-auto grid max-w-7xl grid-cols-2 gap-3 px-5 py-6 sm:grid-cols-3 lg:grid-cols-5 sm:py-8">
         {[
-          { icon: Truck, title: "Pickup made simple", detail: "Choose your Jos or Bauchi point" },
+          { icon: Truck, title: "Home delivery", detail: "Available across Jos & Bauchi metropolis. Ask us for a delivery quote." },
+          { icon: MapPin, title: "Pickup made simple", detail: "Choose your preferred Jos or Bauchi collection point" },
           { icon: ShieldCheck, title: "Shop with confidence", detail: "Clear order status and tracking" },
           { icon: PackageCheck, title: "Product details", detail: "Pack sizes, prices and stock" },
           { icon: Headphones, title: "Friendly support", detail: "Speak with our team on WhatsApp" }
         ].map(item => (
           <div key={item.title} className="ec-benefit-card flex items-center gap-3 rounded-2xl border bg-white p-3 sm:p-4">
             <span className="ec-benefit-icon grid h-11 w-11 shrink-0 place-items-center rounded-xl"><item.icon size={20} /></span>
-            <span><strong className="block text-[11px] font-extrabold sm:text-sm">{item.title}</strong><small className="mt-1 block text-[10px] leading-4 text-[#849184]">{item.detail}</small></span>
+            <span>
+              <strong className="block text-[11px] font-extrabold sm:text-sm">{item.title}</strong>
+              <small className="mt-1 block text-[10px] leading-4 text-[#849184]">{item.detail}</small>
+              {item.title === "Home delivery" && (
+                <a href="https://wa.me/2348080942328?text=Hello%20eCuisine%2C%20I%20would%20like%20a%20home%20delivery%20quote%20for%20Jos%20or%20Bauchi%20metropolis." target="_blank" rel="noreferrer" className="mt-2 inline-flex items-center gap-1 text-[10px] font-extrabold text-[#087f5b]">
+                  Ask about delivery <ArrowRight size={11} />
+                </a>
+              )}
+            </span>
           </div>
         ))}
       </section>
@@ -273,7 +285,7 @@ export default async function HomePage() {
             {[
               { icon: CheckCircle2, title: "Thoughtful choices", detail: "We put care into the products we bring to the store." },
               { icon: ShieldCheck, title: "Clear information", detail: "Prices, pack sizes and availability are shown before checkout." },
-              { icon: Truck, title: "Local convenience", detail: "Choose a pickup point in Jos or Bauchi." },
+              { icon: Truck, title: "Local convenience", detail: "Home delivery across Jos and Bauchi metropolis, plus convenient pickup options." },
               { icon: Headphones, title: "Human support", detail: "Our team is reachable when you need help." }
             ].map(item => <article key={item.title} className="ec-why-card rounded-2xl border bg-white p-4 sm:p-5"><span className="ec-why-icon grid h-10 w-10 place-items-center rounded-xl"><item.icon size={19} /></span><h3 className="mt-4 text-xs font-extrabold sm:text-sm">{item.title}</h3><p className="mt-2 text-[10px] leading-5 text-[#7d897f] sm:text-xs">{item.detail}</p></article>)}
           </div>
@@ -309,9 +321,10 @@ export default async function HomePage() {
       <footer className="ec-store-footer">
         <div className="ec-store-footer__main mx-auto grid max-w-7xl gap-10 px-5 py-12 sm:grid-cols-2 lg:grid-cols-[1.25fr_1fr_1fr_1.15fr] lg:gap-12 lg:py-14">
           <div className="ec-footer-brand">
-            <Link href="/" className="inline-flex items-center gap-3" aria-label="eCuisine home">
-              <span className="grid h-11 w-11 place-items-center rounded-full border-2 border-[#e2bb50] bg-[#087f5b] text-2xl font-black italic text-[#fff0a8] shadow-md">e</span>
-              <span><span className="block text-2xl font-black tracking-[-.05em] text-[#07543f]">eCuisine</span><span className="block text-[9px] font-extrabold uppercase tracking-[.2em] text-[#a77a20]">Good food · Better living</span></span>
+            <Link href="/" className="inline-flex min-h-14 items-center" aria-label="eCuisine home">
+              {storeLogoUrl
+                ? <img src={storeLogoUrl} alt="eCuisine brand logo" className="ec-footer-brand__logo h-14 w-auto max-w-[230px] object-contain" />
+                : <span className="grid h-12 w-12 place-items-center rounded-full border-2 border-[#e2bb50] bg-[#087f5b] text-2xl font-black italic text-[#fff0a8] shadow-md" aria-hidden="true">e</span>}
             </Link>
             <p className="mt-4 max-w-xs text-sm leading-6 text-[#65786a]">Thoughtful food choices, made with purpose and care.</p>
             <a href="https://wa.me/2348080942328" target="_blank" rel="noreferrer" className="ec-footer-contact mt-5 inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-xs font-extrabold">
