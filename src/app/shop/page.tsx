@@ -77,12 +77,12 @@ export default async function ShopPage({searchParams}:{searchParams:Promise<{cat
           const Icon=[Leaf,Sprout,ShoppingBasket,PackageCheck][index%4];
           const count=products.filter(product=>product.category===category).length;
           return <Link key={category} href={"/shop?category="+encodeURIComponent(category)+"#products"} className="ec-shop-category group flex min-h-[142px] flex-col justify-between rounded-2xl border p-4 transition hover:-translate-y-1">
-            <span className="ec-shop-category-icon grid h-10 w-10 place-items-center rounded-xl"><Icon size={19}/></span>
+            <span className="ec-shop-category-icon ec-shop-category-icon--3d grid h-12 w-12 place-items-center rounded-2xl"><Icon size={19}/></span>
             <span><span className="block text-xs font-extrabold leading-5 text-[#304936]">{category}</span><span className="mt-1 flex items-center justify-between text-[10px] font-semibold text-[#879184]"><span>{count} {count===1?"product":"products"}</span><ArrowRight size={13} className="transition group-hover:translate-x-1"/></span></span>
           </Link>;
         })}
         {comingSoon.slice(0,Math.max(0,6-categories.length)).map(item=><div key={item.name} className="ec-shop-category ec-shop-category-coming flex min-h-[142px] flex-col justify-between rounded-2xl border p-4">
-          <span className="ec-shop-category-icon grid h-10 w-10 place-items-center rounded-xl"><item.icon size={19}/></span>
+          <span className="ec-shop-category-icon ec-shop-category-icon--3d grid h-12 w-12 place-items-center rounded-2xl"><item.icon size={19}/></span>
           <span><span className="block text-xs font-extrabold leading-5 text-[#304936]">{item.name}</span><span className="mt-1 block text-[10px] font-semibold text-[#9a8e72]">{item.detail}</span><span className="mt-2 inline-flex rounded-full bg-[#fff0bd] px-2.5 py-1 text-[9px] font-black uppercase tracking-wider text-[#8b6714]">Coming soon</span></span>
         </div>)}
       </div>
