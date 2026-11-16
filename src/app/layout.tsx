@@ -6,8 +6,8 @@ import { FloatingWhatsApp } from "@/components/floating-whatsapp";
 import { supabase } from "@/lib/supabase";
 
 export const metadata: Metadata = {
-  title: "eCuisinefoods | Good food, better living",
-  description: "Wholesome food products from eCuisinefoods. Quality, nutrition and trust in every pack.",
+  title: "eCuisine | Good food, better living",
+  description: "Wholesome food products from eCuisine. Quality, nutrition and trust in every pack.",
 };
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
