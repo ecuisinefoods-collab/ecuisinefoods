@@ -32,7 +32,7 @@ const defaults: StoreConfig = {
   hero_eyebrow: "A brighter way to shop for food",
   hero_title: "Good Food.",
   hero_highlight: "Better Living.",
-  hero_description: "Discover thoughtful food choices, shop your favourites and enjoy home delivery across Jos and Bauchi metropolis, with convenient pickup options.",
+  hero_description: "Discover thoughtful food choices, shop your favourites and enjoy convenient home delivery and collection options at checkout.",
   hero_video_url: "",
   hero_video_fallback_url: "",
   hero_primary_cta: "Shop the collection",
@@ -75,20 +75,17 @@ function categoryDescription(category: string) {
 
 export default async function HomePage() {
   let products: Product[] = [];
-  let locations: { city: string; location_name: string }[] = [];
   let completedProductUnits = 0;
   let storeLogoUrl: string | null = null;
   let config: StoreConfig = { ...defaults };
 
   if (supabase) {
-    const [settingsResult, productsResult, locationsResult, salesResult] = await Promise.all([
+    const [settingsResult, productsResult, salesResult] = await Promise.all([
       supabase.from("site_settings").select("setting_key,setting_value")
         .in("setting_key", ["storefront_config", "store_logo_url"]),
       supabase.from("products")
         .select("id,name,slug,category,short_description,description,ingredients,highlights,image_url,is_featured,created_at,product_variants(id,pack_size,price,sale_price,sale_starts_at,sale_ends_at,stock_quantity)")
         .eq("is_active", true).order("created_at", { ascending: false }).limit(60),
-      supabase.from("pickup_locations")
-        .select("city,location_name").eq("is_active", true).order("city").order("sort_order"),
       supabase.rpc("get_public_completed_product_units")
     ]);
 
@@ -99,7 +96,6 @@ export default async function HomePage() {
       try { config = { ...defaults, ...JSON.parse(raw) }; } catch { config = { ...defaults }; }
     }
     products = (productsResult.data ?? []) as Product[];
-    locations = locationsResult.data ?? [];
     completedProductUnits = Number(salesResult.data ?? 0);
   }
 
@@ -109,13 +105,6 @@ export default async function HomePage() {
     new Date(b.created_at ?? 0).getTime() - new Date(a.created_at ?? 0).getTime()
   ).slice(0, 8);
   const liveCategories = Array.from(new Set(products.map(product => product.category).filter(Boolean)));
-  const locationList = locations.length ? locations : [
-    { city: "Jos", location_name: "Terminus" },
-    { city: "Jos", location_name: "Faringada" },
-    { city: "Jos", location_name: "Lamingo" },
-    { city: "Bauchi", location_name: "Yelwa" },
-    { city: "Bauchi", location_name: "Old G-R-A" }
-  ];
   const videoEnabled = Boolean(config.hero_video_url?.trim());
 
   return (
@@ -162,7 +151,7 @@ export default async function HomePage() {
             </div>
             <div className="ec-hero-proof mt-8 flex flex-wrap gap-x-5 gap-y-2 text-[10px] font-bold">
               <span className="inline-flex items-center gap-2"><ShieldCheck size={14} /> Clear product information</span>
-              <span className="inline-flex items-center gap-2"><MapPin size={14} /> Jos & Bauchi pickup</span>
+              <span className="inline-flex items-center gap-2"><MapPin size={14} /> Convenient options at checkout</span>
             </div>
           </div>
         </div>
@@ -174,8 +163,8 @@ export default async function HomePage() {
 
       <section className="ec-benefit-strip mx-auto grid max-w-7xl grid-cols-2 gap-3 px-5 py-6 sm:grid-cols-3 lg:grid-cols-5 sm:py-8">
         {[
-          { icon: Truck, title: "Home delivery", detail: "Available across Jos & Bauchi metropolis. Ask us for a delivery quote." },
-          { icon: MapPin, title: "Pickup made simple", detail: "Choose your preferred Jos or Bauchi collection point" },
+          { icon: Truck, title: "Home delivery", detail: "Ask our team about delivery to your area." },
+          { icon: MapPin, title: "Pickup made simple", detail: "Choose an available collection point at checkout" },
           { icon: ShieldCheck, title: "Shop with confidence", detail: "Clear order status and tracking" },
           { icon: PackageCheck, title: "Product details", detail: "Pack sizes, prices and stock" },
           { icon: Headphones, title: "Friendly support", detail: "Speak with our team on WhatsApp" }
@@ -186,7 +175,7 @@ export default async function HomePage() {
               <strong className="block text-[11px] font-extrabold sm:text-sm">{item.title}</strong>
               <small className="mt-1 block text-[10px] leading-4 text-[#849184]">{item.detail}</small>
               {item.title === "Home delivery" && (
-                <a href="https://wa.me/2348080942328?text=Hello%20eCuisine%2C%20I%20would%20like%20a%20home%20delivery%20quote%20for%20Jos%20or%20Bauchi%20metropolis." target="_blank" rel="noreferrer" className="mt-2 inline-flex items-center gap-1 text-[10px] font-extrabold text-[#087f5b]">
+                <a href="https://wa.me/2348080942328?text=Hello%20eCuisine%2C%20I%20would%20like%20a%20home%20delivery%20quote." target="_blank" rel="noreferrer" className="mt-2 inline-flex items-center gap-1 text-[10px] font-extrabold text-[#087f5b]">
                   Ask about delivery <ArrowRight size={11} />
                 </a>
               )}
@@ -285,7 +274,7 @@ export default async function HomePage() {
             {[
               { icon: CheckCircle2, title: "Thoughtful choices", detail: "We put care into the products we bring to the store." },
               { icon: ShieldCheck, title: "Clear information", detail: "Prices, pack sizes and availability are shown before checkout." },
-              { icon: Truck, title: "Local convenience", detail: "Home delivery across Jos and Bauchi metropolis, plus convenient pickup options." },
+              { icon: Truck, title: "Local convenience", detail: "Home delivery and collection options are available at checkout." },
               { icon: Headphones, title: "Human support", detail: "Our team is reachable when you need help." }
             ].map(item => <article key={item.title} className="ec-why-card rounded-2xl border bg-white p-4 sm:p-5"><span className="ec-why-icon grid h-10 w-10 place-items-center rounded-xl"><item.icon size={19} /></span><h3 className="mt-4 text-xs font-extrabold sm:text-sm">{item.title}</h3><p className="mt-2 text-[10px] leading-5 text-[#7d897f] sm:text-xs">{item.detail}</p></article>)}
           </div>
@@ -297,23 +286,6 @@ export default async function HomePage() {
           <div className="ec-review-promo flex flex-col gap-5 rounded-[1.7rem] border p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
             <div><p className="ec-kicker">From our community</p><h2 className="mt-2 text-2xl font-black sm:text-3xl">Your experience matters.</h2><p className="mt-2 max-w-xl text-sm leading-6 text-[#748277]">Read customer feedback and share your experience after a completed purchase.</p></div>
             <Link href="/reviews" className="inline-flex w-fit items-center gap-2 rounded-xl bg-[#07543f] px-5 py-3 text-xs font-extrabold text-white">Customer reviews <Star size={14} /></Link>
-          </div>
-        </div>
-      </section>
-
-      <section className="ec-pickup-section py-9 sm:py-11" aria-labelledby="ec-locations-title">
-        <div className="mx-auto flex max-w-7xl flex-col gap-5 px-5 lg:flex-row lg:items-center lg:justify-between">
-          <div className="max-w-sm">
-            <p className="ec-kicker">Closer to home</p>
-            <h2 id="ec-locations-title" className="mt-2 text-2xl font-black tracking-tight sm:text-3xl">See locations</h2>
-            <p className="mt-2 text-sm leading-6">Choose a convenient collection point when you place your order.</p>
-          </div>
-          <div className="ec-location-list flex flex-wrap gap-2" aria-label="Available collection points">
-            {locationList.map((location, index) => (
-              <span key={location.city + location.location_name + index} className="ec-location-chip rounded-full px-4 py-2.5 text-xs font-bold">
-                <MapPin size={13} /> {location.city} <span aria-hidden="true">·</span> {location.location_name}
-              </span>
-            ))}
           </div>
         </div>
       </section>
@@ -350,6 +322,7 @@ export default async function HomePage() {
               <Link href="/checkout">Checkout</Link>
               <Link href="/about">Our story &amp; vision</Link>
               <Link href="/partnerships">Partnership opportunities</Link>
+              <Link href="/affiliates">Affiliate programme</Link>
             </div>
           </nav>
 

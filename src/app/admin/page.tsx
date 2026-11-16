@@ -45,6 +45,7 @@ const navGroups: { label: string; items: { label: string; icon: typeof LayoutDas
     { label: "Storefront editor", icon: LayoutDashboard, href: "/admin/storefront", roles: ["owner","store_manager"] },
     { label: "Our Story & team", icon: Users, href: "/admin/story", roles: ["owner","store_manager"] },
     { label: "Partnership enquiries", icon: Handshake, href: "/admin/partnerships", roles: ["owner","store_manager","marketing_manager"] },
+    { label: "Affiliate applications", icon: Users, href: "/admin/affiliates", roles: ["owner","store_manager","marketing_manager"] },
   ]},
   { label: "Reports & finance", items: [
     { label: "Analytics", icon: BarChart3, href: "/admin/analytics", roles: ["owner","store_manager","finance_officer","analyst"] },

@@ -64,8 +64,8 @@ export default function ContactPage() {
             <div className="rounded-2xl border border-[#e6ece3] bg-white p-5">
               <MapPin size={22} className="text-[#3e704b]" />
               <h3 className="mt-4 font-bold text-[#2a4732]">Pickup points</h3>
-              <p className="mt-2 text-sm leading-6 text-[#829080]">Choose an active Jos or Bauchi pickup location at checkout. Wait for confirmation before visiting.</p>
-              <span className="mt-5 inline-flex text-xs font-bold text-[#356344]">Jos · Bauchi</span>
+              <p className="mt-2 text-sm leading-6 text-[#829080]">Available collection options are shown during checkout. Wait for confirmation before visiting.</p>
+              <span className="mt-5 inline-flex text-xs font-bold text-[#356344]">View options at checkout</span>
             </div>
             <Link href="/partnerships" className="group rounded-2xl border border-[#e6ece3] bg-white p-5 transition hover:-translate-y-1 hover:shadow-lg hover:shadow-[#1a3e27]/5">
               <Handshake size={22} className="text-[#3e704b]" />
