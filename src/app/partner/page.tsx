@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { ArrowRight, CalendarClock, CheckCircle2, ClipboardCheck, ExternalLink, LoaderCircle, LogOut, Package, Send, ShieldCheck, Sparkles, Users } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
@@ -15,7 +14,6 @@ const label = (value:string) => value.replaceAll("_"," ").replace(/\b\w/g, c=>c.
 const date = (value:string|null) => value ? new Date(value).toLocaleString("en-NG",{dateStyle:"medium",timeStyle:"short"}) : "No deadline set";
 
 export default function PartnerDashboardPage(){
- const router=useRouter();
  const [email,setEmail]=useState("");
  const [password,setPassword]=useState("");
  const [mode,setMode]=useState<"signin"|"signup">("signin");
