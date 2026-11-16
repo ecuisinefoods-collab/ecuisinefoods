@@ -26,7 +26,7 @@ export function SalesCounter({ total }: { total: number }) {
 
     let frame = 0;
     let start = 0;
-    const duration = 8000;
+    const duration = 5000;
     const animate = (now: number) => {
       if (!start) start = now;
       const progress = Math.min(1, (now - start) / duration);
