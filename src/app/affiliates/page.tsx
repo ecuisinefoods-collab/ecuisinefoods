@@ -6,7 +6,7 @@ import { AffiliateApplicationForm } from "@/components/affiliate-application-for
 const steps = [
   { icon: Share2, title: "Tell us about your audience", text: "Share your main platform, audience size and how you create or share content." },
   { icon: ShieldCheck, title: "Our team reviews your application", text: "We look at fit, audience and how you would represent the eCuisine brand." },
-  { icon: Link2, title: "Receive your affiliate details", text: "Approved partners receive their referral arrangements, tracking information and commercial terms before promotion begins." },
+  { icon: Link2, title: "Get your partner workspace", text: "Approved partners can sign in to see product promotion briefs, social engagement activities, deadlines, submissions and manager feedback." },
 ];
 
 export default function AffiliatesPage() {
@@ -25,7 +25,7 @@ export default function AffiliatesPage() {
               <a href="#affiliate-application" className="inline-flex items-center gap-2 rounded-xl bg-[#e7c96e] px-5 py-3.5 text-xs font-black text-[#173b2b] shadow-lg transition hover:-translate-y-0.5 hover:bg-[#f4da89]">Apply for partnership <ArrowRight size={15}/></a>
               <Link href="/about" className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-5 py-3.5 text-xs font-bold text-white transition hover:bg-white/10">Meet eCuisine</Link><Link href="/partner" className="inline-flex items-center gap-2 rounded-xl border border-[#e7c96e]/40 bg-[#e7c96e]/10 px-5 py-3.5 text-xs font-bold text-[#f0d98c] transition hover:bg-[#e7c96e]/20">Partner login <ArrowRight size={14}/></Link>
             </div>
-            <p className="mt-5 text-[11px] leading-5 text-[#a9bcae]">No payment is required to submit an application. Commercial terms are shared with accepted affiliates before any promotion starts.</p>
+            <p className="mt-5 text-[11px] leading-5 text-[#a9bcae]">No payment is required to apply. Partner responsibilities and any commercial terms are agreed with accepted partners before work begins.</p>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
             <article className="rounded-3xl border border-white/10 bg-white/[.06] p-5 backdrop-blur">
