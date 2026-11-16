@@ -15,8 +15,8 @@ const datasets=[
  {key:"partnership_inquiries",label:"Partnership enquiries"},{key:"affiliate_applications",label:"Partner applications"},
  {key:"partner_profiles",label:"Partner accounts"},{key:"partner_tasks",label:"Partner assignments"},
  {key:"partner_task_submissions",label:"Partner work submissions"},{key:"partner_referral_clicks",label:"Referral visits"},
- {key:"admin_audit_logs",label:"Admin audit history"},{key:"assistant_conversations",label:"Support conversations"},
- {key:"assistant_messages",label:"Support messages"},{key:"assistant_knowledge",label:"Assistant knowledge"},
+ {key:"admin_profiles",label:"Admin accounts & roles"},{key:"admin_audit_logs",label:"Admin audit history"},{key:"assistant_conversations",label:"Support conversations"},
+ {key:"assistant_messages",label:"Support messages"},{key:"assistant_rate_limits",label:"Assistant rate-limit counters"},{key:"assistant_knowledge",label:"Assistant knowledge"},{key:"assistant_knowledge_config",label:"Assistant knowledge settings"},
  {key:"assistant_knowledge_documents",label:"Assistant documents"}
 ];
 function csvValue(v:unknown){const s=v==null?"":typeof v==="object"?JSON.stringify(v):String(v);return '"'+s.replace(/"/g,'""')+'"';}
