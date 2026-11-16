@@ -57,9 +57,6 @@ export function BrandLoadingScreen({ initialLogoUrl }: { initialLogoUrl?: string
         if (!active || error) return;
         const value = data?.setting_value;
         if (typeof value === "string" && /^https?:\/\//i.test(value)) setLogoUrl(value);
-      })
-      .catch(() => {
-        // Keep the built-in eCuisine wordmark when the custom logo is unavailable.
       });
     return () => {
       active = false;
