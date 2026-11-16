@@ -6,7 +6,7 @@ import { AffiliateApplicationForm } from "@/components/affiliate-application-for
 const steps = [
   { icon: Share2, title: "Tell us about your audience", text: "Share your main platform, audience size and how you create or share content." },
   { icon: ShieldCheck, title: "Our team reviews your application", text: "We look at fit, audience and how you would represent the eCuisine brand." },
-  { icon: Link2, title: "Get your partner workspace", text: "Approved partners can sign in to see product promotion briefs, social engagement activities, deadlines, submissions and manager feedback." },
+  { icon: Link2, title: "Get your partner workspace", text: "Approved partners receive a unique referral code and workspace for campaigns, deadlines, submissions, feedback and referral performance." },
 ];
 
 export default function AffiliatesPage() {
@@ -19,8 +19,8 @@ export default function AffiliatesPage() {
         <div className="relative mx-auto grid max-w-6xl gap-10 lg:grid-cols-[1.1fr_.9fr] lg:items-center">
           <div>
             <span className="inline-flex items-center gap-2 rounded-full border border-[#e5c978]/25 bg-white/5 px-4 py-2 text-[10px] font-black uppercase tracking-[.2em] text-[#f0d98c]"><HeartHandshake size={14}/> eCuisine Partner Programme</span>
-            <h1 className="mt-6 max-w-3xl text-4xl font-black leading-[1.04] tracking-[-.05em] sm:text-6xl">Good food travels further when we share it.</h1>
-            <p className="mt-5 max-w-xl text-sm leading-7 text-[#d4e0d5] sm:text-base">Join a working partnership with eCuisine. Partners may promote products, support social media activity, create content, participate in campaigns and help us serve our community—with clear briefs, responsibilities, deadlines and work reviews.</p>
+            <h1 className="mt-6 max-w-3xl text-4xl font-black leading-[1.04] tracking-[-.05em] sm:text-6xl">A considered partnership. A shared purpose.</h1>
+            <p className="mt-5 max-w-xl text-sm leading-7 text-[#d4e0d5] sm:text-base">Join a considered partnership built around quality, consistency and measurable contribution. Promote products, create thoughtful content, support social channels and take part in campaigns—with clear briefs, agreed deadlines and meaningful reviews.</p>
             <div className="mt-8 flex flex-wrap gap-3">
               <a href="#affiliate-application" className="inline-flex items-center gap-2 rounded-xl bg-[#e7c96e] px-5 py-3.5 text-xs font-black text-[#173b2b] shadow-lg transition hover:-translate-y-0.5 hover:bg-[#f4da89]">Apply for partnership <ArrowRight size={15}/></a>
               <Link href="/about" className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-5 py-3.5 text-xs font-bold text-white transition hover:bg-white/10">Meet eCuisine</Link><Link href="/partner" className="inline-flex items-center gap-2 rounded-xl border border-[#e7c96e]/40 bg-[#e7c96e]/10 px-5 py-3.5 text-xs font-bold text-[#f0d98c] transition hover:bg-[#e7c96e]/20">Partner login <ArrowRight size={14}/></Link>
@@ -35,8 +35,8 @@ export default function AffiliatesPage() {
             </article>
             <article className="rounded-3xl border border-white/10 bg-white/[.06] p-5 backdrop-blur sm:translate-y-8">
               <span className="grid h-11 w-11 place-items-center rounded-2xl bg-[#e7c96e]/15 text-[#f0d98c]"><BadgeCheck size={20}/></span>
-              <h2 className="mt-4 text-base font-extrabold text-white">Clear partner terms</h2>
-              <p className="mt-2 text-xs leading-6 text-[#c5d4c7]">Referral links, commission details and payout arrangements are confirmed before launch.</p>
+              <h2 className="mt-4 text-base font-extrabold text-white">Performance with purpose</h2>
+              <p className="mt-2 text-xs leading-6 text-[#c5d4c7]">Every approved partner receives a unique referral code, trackable product links and a clear view of attributed visits and orders.</p>
             </article>
           </div>
         </div>
@@ -45,8 +45,8 @@ export default function AffiliatesPage() {
       <section className="mx-auto max-w-6xl px-5 py-12 sm:py-16">
         <div className="max-w-2xl">
           <p className="text-[10px] font-black uppercase tracking-[.2em] text-[#9a7832]">How it works</p>
-          <h2 className="mt-3 text-3xl font-black tracking-tight text-[#173c2b] sm:text-4xl">A clear, accountable partnership.</h2>
-          <p className="mt-3 text-sm leading-7 text-[#718174]">We start with a conversation, then confirm the practical details with approved partners.</p>
+          <h2 className="mt-3 text-3xl font-black tracking-tight text-[#173c2b] sm:text-4xl">A professional way to work together.</h2>
+          <p className="mt-3 text-sm leading-7 text-[#718174]">We review every application, agree expectations and provide the tools partners need to deliver consistently.</p>
         </div>
         <div className="mt-8 grid gap-4 md:grid-cols-3">
           {steps.map((step,index)=><article key={step.title} className="rounded-3xl border border-[#e1e9df] bg-white p-6 shadow-[0_12px_35px_rgba(23,61,39,.045)]">
@@ -60,7 +60,7 @@ export default function AffiliatesPage() {
       <section id="affiliate-application" className="mx-auto grid max-w-6xl scroll-mt-24 gap-8 px-5 pb-14 lg:grid-cols-[.72fr_1.28fr] lg:items-start">
         <div className="lg:sticky lg:top-28">
           <p className="text-[10px] font-black uppercase tracking-[.2em] text-[#9a7832]">Your next step</p>
-          <h2 className="mt-3 text-3xl font-black leading-tight tracking-tight text-[#173c2b]">Let’s grow something good.</h2>
+          <h2 className="mt-3 text-3xl font-black leading-tight tracking-tight text-[#173c2b]">Let’s build something meaningful.</h2>
           <p className="mt-4 text-sm leading-7 text-[#718174]">Complete the application and tell us about your strengths, experience, availability and the kind of work you can reliably deliver. Approved partners receive access to a dashboard with assigned activities and deadlines.</p>
           <div className="mt-6 rounded-2xl border border-[#e2eadf] bg-[#edf4e9] p-5">
             <div className="flex items-center gap-2 text-sm font-extrabold text-[#315b3e]"><Sparkles size={16}/> A clear process</div>
