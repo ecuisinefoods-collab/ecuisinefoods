@@ -149,7 +149,7 @@ export function CheckoutForm({ locations, deliveryZones }: { locations: Location
     const trackingUrl=window.location.origin+"/track?code="+encodeURIComponent(created.tracking_code);
     const selected=locations.find(l=>l.id===pickup);
     const lines=[
-      "Hello eCuisinefoods, I would like to complete my checkout on WhatsApp.",
+      "Hello eCuisine, I would like to complete my checkout on WhatsApp.",
       "",
       "Order number: #"+created.order_number,
       ...itemsToSave.map(item=>"• "+item.name+" — "+item.pack_size+" × "+item.qty+" = "+money(item.price*item.qty)),
