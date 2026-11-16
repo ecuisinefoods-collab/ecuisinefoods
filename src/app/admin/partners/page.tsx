@@ -69,7 +69,9 @@ export default function AdminPartnersPage(){
   if(updateError)setError(updateError.message);
   else{
     setPartners(rows=>rows.map(p=>p.id===id?{...p,status,restriction_reason:reason?.trim()||null,restricted_at:["banned","suspended","deleted"].includes(status)?now:null,deleted_at:status==="deleted"?now:null}:p));
-    setMessage(status==="banned"?"Partner banned and access restricted.":status==="deleted"?"Partner removed from the active programme; history retained.":"Partner status updated.");
+    const {data:{user}}=await supabase.auth.getUser();
+    const {error:auditError}=await supabase.from("admin_audit_logs").insert({actor_user_id:user?.id||null,actor_email:user?.email||null,action:"partner_"+status,resource_type:"partner_profile",resource_id:id,details:{reason:reason?.trim()||null}});
+    setMessage(auditError?"Partner status updated, but the audit note could not be saved.":status==="banned"?"Partner banned and access restricted.":status==="deleted"?"Partner removed from the active programme; history retained.":"Partner status updated.");
   }
  }
  if(loading)return <main className="grid min-h-screen place-items-center bg-[#f5f7f3] text-sm font-semibold text-[#42694b]"><LoaderCircle className="mr-2 animate-spin"/>Loading partner management…</main>;
