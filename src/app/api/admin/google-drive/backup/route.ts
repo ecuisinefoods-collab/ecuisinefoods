@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
     let folderId = saved.folderId;
     if (!folderId) {
       const folderResponse = await driveFetch(
-        "https://www.googleapis.com/drive/v3/files?fields=files(id,name)",
+        "https://www.googleapis.com/drive/v3/files?fields=id,name",
         accessToken,
         {
           method: "POST", headers: { "Content-Type": "application/json" },
