@@ -2,13 +2,13 @@
 
 import { useEffect, useState } from "react";
 
-const LIFETIME_SALES_MILESTONE = 1000;
+const LIFETIME_SALES_MILESTONE = 2500;
 const JOURNEY_NOTES = [
-  "Rooted in Jos. Growing with Bauchi.",
   "Good food. Better everyday choices.",
-  "Five local pickup points. More convenience.",
   "Every order helps shape our next chapter.",
-  "New finds and special offers await."
+  "Made with care. Shared with purpose.",
+  "New finds and special offers await.",
+  "Growing through every customer story."
 ];
 
 export function SalesCounter({ total }: { total: number }) {
