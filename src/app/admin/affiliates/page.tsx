@@ -97,7 +97,7 @@ export default function AffiliateApplicationsPage() {
             <p className="mt-2 max-w-2xl text-sm leading-6 text-[#758276]">Review people who have applied to promote eCuisine and update their application status.</p>
           </div>
           <div className="flex flex-wrap gap-2">
-            <Link href="/affiliates" target="_blank" className="inline-flex items-center gap-2 rounded-xl border border-[#d9e0db] bg-white px-4 py-3 text-xs font-bold text-[#344c3c]">Open public page <ExternalLink size={14}/></Link>
+            <Link href="/admin/partners" className="inline-flex items-center gap-2 rounded-xl bg-[#0b6849] px-4 py-3 text-xs font-bold text-white">Partner operations <Users size={14}/></Link><Link href="/affiliates" target="_blank" className="inline-flex items-center gap-2 rounded-xl border border-[#d9e0db] bg-white px-4 py-3 text-xs font-bold text-[#344c3c]">Open public page <ExternalLink size={14}/></Link>
             <button type="button" onClick={()=>{setLoading(true);void load();}} className="inline-flex items-center gap-2 rounded-xl border border-[#d9e0db] bg-white px-4 py-3 text-xs font-bold text-[#344c3c]"><RefreshCw size={14}/> Refresh</button>
           </div>
         </div>
