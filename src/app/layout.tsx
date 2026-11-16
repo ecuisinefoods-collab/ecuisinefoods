@@ -7,6 +7,7 @@ import { FloatingWhatsApp } from "@/components/floating-whatsapp";
 import { AssistantWidget } from "@/components/assistant-widget";
 import { BrandLoadingFallback, BrandLoadingScreen } from "@/components/brand-loading-screen";
 import { supabase } from "@/lib/supabase";
+import { ThemeProvider } from "@/components/theme-provider";
 
 export const metadata: Metadata = {
   title: "eCuisine | Good food, better living",
@@ -27,8 +28,12 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   }
 
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem("ecuisine-theme");document.documentElement.dataset.theme=t==="dark"?"dark":"light";}catch(e){document.documentElement.dataset.theme="light";}})();` }} />
+      </head>
       <body>
+        <ThemeProvider>
         <Suspense fallback={<BrandLoadingFallback logoUrl={brandLogoUrl} />}>
           <BrandLoadingScreen initialLogoUrl={brandLogoUrl} />
         </Suspense>
@@ -37,6 +42,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         <FloatingWhatsApp />
         <AssistantWidget />
         {showDiscountMascot ? <DiscountMascot /> : null}
+        </ThemeProvider>
       </body>
     </html>
   );

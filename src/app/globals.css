@@ -864,3 +864,429 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .admin-premium-shell *, .ec-sales-story * { animation: none !important; transition: none !important; }
 }
+
+
+/* --- eCuisine 3D pantry artwork and premium sales-story presentation --- */
+.ec-category-art {
+  display: block;
+  width: clamp(76px, 8vw, 106px);
+  aspect-ratio: 1;
+  border: 1px solid rgba(255,255,255,.72);
+  border-radius: 24px;
+  background-image: url("/category-food-art.webp");
+  background-repeat: no-repeat;
+  background-size: 300% 200%;
+  box-shadow: 0 15px 28px rgba(30,57,35,.15), inset 0 1px 0 rgba(255,255,255,.86);
+  filter: saturate(1.06);
+  transform: translateZ(0);
+  transition: transform .3s cubic-bezier(.2,.75,.25,1), box-shadow .3s ease;
+}
+.ec-category-art--cereal { background-position: 0 0; }
+.ec-category-art--grains { background-position: 50% 0; }
+.ec-category-art--spices { background-position: 100% 0; }
+.ec-category-art--drinks { background-position: 0 100%; }
+.ec-category-art--snacks { background-position: 50% 100%; }
+.ec-category-art--natural { background-position: 100% 100%; }
+.ec-category-tile:hover .ec-category-art {
+  transform: translateY(-5px) rotate(-2deg) scale(1.045);
+  box-shadow: 0 22px 36px rgba(30,57,35,.2), inset 0 1px 0 rgba(255,255,255,.94);
+}
+.ec-category-tile { min-height: 178px; }
+.ec-category-tile .ec-category-art { align-self: flex-start; }
+@media (max-width: 640px) {
+  .ec-category-art { width: 82px; border-radius: 19px; }
+  .ec-category-tile { min-height: 155px; }
+}
+
+.ec-sales-story {
+  isolation: isolate;
+  min-height: 245px;
+  color: #eff6ef;
+  border: 1px solid rgba(240,216,153,.42);
+  background:
+    radial-gradient(ellipse at 12% 0%, rgba(92,151,103,.35), transparent 34%),
+    radial-gradient(ellipse at 100% 100%, rgba(207,160,65,.22), transparent 38%),
+    linear-gradient(122deg, #0b2d22 0%, #114531 48%, #163b2c 100%);
+  box-shadow: 0 24px 64px rgba(8,47,32,.22), inset 0 1px 0 rgba(255,255,255,.16), inset 0 -1px 0 rgba(0,0,0,.16);
+}
+.ec-sales-story::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 1px;
+  border-radius: calc(2rem - 1px);
+  background: linear-gradient(112deg, rgba(255,255,255,.09), transparent 34%, rgba(255,255,255,.025) 72%, transparent);
+  pointer-events: none;
+}
+.ec-sales-story__glow {
+  z-index: -1;
+  filter: blur(3px);
+  pointer-events: none;
+}
+.ec-sales-story__glow--one { background: rgba(52,145,99,.26); }
+.ec-sales-story__glow--two { background: rgba(198,157,69,.18); }
+.ec-sales-story__ring {
+  z-index: -1;
+  border: 1px solid rgba(246,221,165,.12);
+  box-shadow: inset 0 0 24px rgba(255,255,255,.025), 0 0 35px rgba(0,0,0,.08);
+}
+.ec-sales-story__ring--two { border-color: rgba(255,255,255,.08); }
+.ec-sales-story__eyebrow {
+  color: #f7dfaa;
+  border: 1px solid rgba(245,220,162,.22);
+  background: rgba(255,255,255,.075);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.10), 0 8px 22px rgba(0,0,0,.12);
+}
+.ec-sales-story h2 { color: #fffdf3 !important; text-shadow: 0 2px 24px rgba(0,0,0,.18); }
+.ec-sales-story p:not(.ec-sales-story__number) { color: #c8d8cc !important; }
+.ec-sales-story__proof {
+  color: #dfece0;
+  border: 1px solid rgba(255,255,255,.13);
+  background: rgba(255,255,255,.065);
+}
+.ec-sales-story__display {
+  border: 1px solid rgba(248,224,171,.32);
+  background:
+    radial-gradient(ellipse at 48% 0%, rgba(255,255,255,.16), transparent 65%),
+    linear-gradient(155deg, rgba(255,255,255,.13), rgba(255,255,255,.045));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.2), inset 0 -14px 30px rgba(0,0,0,.12), 0 22px 48px rgba(0,0,0,.22);
+  -webkit-backdrop-filter: blur(18px) saturate(145%);
+  backdrop-filter: blur(18px) saturate(145%);
+}
+.ec-sales-story__display-kicker { color: #d9c18b; }
+.ec-sales-story__label { color: #eef5ec; }
+.ec-sales-story__number {
+  display: inline-block;
+  position: relative;
+  font-family: "Arial Black", "Trebuchet MS", system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.075em;
+  background: linear-gradient(180deg, #fff9d8 0%, #f4d889 18%, #d9a93d 42%, #fff0b8 53%, #bd8325 76%, #f1d18a 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent !important;
+  -webkit-text-fill-color: transparent;
+  -webkit-text-stroke: 1px rgba(255,238,194,.48);
+  text-shadow: 0 1px 0 rgba(102,66,18,.85), 0 2px 0 rgba(95,61,17,.8), 0 3px 0 rgba(79,52,17,.76), 0 5px 0 rgba(14,37,26,.5), 0 9px 14px rgba(0,0,0,.32);
+  filter: drop-shadow(0 10px 11px rgba(0,0,0,.22));
+  transform: perspective(620px) rotateX(8deg);
+}
+.ec-sales-story__plus {
+  margin-left: .025em;
+  color: #fff0bd;
+  -webkit-text-fill-color: #fff0bd;
+  -webkit-text-stroke: 1px rgba(132,90,24,.68);
+  text-shadow: 0 2px 0 #94651f, 0 4px 0 #6d481b, 0 7px 9px rgba(0,0,0,.35);
+}
+.ec-sales-story__base { color: #d9c18b; }
+.ec-sales-story__edge { background: linear-gradient(90deg, transparent, rgba(249,224,166,.52), transparent); }
+@media (max-width: 640px) {
+  .ec-sales-story { min-height: 0; }
+  .ec-sales-story__display { max-width: 100%; }
+}
+
+/* Make the offer action unmistakably legible on its white surface. */
+.ec-offer-cta,
+.ec-offer-cta:visited {
+  color: #073d2d !important;
+  background: linear-gradient(180deg, #fffef8, #f7f0db) !important;
+  border: 1px solid rgba(231,205,143,.9);
+  text-shadow: none !important;
+  box-shadow: inset 0 1px 0 #fff, 0 10px 24px rgba(4,48,34,.16);
+}
+.ec-offer-cta svg { color: #0a6548 !important; }
+.ec-offer-cta:hover {
+  color: #052f23 !important;
+  background: #f4e6bd !important;
+}
+
+/* Premium light admin: executive forest-and-brass navigation, clean work surfaces. */
+.admin-premium-shell {
+  color: #24372d;
+  background:
+    radial-gradient(ellipse at 3% 0%, rgba(224,235,228,.86), transparent 34%),
+    radial-gradient(ellipse at 96% 4%, rgba(235,225,199,.46), transparent 28%),
+    linear-gradient(145deg, #edf2ef 0%, #f3f4ef 50%, #e9efeb 100%);
+}
+.admin-premium-shell aside {
+  color: #edf4ee;
+  border-right: 1px solid rgba(217,192,132,.19) !important;
+  background: linear-gradient(180deg, #14281f 0%, #10231b 50%, #0e1d18 100%) !important;
+  box-shadow: 16px 0 48px rgba(10,31,22,.16), inset -1px 0 0 rgba(255,255,255,.06);
+}
+.admin-premium-shell aside > a span:last-child b { color: #f4f4e9 !important; }
+.admin-premium-shell aside > a span:last-child small { color: #a7b8aa !important; }
+.admin-premium-shell aside > p { color: #91a394 !important; }
+.admin-premium-shell aside details {
+  border-color: rgba(228,237,223,.10) !important;
+  background: rgba(255,255,255,.035) !important;
+}
+.admin-premium-shell aside details[open] {
+  border-color: rgba(221,188,111,.27) !important;
+  background: rgba(255,255,255,.065) !important;
+}
+.admin-premium-shell aside details summary { color: #c1d0c4 !important; }
+.admin-premium-shell aside details div a { color: #c4d2c8 !important; }
+.admin-premium-shell aside details div a:hover { color: #fff8df !important; background: rgba(230,205,148,.13) !important; }
+.admin-premium-shell aside nav > a:first-child {
+  color: #1a3024 !important;
+  background: linear-gradient(135deg, #f1dfaa, #d6b56c) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.62), 0 8px 20px rgba(0,0,0,.13);
+}
+.admin-premium-shell aside .mt-auto {
+  color: #dce8df;
+  border: 1px solid rgba(235,222,185,.15);
+  background: rgba(255,255,255,.055) !important;
+}
+.admin-premium-shell aside .mt-auto div { color: #f2dc9f !important; }
+.admin-premium-shell aside .mt-auto p { color: #b7c6ba !important; }
+.admin-premium-shell header h1 { color: #1b3025 !important; text-shadow: none; }
+.admin-premium-shell header p { color: #78877d !important; text-shadow: none; }
+.admin-premium-shell header button { border-color: #d5ded7 !important; color: #324b3b !important; }
+.admin-premium-shell article[class*="rounded-"], .admin-premium-shell section[class*="rounded-"] {
+  border-color: rgba(209,220,212,.86) !important;
+  box-shadow: 0 15px 34px rgba(28,51,38,.055), inset 0 1px 0 rgba(255,255,255,.98);
+}
+.admin-premium-shell .text-[#1e3b29], .admin-premium-shell .text-[#203b2a], .admin-premium-shell .text-[#1d3928] { color: #1b3025; }
+.admin-premium-shell .text-[#7b887a], .admin-premium-shell .text-[#929d90], .admin-premium-shell .text-[#899487] { color: #718178; }
+
+/* Theme switch controls */
+.ec-theme-toggle {
+  border-color: rgba(202,217,203,.92);
+  background: rgba(255,255,255,.84);
+  color: #1b5039;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.98), 0 5px 14px rgba(16,61,39,.07);
+}
+.ec-theme-toggle:hover { transform: translateY(-1px); box-shadow: 0 10px 22px rgba(16,61,39,.12); }
+.admin-theme-toggle { box-shadow: 0 18px 42px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.16); }
+
+/* Dark mode — shared by the public store and the entire administration suite. */
+html[data-theme="dark"] { color-scheme: dark; background: #101b17; }
+html[data-theme="dark"] body {
+  color: #e4eee6;
+  background: radial-gradient(ellipse at 5% 0%, rgba(39,88,64,.22), transparent 38%), #101b17;
+}
+html[data-theme="dark"] .ec-storefront,
+html[data-theme="dark"] .storefront-glass {
+  color: #e4eee6 !important;
+  background: linear-gradient(145deg, #101c17 0%, #14221b 55%, #101a16 100%) !important;
+}
+html[data-theme="dark"] .site-header {
+  border-color: rgba(225,236,226,.1) !important;
+  background: rgba(15,30,23,.9) !important;
+  box-shadow: 0 14px 36px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.07);
+}
+html[data-theme="dark"] .site-header .brand-lockup,
+html[data-theme="dark"] .site-header .nav-link { color: #e4eee6 !important; }
+html[data-theme="dark"] .site-header form {
+  border-color: rgba(224,239,225,.13);
+  background: rgba(255,255,255,.06);
+}
+html[data-theme="dark"] .site-header input { color: #eef6ef !important; }
+html[data-theme="dark"] .site-header input::placeholder { color: #9eafa3 !important; }
+html[data-theme="dark"] .site-header a[aria-label="My account"] {
+  border-color: rgba(224,239,225,.2) !important;
+  color: #dce9df !important;
+}
+html[data-theme="dark"] .ec-announcement {
+  color: #efdfb4 !important;
+  background: #14281f;
+}
+html[data-theme="dark"] .ec-storefront .bg-white,
+html[data-theme="dark"] .storefront-glass .bg-white,
+html[data-theme="dark"] .ec-benefit-card,
+html[data-theme="dark"] .ec-why-card,
+html[data-theme="dark"] .ec-category-tile,
+html[data-theme="dark"] .ec-shop-stat-panel,
+html[data-theme="dark"] .ec-shop-category,
+html[data-theme="dark"] .ec-shop-reassurance-card,
+html[data-theme="dark"] .ec-catalogue-toolbar,
+html[data-theme="dark"] .ec-product-card,
+html[data-theme="dark"] .ec-product-gallery,
+html[data-theme="dark"] .ec-product-information,
+html[data-theme="dark"] .ec-product-info-card,
+html[data-theme="dark"] .ec-pickup-card,
+html[data-theme="dark"] .ec-review-promo,
+html[data-theme="dark"] .ec-home-empty,
+html[data-theme="dark"] .ec-partnership-path,
+html[data-theme="dark"] .ec-partnership-form {
+  border-color: rgba(219,235,222,.12) !important;
+  background-color: #1b2b23 !important;
+  color: #e4eee6;
+  box-shadow: 0 16px 38px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.035);
+}
+html[data-theme="dark"] .ec-category-section,
+html[data-theme="dark"] .ec-offer-section,
+html[data-theme="dark"] .ec-discount-section,
+html[data-theme="dark"] .ec-why-section,
+html[data-theme="dark"] .ec-review-promo,
+html[data-theme="dark"] .ec-storefront section.bg-white {
+  background: #142019 !important;
+}
+html[data-theme="dark"] .ec-storefront h1,
+html[data-theme="dark"] .ec-storefront h2,
+html[data-theme="dark"] .ec-storefront h3,
+html[data-theme="dark"] .storefront-glass h1,
+html[data-theme="dark"] .storefront-glass h2,
+html[data-theme="dark"] .storefront-glass h3 {
+  color: #f0f5ef !important;
+  text-shadow: none;
+}
+html[data-theme="dark"] .ec-storefront p,
+html[data-theme="dark"] .storefront-glass p,
+html[data-theme="dark"] .ec-storefront small,
+html[data-theme="dark"] .storefront-glass small,
+html[data-theme="dark"] .ec-storefront label,
+html[data-theme="dark"] .storefront-glass label {
+  color: #b0c0b5 !important;
+}
+html[data-theme="dark"] .ec-storefront a:not(.ec-primary-cta):not(.ec-offer-cta),
+html[data-theme="dark"] .storefront-glass a:not(.ec-primary-cta):not(.ec-offer-cta) {
+  text-decoration-color: rgba(206,224,210,.25);
+}
+html[data-theme="dark"] .ec-storefront input,
+html[data-theme="dark"] .ec-storefront textarea,
+html[data-theme="dark"] .ec-storefront select,
+html[data-theme="dark"] .storefront-glass input,
+html[data-theme="dark"] .storefront-glass textarea,
+html[data-theme="dark"] .storefront-glass select {
+  border-color: rgba(220,237,223,.17) !important;
+  background: #122219 !important;
+  color: #edf5ef !important;
+}
+html[data-theme="dark"] .ec-storefront input::placeholder,
+html[data-theme="dark"] .ec-storefront textarea::placeholder,
+html[data-theme="dark"] .storefront-glass input::placeholder,
+html[data-theme="dark"] .storefront-glass textarea::placeholder { color: #8d9e92 !important; }
+html[data-theme="dark"] .ec-sales-story {
+  border-color: rgba(233,204,139,.34);
+  background: radial-gradient(ellipse at 14% 0%, rgba(64,122,83,.23), transparent 36%), linear-gradient(122deg,#091f18,#102d21 55%,#11261e);
+}
+html[data-theme="dark"] .ec-partnership-success {
+  border-color: rgba(224,237,224,.13);
+  background: #1b2b23;
+}
+html[data-theme="dark"] .ec-partnership-success h2 { color: #eff5ee !important; }
+html[data-theme="dark"] .ec-partnership-hero { background: linear-gradient(125deg,#091f18,#123d2a 58%,#1a3829); }
+html[data-theme="dark"] .ec-partnership-path__icon { color: #f1d99e; background: rgba(221,190,120,.12); }
+html[data-theme="dark"] .ec-partnership-form input,
+html[data-theme="dark"] .ec-partnership-form textarea,
+html[data-theme="dark"] .ec-partnership-form select {
+  border-color: rgba(219,235,222,.15) !important;
+  background: #122219 !important;
+  color: #eff5ef !important;
+}
+
+html[data-theme="dark"] .admin-premium-shell {
+  color: #e4eee6;
+  background: radial-gradient(ellipse at 5% 0%,rgba(41,85,62,.24),transparent 35%),linear-gradient(145deg,#0c1713,#12211a 58%,#0b1511);
+}
+html[data-theme="dark"] .admin-premium-shell aside {
+  border-color: rgba(224,237,225,.1) !important;
+  background: linear-gradient(180deg,#091811,#0d1c15 55%,#0a1712) !important;
+}
+html[data-theme="dark"] .admin-premium-shell aside > a span:last-child b { color: #eff5ed !important; }
+html[data-theme="dark"] .admin-premium-shell aside > a span:last-child small,
+html[data-theme="dark"] .admin-premium-shell aside > p { color: #91a89a !important; }
+html[data-theme="dark"] .admin-premium-shell aside details {
+  border-color: rgba(225,237,225,.1) !important;
+  background: rgba(255,255,255,.035) !important;
+}
+html[data-theme="dark"] .admin-premium-shell aside details summary,
+html[data-theme="dark"] .admin-premium-shell aside details div a { color: #c8d6cc !important; }
+html[data-theme="dark"] .admin-premium-shell aside nav > a:first-child {
+  color: #1c3025 !important;
+  background: linear-gradient(135deg,#efd99a,#c7a85f) !important;
+}
+html[data-theme="dark"] .admin-premium-shell header {
+  border-color: rgba(224,237,225,.1) !important;
+  background: rgba(16,30,23,.9) !important;
+}
+html[data-theme="dark"] .admin-premium-shell header h1,
+html[data-theme="dark"] .admin-premium-shell header p { color: #e7f0e8 !important; }
+html[data-theme="dark"] .admin-premium-shell header button { color: #e3ece4 !important; border-color: rgba(225,237,225,.15) !important; }
+html[data-theme="dark"] .admin-premium-shell .bg-white,
+html[data-theme="dark"] .admin-premium-shell article[class*="rounded-"],
+html[data-theme="dark"] .admin-premium-shell section[class*="rounded-"],
+html[data-theme="dark"] .admin-premium-shell [class*="rounded-"][class*="border"] {
+  border-color: rgba(222,237,224,.12) !important;
+  background-color: #1a2a22 !important;
+  color: #e4eee6;
+  box-shadow: 0 16px 38px rgba(0,0,0,.2), inset 0 1px 0 rgba(255,255,255,.035);
+}
+html[data-theme="dark"] .admin-premium-shell h1,
+html[data-theme="dark"] .admin-premium-shell h2,
+html[data-theme="dark"] .admin-premium-shell h3,
+html[data-theme="dark"] .admin-premium-shell b,
+html[data-theme="dark"] .admin-premium-shell label { color: #e8f0e9 !important; }
+html[data-theme="dark"] .admin-premium-shell p,
+html[data-theme="dark"] .admin-premium-shell small,
+html[data-theme="dark"] .admin-premium-shell span { color: #b1c1b6; }
+html[data-theme="dark"] .admin-premium-shell input,
+html[data-theme="dark"] .admin-premium-shell select,
+html[data-theme="dark"] .admin-premium-shell textarea {
+  border-color: rgba(222,237,224,.17) !important;
+  background: #0f1d16 !important;
+  color: #eff5ef !important;
+}
+html[data-theme="dark"] .admin-premium-shell input::placeholder,
+html[data-theme="dark"] .admin-premium-shell textarea::placeholder { color: #82978a !important; }
+html[data-theme="dark"] .admin-premium-shell th { color: #d3e0d5 !important; background: #23392d !important; }
+html[data-theme="dark"] .admin-premium-shell td { border-color: rgba(222,237,224,.08) !important; }
+html[data-theme="dark"] .admin-theme-toggle { border-color: rgba(221,190,120,.3) !important; background: #193327 !important; color: #f2dfae !important; }
+html[data-theme="dark"] .ec-theme-toggle {
+  border-color: rgba(224,237,225,.16);
+  background: rgba(25,47,36,.85);
+  color: #f0d99f;
+}
+html[data-theme="dark"] .admin-premium-shell .text-red-700,
+html[data-theme="dark"] .admin-premium-shell .text-red-600 { color: #ffaaa1 !important; }
+html[data-theme="dark"] .admin-premium-shell .bg-red-50 { background: #442722 !important; }
+html[data-theme="dark"] .admin-premium-shell .bg-green-50 { background: #173e2b !important; }
+@media (prefers-reduced-motion: reduce) {
+  .ec-category-art, .ec-category-tile:hover .ec-category-art { transition: none !important; transform: none !important; }
+}
+
+
+/* Dark-mode coverage for public routes that do not use the homepage storefront wrapper. */
+html[data-theme="dark"] body main:not(.admin-glass-shell):not(.admin-premium-shell) {
+  background-color: #101b17 !important;
+  color: #e4eee6 !important;
+}
+html[data-theme="dark"] body main:not(.admin-glass-shell):not(.admin-premium-shell) section.bg-white,
+html[data-theme="dark"] body main:not(.admin-glass-shell):not(.admin-premium-shell) .bg-white:not(.ec-offer-cta) {
+  background-color: #1a2b22 !important;
+  border-color: rgba(222,237,224,.13) !important;
+}
+html[data-theme="dark"] body main:not(.admin-glass-shell):not(.admin-premium-shell) [class*="rounded-2xl"][class*="border"],
+html[data-theme="dark"] body main:not(.admin-glass-shell):not(.admin-premium-shell) [class*="rounded-3xl"][class*="border"],
+html[data-theme="dark"] body main:not(.admin-glass-shell):not(.admin-premium-shell) [class*="rounded-[28px]"][class*="border"] {
+  border-color: rgba(222,237,224,.13) !important;
+}
+html[data-theme="dark"] body main:not(.admin-glass-shell):not(.admin-premium-shell) h1,
+html[data-theme="dark"] body main:not(.admin-glass-shell):not(.admin-premium-shell) h2,
+html[data-theme="dark"] body main:not(.admin-glass-shell):not(.admin-premium-shell) h3,
+html[data-theme="dark"] body main:not(.admin-glass-shell):not(.admin-premium-shell) h4 {
+  color: #eff5ef !important;
+}
+html[data-theme="dark"] body main:not(.admin-glass-shell):not(.admin-premium-shell) p,
+html[data-theme="dark"] body main:not(.admin-glass-shell):not(.admin-premium-shell) label,
+html[data-theme="dark"] body main:not(.admin-glass-shell):not(.admin-premium-shell) small {
+  color: #b0c0b5 !important;
+}
+html[data-theme="dark"] body main:not(.admin-glass-shell):not(.admin-premium-shell) input,
+html[data-theme="dark"] body main:not(.admin-glass-shell):not(.admin-premium-shell) select,
+html[data-theme="dark"] body main:not(.admin-glass-shell):not(.admin-premium-shell) textarea {
+  border-color: rgba(220,237,223,.17) !important;
+  background: #122219 !important;
+  color: #edf5ef !important;
+}
+html[data-theme="dark"] body main:not(.admin-glass-shell):not(.admin-premium-shell) input::placeholder,
+html[data-theme="dark"] body main:not(.admin-glass-shell):not(.admin-premium-shell) textarea::placeholder {
+  color: #8d9e92 !important;
+}
+html[data-theme="dark"] body main:not(.admin-glass-shell):not(.admin-premium-shell) .ec-offer-cta {
+  color: #073d2d !important;
+  background: linear-gradient(180deg,#fffef8,#f7f0db) !important;
+}
+html[data-theme="dark"] .ec-theme-toggle { color: #f0d99f; }
