@@ -18,11 +18,11 @@ export default function AffiliatesPage() {
         <div className="pointer-events-none absolute -bottom-36 left-[12%] h-80 w-80 rounded-full border border-[#e3c66f]/20" />
         <div className="relative mx-auto grid max-w-6xl gap-10 lg:grid-cols-[1.1fr_.9fr] lg:items-center">
           <div>
-            <span className="inline-flex items-center gap-2 rounded-full border border-[#e5c978]/25 bg-white/5 px-4 py-2 text-[10px] font-black uppercase tracking-[.2em] text-[#f0d98c]"><HeartHandshake size={14}/> eCuisine Affiliate Programme</span>
+            <span className="inline-flex items-center gap-2 rounded-full border border-[#e5c978]/25 bg-white/5 px-4 py-2 text-[10px] font-black uppercase tracking-[.2em] text-[#f0d98c]"><HeartHandshake size={14}/> eCuisine Partner Programme</span>
             <h1 className="mt-6 max-w-3xl text-4xl font-black leading-[1.04] tracking-[-.05em] sm:text-6xl">Good food travels further when we share it.</h1>
-            <p className="mt-5 max-w-xl text-sm leading-7 text-[#d4e0d5] sm:text-base">Join our growing partner community. Introduce eCuisine to people who value thoughtful food choices, and explore a referral partnership built around clear terms and genuine recommendations.</p>
+            <p className="mt-5 max-w-xl text-sm leading-7 text-[#d4e0d5] sm:text-base">Join a working partnership with eCuisine. Partners may promote products, support social media activity, create content, participate in campaigns and help us serve our community—with clear briefs, responsibilities, deadlines and work reviews.</p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <a href="#affiliate-application" className="inline-flex items-center gap-2 rounded-xl bg-[#e7c96e] px-5 py-3.5 text-xs font-black text-[#173b2b] shadow-lg transition hover:-translate-y-0.5 hover:bg-[#f4da89]">Apply to join <ArrowRight size={15}/></a>
+              <a href="#affiliate-application" className="inline-flex items-center gap-2 rounded-xl bg-[#e7c96e] px-5 py-3.5 text-xs font-black text-[#173b2b] shadow-lg transition hover:-translate-y-0.5 hover:bg-[#f4da89]">Apply for partnership <ArrowRight size={15}/></a>
               <Link href="/about" className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-5 py-3.5 text-xs font-bold text-white transition hover:bg-white/10">Meet eCuisine</Link>
             </div>
             <p className="mt-5 text-[11px] leading-5 text-[#a9bcae]">No payment is required to submit an application. Commercial terms are shared with accepted affiliates before any promotion starts.</p>
@@ -45,7 +45,7 @@ export default function AffiliatesPage() {
       <section className="mx-auto max-w-6xl px-5 py-12 sm:py-16">
         <div className="max-w-2xl">
           <p className="text-[10px] font-black uppercase tracking-[.2em] text-[#9a7832]">How it works</p>
-          <h2 className="mt-3 text-3xl font-black tracking-tight text-[#173c2b] sm:text-4xl">A simple way to start together.</h2>
+          <h2 className="mt-3 text-3xl font-black tracking-tight text-[#173c2b] sm:text-4xl">A clear, accountable partnership.</h2>
           <p className="mt-3 text-sm leading-7 text-[#718174]">We start with a conversation, then confirm the practical details with approved partners.</p>
         </div>
         <div className="mt-8 grid gap-4 md:grid-cols-3">
@@ -61,7 +61,7 @@ export default function AffiliatesPage() {
         <div className="lg:sticky lg:top-28">
           <p className="text-[10px] font-black uppercase tracking-[.2em] text-[#9a7832]">Your next step</p>
           <h2 className="mt-3 text-3xl font-black leading-tight tracking-tight text-[#173c2b]">Let’s grow something good.</h2>
-          <p className="mt-4 text-sm leading-7 text-[#718174]">Complete the application and our team will review it. Please use details where we can reach you and share a little about the people you connect with.</p>
+          <p className="mt-4 text-sm leading-7 text-[#718174]">Complete the application and tell us about your strengths, experience, availability and the kind of work you can reliably deliver. Approved partners receive access to a dashboard with assigned activities and deadlines.</p>
           <div className="mt-6 rounded-2xl border border-[#e2eadf] bg-[#edf4e9] p-5">
             <div className="flex items-center gap-2 text-sm font-extrabold text-[#315b3e]"><Sparkles size={16}/> A clear process</div>
             <p className="mt-2 text-xs leading-6 text-[#6e806f]">An application is not automatic approval. We will contact you with the next steps and agreed terms if your profile is a fit.</p>
