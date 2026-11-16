@@ -57,7 +57,7 @@ export default function AdminStoryPage(){
   setLoading(false);
  },[]);
  useEffect(()=>{void load();},[load]);
- const patch=(key:keyof StoryConfig,value:StoryConfig[keyof StoryConfig])=>setStory(current=>({...current,[key]:value}));
+ const patch=<K extends keyof StoryConfig>(key:K,value:StoryConfig[K])=>setStory(current=>({...current,[key]:value}));
  const upload=async(file:File|undefined,memberIndex?:number)=>{
   if(!file||!supabase)return;
   if(!file.type.startsWith("image/")){setError("Choose an image file.");return;}
