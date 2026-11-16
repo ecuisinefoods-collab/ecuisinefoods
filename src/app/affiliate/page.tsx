@@ -22,7 +22,8 @@ export default function PartnerDashboardPage(){
  const [tasks,setTasks]=useState<Task[]>([]);
  const [submissions,setSubmissions]=useState<Submission[]>([]);
  const [products,setProducts]=useState<Product[]>([]);
- const [referralStats,setReferralStats]=useState({clicks:0,orders:0});\n const [commissionStats,setCommissionStats]=useState({earned:0,approved:0,paid:0});
+ const [referralStats,setReferralStats]=useState({clicks:0,orders:0});
+ const [commissionStats,setCommissionStats]=useState({earned:0,approved:0,paid:0});
  const [selectedTask,setSelectedTask]=useState("");
  const [submissionText,setSubmissionText]=useState("");
  const [proofUrl,setProofUrl]=useState("");
@@ -45,14 +46,17 @@ export default function PartnerDashboardPage(){
    supabase.from("partner_tasks").select("id,title,description,task_type,priority,status,due_at,reference_url,product_id").eq("assigned_partner_id",profile.id).neq("status","cancelled").order("due_at",{ascending:true}),
    supabase.from("partner_task_submissions").select("id,task_id,status,submission_text,proof_url,submitted_at").eq("partner_id",profile.id).order("submitted_at",{ascending:false}),
    supabase.from("products").select("id,name,slug,image_url").eq("is_active",true).order("name").limit(60),
-   supabase.rpc("get_my_partner_referral_stats")
+   supabase.rpc("get_my_partner_referral_stats"),
+   supabase.from("affiliate_commissions").select("commission_amount,status").eq("partner_id",profile.id)
   ]);
   if(taskResult.error)setError(taskResult.error.message);
   else setTasks((taskResult.data||[]) as Task[]);
   if(submissionResult.error)setError(submissionResult.error.message);
   else setSubmissions((submissionResult.data||[]) as Submission[]);
   setProducts((productResult.data||[]) as Product[]);
-  setReferralStats({clicks:Number(referralResult.data?.clicks||0),orders:Number(referralResult.data?.orders||0)});\n  const commissionRows=(commissionResult.data||[]) as {commission_amount:number;status:string}[];\n  setCommissionStats({earned:commissionRows.filter(x=>x.status==="earned"||x.status==="approved").reduce((n,x)=>n+Number(x.commission_amount),0),approved:commissionRows.filter(x=>x.status==="approved").reduce((n,x)=>n+Number(x.commission_amount),0),paid:commissionRows.filter(x=>x.status==="paid").reduce((n,x)=>n+Number(x.commission_amount),0)});
+  setReferralStats({clicks:Number(referralResult.data?.clicks||0),orders:Number(referralResult.data?.orders||0)});
+  const commissionRows=(commissionResult.data||[]) as {commission_amount:number;status:string}[];
+  setCommissionStats({earned:commissionRows.filter(x=>x.status==="earned"||x.status==="approved").reduce((n,x)=>n+Number(x.commission_amount),0),approved:commissionRows.filter(x=>x.status==="approved").reduce((n,x)=>n+Number(x.commission_amount),0),paid:commissionRows.filter(x=>x.status==="paid").reduce((n,x)=>n+Number(x.commission_amount),0)});
   setPartner(profile as Partner);
   setLoading(false);
  },[]);
