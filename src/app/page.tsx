@@ -210,7 +210,7 @@ export default async function HomePage() {
                 </Link>
               );
             })}
-            {comingSoonCategories.filter(item => !liveCategories.some(category => category.toLowerCase().includes(item.name.split(" ")[0].toLowerCase()))).slice(0, Math.max(0, 5 - liveCategories.length)).map(item => (
+            {comingSoonCategories.filter(item => !liveCategories.some(category => category.toLowerCase().includes(item.name.split(" ")[0].toLowerCase()))).slice(0, Math.max(0, 5 - liveCategories.length)).map((item, index) => (
               <div key={item.name} className="ec-category-tile ec-category-coming flex min-h-[142px] flex-col justify-between rounded-2xl border p-4">
                 <span aria-hidden="true" className={`ec-category-art ${categoryArtClass(item.name, index)}`} />
                 <span><span className="block text-xs font-extrabold">{item.name}</span><span className="mt-1 block text-[10px] text-[#8a9589]">{item.description} · Coming soon</span></span>
