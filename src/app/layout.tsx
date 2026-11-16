@@ -3,6 +3,7 @@ import "./globals.css";
 import { DiscountMascot } from "@/components/discount-mascot";
 import { MobileStoreNav } from "@/components/mobile-store-nav";
 import { FloatingWhatsApp } from "@/components/floating-whatsapp";
+import { AssistantWidget } from "@/components/assistant-widget";
 import { supabase } from "@/lib/supabase";
 
 export const metadata: Metadata = {
@@ -20,5 +21,5 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
       .maybeSingle();
     showDiscountMascot = data?.setting_value === "true";
   }
-  return <html lang="en"><body>{children}<MobileStoreNav/><FloatingWhatsApp/>{showDiscountMascot ? <DiscountMascot /> : null}</body></html>;
+  return <html lang="en"><body>{children}<MobileStoreNav/><FloatingWhatsApp/><AssistantWidget/>{showDiscountMascot ? <DiscountMascot /> : null}</body></html>;
 }
