@@ -16,6 +16,10 @@ type Application = {
   audience_size: string;
   promotion_channels: string | null;
   motivation: string;
+  skills: string | null;
+  availability: string | null;
+  preferred_activities: string[];
+  deadline_commitment: boolean;
   status: ApplicationStatus;
   created_at: string;
   updated_at: string;
@@ -54,7 +58,7 @@ export default function AffiliateApplicationsPage() {
     setRole(profile.role);
     const { data, error: queryError } = await supabase
       .from("affiliate_applications")
-      .select("id,full_name,email,phone,social_handle,primary_platform,audience_size,promotion_channels,motivation,status,created_at,updated_at")
+      .select("id,full_name,email,phone,social_handle,primary_platform,audience_size,promotion_channels,motivation,skills,availability,preferred_activities,deadline_commitment,status,created_at,updated_at")
       .order("created_at", { ascending: false })
       .limit(200);
     if (queryError) setError(queryError.message);
@@ -97,7 +101,7 @@ export default function AffiliateApplicationsPage() {
             <p className="mt-2 max-w-2xl text-sm leading-6 text-[#758276]">Review people who have applied to promote eCuisine and update their application status.</p>
           </div>
           <div className="flex flex-wrap gap-2">
-            <Link href="/affiliates" target="_blank" className="inline-flex items-center gap-2 rounded-xl border border-[#d9e0db] bg-white px-4 py-3 text-xs font-bold text-[#344c3c]">Open public page <ExternalLink size={14}/></Link>
+            <Link href="/admin/partners" className="inline-flex items-center gap-2 rounded-xl bg-[#0b6849] px-4 py-3 text-xs font-bold text-white">Partner operations <Users size={14}/></Link><Link href="/affiliates" target="_blank" className="inline-flex items-center gap-2 rounded-xl border border-[#d9e0db] bg-white px-4 py-3 text-xs font-bold text-[#344c3c]">Open public page <ExternalLink size={14}/></Link>
             <button type="button" onClick={()=>{setLoading(true);void load();}} className="inline-flex items-center gap-2 rounded-xl border border-[#d9e0db] bg-white px-4 py-3 text-xs font-bold text-[#344c3c]"><RefreshCw size={14}/> Refresh</button>
           </div>
         </div>
@@ -152,6 +156,10 @@ export default function AffiliateApplicationsPage() {
                   <p className="text-[9px] font-black uppercase tracking-[.16em] text-[#8c9a8d]">Promotion channels</p>
                   <p className="mt-2 text-sm leading-6 text-[#52695a]">{item.promotion_channels || "Not provided"}</p>
                 </div>
+              </div>
+              <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                <div className="rounded-xl border border-[#e7ece5] bg-[#f8faf7] p-4"><p className="text-[9px] font-black uppercase tracking-[.16em] text-[#8c9a8d]">Skills & experience</p><p className="mt-2 whitespace-pre-wrap text-xs leading-6 text-[#52695a]">{item.skills || "Not provided"}</p></div>
+                <div className="rounded-xl border border-[#e7ece5] bg-[#f8faf7] p-4"><p className="text-[9px] font-black uppercase tracking-[.16em] text-[#8c9a8d]">Weekly availability</p><p className="mt-2 text-xs font-bold text-[#52695a]">{item.availability || "Not provided"}</p><p className="mt-2 text-[10px] leading-5 text-[#6e806f]">Activities: {(item.preferred_activities || []).join(", ") || "Not selected"}</p><p className={`mt-2 text-[10px] font-bold ${item.deadline_commitment ? "text-green-700" : "text-red-700"}`}>{item.deadline_commitment ? "Agrees to meet deadlines" : "Deadline commitment missing"}</p></div>
               </div>
               <div className="mt-3 rounded-2xl border border-[#e7ece5] bg-[#f8faf7] p-4">
                 <p className="text-[9px] font-black uppercase tracking-[.16em] text-[#8c9a8d]">Why they want to join</p>

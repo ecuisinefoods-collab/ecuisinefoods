@@ -67,6 +67,17 @@ export default async function ShopPage({searchParams}:{searchParams:Promise<{cat
       </div>
     </section>
 
+    <section id="products" className="ec-shop-catalogue-section scroll-mt-28 py-10 sm:py-14">
+      <div className="mx-auto max-w-7xl px-5">
+        <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+          <div><p className="ec-shop-section-kicker">Shop the collection</p><h2 className="mt-2 text-3xl font-black tracking-tight text-[#183d2b] sm:text-4xl">Products available now</h2><p className="mt-2 text-sm text-[#758276]">Current prices and pack availability are taken from our live catalogue.</p></div>
+          <div className="flex flex-wrap gap-2 text-[10px] font-bold text-[#6d7e70]"><span className="rounded-full border border-[#dce8d8] bg-white px-3 py-2"><BadgePercent size={12} className="mr-1 inline"/> Live offers where available</span><span className="rounded-full border border-[#dce8d8] bg-white px-3 py-2">Prices in Nigerian naira</span></div>
+        </div>
+        <ProductCatalog products={catalog} initialCategory={initialCategory} initialSearch={initialSearch}/>
+        {!products.length&&<p className="mt-5 text-center text-xs text-[#849184]">Our active product range will appear here as products are made available.</p>}
+      </div>
+    </section>
+
     <section className="mx-auto max-w-7xl px-5 py-10 sm:py-14">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div><p className="ec-shop-section-kicker">Explore the pantry</p><h2 className="mt-2 text-2xl font-black tracking-tight text-[#183d2b] sm:text-3xl">Shop by category</h2><p className="mt-2 text-sm text-[#7b887c]">Choose a current collection or see what's coming next.</p></div>
@@ -85,17 +96,6 @@ export default async function ShopPage({searchParams}:{searchParams:Promise<{cat
           <span className="ec-shop-category-icon ec-shop-category-icon--3d grid h-12 w-12 place-items-center rounded-2xl"><item.icon size={19}/></span>
           <span><span className="block text-xs font-extrabold leading-5 text-[#304936]">{item.name}</span><span className="mt-1 block text-[10px] font-semibold text-[#9a8e72]">{item.detail}</span><span className="mt-2 inline-flex rounded-full bg-[#fff0bd] px-2.5 py-1 text-[9px] font-black uppercase tracking-wider text-[#8b6714]">Coming soon</span></span>
         </div>)}
-      </div>
-    </section>
-
-    <section id="products" className="ec-shop-catalogue-section scroll-mt-28 py-10 sm:py-14">
-      <div className="mx-auto max-w-7xl px-5">
-        <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
-          <div><p className="ec-shop-section-kicker">Shop the collection</p><h2 className="mt-2 text-3xl font-black tracking-tight text-[#183d2b] sm:text-4xl">Products available now</h2><p className="mt-2 text-sm text-[#758276]">Current prices and pack availability are taken from our live catalogue.</p></div>
-          <div className="flex flex-wrap gap-2 text-[10px] font-bold text-[#6d7e70]"><span className="rounded-full border border-[#dce8d8] bg-white px-3 py-2"><BadgePercent size={12} className="mr-1 inline"/> Live offers where available</span><span className="rounded-full border border-[#dce8d8] bg-white px-3 py-2">Prices in Nigerian naira</span></div>
-        </div>
-        <ProductCatalog products={catalog} initialCategory={initialCategory} initialSearch={initialSearch}/>
-        {!products.length&&<p className="mt-5 text-center text-xs text-[#849184]">Our active product range will appear here as products are made available.</p>}
       </div>
     </section>
 

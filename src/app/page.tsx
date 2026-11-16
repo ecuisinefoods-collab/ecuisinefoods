@@ -322,7 +322,7 @@ export default async function HomePage() {
               <Link href="/checkout">Checkout</Link>
               <Link href="/about">Our story &amp; vision</Link>
               <Link href="/partnerships">Partnership opportunities</Link>
-              <Link href="/affiliates">Affiliate programme</Link>
+              <Link href="/affiliates">Partner programme</Link>
             </div>
           </nav>
 
