@@ -127,8 +127,8 @@ export default async function HomePage() {
         <div className="ec-hero-overlay absolute inset-0" />
         <div className="ec-hero-orb ec-hero-orb-one absolute -left-24 top-12 h-72 w-72 rounded-full" />
         <div className="ec-hero-orb ec-hero-orb-two absolute -right-20 bottom-0 h-80 w-80 rounded-full" />
-        <div className="relative z-10 mx-auto grid max-w-7xl items-center gap-8 px-5 py-12 sm:py-16 md:grid-cols-[1.08fr_.92fr] md:py-20">
-          <div className="ec-hero-copy max-w-2xl">
+        <div className="relative z-10 mx-auto max-w-7xl px-5 py-16 sm:py-20 md:py-28">
+          <div className="ec-hero-copy max-w-3xl">
             <p className="ec-hero-eyebrow inline-flex items-center gap-2 rounded-full border px-4 py-2 text-[10px] font-extrabold uppercase tracking-[.16em]">
               <Sprout size={15} /> {config.hero_eyebrow}
             </p>
@@ -150,33 +150,6 @@ export default async function HomePage() {
             <div className="ec-hero-proof mt-8 flex flex-wrap gap-x-5 gap-y-2 text-[10px] font-bold">
               <span className="inline-flex items-center gap-2"><ShieldCheck size={14} /> Clear product information</span>
               <span className="inline-flex items-center gap-2"><MapPin size={14} /> Jos & Bauchi pickup</span>
-            </div>
-          </div>
-
-          <div className="ec-hero-product relative mx-auto w-full max-w-[500px]">
-            <div className="ec-product-glow absolute -inset-7 rounded-full blur-3xl" />
-            <div className="ec-product-stage relative flex min-h-[320px] items-center justify-center overflow-hidden rounded-[2rem] border p-6 shadow-2xl sm:min-h-[430px]">
-              {heroProduct?.image_url ? (
-                <img src={heroProduct.image_url} alt={heroProduct.name} className="ec-hero-product-image relative z-10 max-h-[340px] w-auto max-w-[82%] object-contain sm:max-h-[390px]" />
-              ) : (
-                <div className="relative z-10 text-center">
-                  <div className="mx-auto grid h-20 w-20 place-items-center rounded-full bg-white/80 text-[#087f5b] shadow-xl"><Leaf size={34} /></div>
-                  <p className="mt-5 text-[10px] font-extrabold uppercase tracking-[.24em] text-[#9a7326]">eCuisinefoods original</p>
-                  <h2 className="mt-2 text-4xl font-black text-[#087f5b]">Tom Brown</h2>
-                  <p className="mt-2 text-sm font-semibold text-[#38563d]">Multigrain cereal</p>
-                </div>
-              )}
-              <span className="absolute left-4 top-4 rounded-full bg-[#fff2b8] px-3 py-2 text-[9px] font-black uppercase tracking-widest text-[#654b09]">Made for everyday goodness</span>
-              <span className="absolute bottom-4 right-4 rounded-full bg-[#07543f] px-4 py-2.5 text-[10px] font-bold text-white shadow-xl">Good food · Better living</span>
-            </div>
-            <div className="ec-featured-caption relative z-10 mx-4 -mt-4 flex items-center justify-between gap-3 rounded-2xl border bg-white px-4 py-3 shadow-xl">
-              <div className="min-w-0">
-                <p className="text-[9px] font-bold uppercase tracking-[.17em] text-[#879184]">Featured from our range</p>
-                <p className="mt-1 truncate text-sm font-extrabold text-[#24452f]">{heroProduct?.name ?? "Discover eCuisinefoods"}</p>
-              </div>
-              <Link href={heroProduct ? "/products/" + heroProduct.slug : "/shop"} className="shrink-0 inline-flex items-center gap-2 rounded-full bg-[#eef5e9] px-4 py-2.5 text-[10px] font-extrabold text-[#245b42]">
-                Explore <ArrowRight size={13} />
-              </Link>
             </div>
           </div>
         </div>
