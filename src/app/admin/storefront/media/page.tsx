@@ -63,6 +63,38 @@ export default function StorefrontMediaPage() {
     return () => { alive = false; };
   }, []);
 
+  async function generateMobilePoster(file: File): Promise<Blob | null> {
+    const objectUrl = URL.createObjectURL(file);
+    try {
+      const video = document.createElement("video");
+      video.preload = "auto";
+      video.muted = true;
+      video.playsInline = true;
+      video.src = objectUrl;
+      await new Promise<void>((resolve, reject) => {
+        video.onloadeddata = () => resolve();
+        video.onerror = () => reject(new Error("The uploaded MP4 could not be previewed for its mobile fallback."));
+      });
+      const targetTime = Math.min(1, Math.max(0, (video.duration || 1) * 0.15));
+      if (targetTime > 0) {
+        await new Promise<void>((resolve, reject) => {
+          video.onseeked = () => resolve();
+          video.onerror = () => reject(new Error("Could not capture a frame for the mobile fallback."));
+          video.currentTime = targetTime;
+        });
+      }
+      const canvas = document.createElement("canvas");
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const context = canvas.getContext("2d");
+      if (!context || !canvas.width || !canvas.height) return null;
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+      return await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, "image/jpeg", 0.88));
+    } finally {
+      URL.revokeObjectURL(objectUrl);
+    }
+  }
+
   async function upload(file: File | undefined, kind: "video" | "image") {
     if (!supabase || !file) return;
     const isVideo = kind === "video";
@@ -86,9 +118,32 @@ export default function StorefrontMediaPage() {
       setError(uploadError.message);
     } else {
       const { data: publicData } = supabase.storage.from("promotion-media").getPublicUrl(data.path);
-      if (isVideo) setVideoUrl(publicData.publicUrl);
-      else setFallbackUrl(publicData.publicUrl);
-      setMessage("Upload complete. Select Save homepage media to publish the new URL.");
+      if (isVideo) {
+        setVideoUrl(publicData.publicUrl);
+        try {
+          const poster = await generateMobilePoster(file);
+          if (poster) {
+            const posterPath = `homepage/mobile-fallback-${Date.now()}.jpg`;
+            const { data: posterData, error: posterError } = await supabase.storage
+              .from("promotion-media")
+              .upload(posterPath, poster, { upsert: false, contentType: "image/jpeg", cacheControl: "3600" });
+            if (!posterError) {
+              const { data: posterPublic } = supabase.storage.from("promotion-media").getPublicUrl(posterData.path);
+              setFallbackUrl(posterPublic.publicUrl);
+              setMessage("Video uploaded and a mobile fallback image was generated automatically. Select Save homepage media to publish.");
+            } else {
+              setMessage("Video uploaded. The mobile fallback could not be saved; you can upload a separate image below.");
+            }
+          } else {
+            setMessage("Video uploaded. Add a mobile fallback image below, then select Save homepage media.");
+          }
+        } catch {
+          setMessage("Video uploaded. Add a mobile fallback image below, then select Save homepage media.");
+        }
+      } else {
+        setFallbackUrl(publicData.publicUrl);
+        setMessage("Mobile fallback uploaded. Select Save homepage media to publish.");
+      }
     }
     isVideo ? setUploadingVideo(false) : setUploadingImage(false);
   }
@@ -156,7 +211,7 @@ export default function StorefrontMediaPage() {
           <label className="mt-5 flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-[#e8dba9] bg-[#fffdf5] px-5 py-7 text-center transition hover:bg-[#fff8df]">
             {uploadingImage ? <LoaderCircle className="animate-spin text-[#987019]" size={25} /> : <ImagePlus className="text-[#987019]" size={27} />}
             <span className="mt-3 text-sm font-bold text-[#725719]">{uploadingImage ? "Uploading image…" : "Choose a mobile fallback image"}</span>
-            <span className="mt-1 text-[11px] text-[#8a9689]">The image is shown instead of the background video on small screens.</span>
+            <span className="mt-1 text-[11px] text-[#8a9689]">A still frame is generated from the MP4 automatically; you can replace it with a different image here.</span>
             <input type="file" accept="image/jpeg,image/png,image/webp" disabled={uploadingImage} onChange={(event: ChangeEvent<HTMLInputElement>) => void upload(event.target.files?.[0], "image")} className="sr-only" />
           </label>
           <label className="mt-5 block text-xs font-bold text-[#405443]">Fallback image URL
