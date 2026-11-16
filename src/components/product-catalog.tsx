@@ -167,14 +167,18 @@ export function CartPage(){
      if(!active)return;
      if(error){setStockError("We could not verify the latest stock. Please check again before placing your order.");setStockChecked(true);setChecking(false);return;}
      const rows=new Map((data??[]).map((v:any)=>[v.id,v]));
+     const {data:products}=await supabase.from("products").select("id,image_url").in("id",saved.map(item=>item.product_id));
+     if(!active)return;
+     const images=new Map((products??[]).map((product:any)=>[product.id,product.image_url]));
      let adjusted=false;
      const refreshed=saved.map(item=>{
        const variant=rows.get(item.variant_id) as {id:string;pack_size:string;price:number;sale_price:number|null;sale_starts_at:string|null;sale_ends_at:string|null;stock_quantity:number}|undefined;
-       if(!variant)return {...item,stock_quantity:0};
+       const image=images.get(item.product_id) as string|null|undefined;
+       if(!variant)return {...item,image_url:image??item.image_url??null,stock_quantity:0};
        const available=Math.max(0,Number(variant.stock_quantity)||0);
        const qty=available>0?Math.min(item.qty,available):item.qty;
        if(qty!==item.qty)adjusted=true;
-       return {...item,pack_size:variant.pack_size,price:getEffectivePrice(variant),original_price:Number(variant.price),stock_quantity:available,qty};
+       return {...item,image_url:image??item.image_url??null,pack_size:variant.pack_size,price:getEffectivePrice(variant),original_price:Number(variant.price),stock_quantity:available,qty};
      });
      setItems(refreshed);
      try{localStorage.setItem(KEY,JSON.stringify(refreshed));}catch{}
