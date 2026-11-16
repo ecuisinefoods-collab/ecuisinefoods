@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, BadgePercent, CheckCircle2, ChevronRight, Headphones, MapPin, PackageCheck, ShieldCheck, ShoppingBasket, Sparkles, Sprout, Star, Truck } from "lucide-react";
+import { ArrowRight, BadgePercent, CheckCircle2, ChevronRight, Facebook, Headphones, Instagram, MapPin, MessageCircle, Music2, PackageCheck, ShieldCheck, ShoppingBasket, Sparkles, Sprout, Star, Truck, Youtube } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { ProductCatalog } from "@/components/product-catalog";
 import { PromoCarousel } from "@/components/promo-carousel";
@@ -289,25 +289,82 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="ec-pickup-section py-12 sm:py-16">
-        <div className="mx-auto grid max-w-7xl gap-8 px-5 md:grid-cols-[1fr_.9fr] md:items-center">
-          <div><p className="ec-kicker">Closer to home</p><h2 className="mt-2 text-3xl font-black tracking-tight sm:text-4xl">Pickup in Jos & Bauchi</h2><p className="mt-3 max-w-xl text-sm leading-7 text-[#d6e2d7]">Select your preferred active pickup point at checkout. Please wait for order confirmation before visiting.</p><div className="mt-6 flex flex-wrap gap-2">{locationList.map((location, index) => <span key={location.city + location.location_name + index} className="ec-location-chip rounded-full border px-3 py-2 text-[10px] font-bold">{location.city} · {location.location_name}</span>)}</div></div>
-          <div className="ec-pickup-card rounded-[1.7rem] border p-6 sm:p-8"><MapPin size={26} /><h3 className="mt-4 text-xl font-black">Need help choosing a location?</h3><p className="mt-2 text-sm leading-6 text-[#6d7c70]">Our support team can help with pickup, delivery enquiries and order updates.</p><div className="mt-5 flex flex-wrap gap-3"><Link href="/contact" className="rounded-xl bg-[#07543f] px-4 py-3 text-xs font-extrabold text-white">Contact us</Link><a href="https://wa.me/2348080942328" target="_blank" rel="noreferrer" className="rounded-xl border border-[#dbe5d9] px-4 py-3 text-xs font-extrabold text-[#07543f]">WhatsApp support</a></div></div>
+      <section className="ec-pickup-section py-9 sm:py-11" aria-labelledby="ec-locations-title">
+        <div className="mx-auto flex max-w-7xl flex-col gap-5 px-5 lg:flex-row lg:items-center lg:justify-between">
+          <div className="max-w-sm">
+            <p className="ec-kicker">Closer to home</p>
+            <h2 id="ec-locations-title" className="mt-2 text-2xl font-black tracking-tight sm:text-3xl">See locations</h2>
+            <p className="mt-2 text-sm leading-6">Choose a convenient collection point when you place your order.</p>
+          </div>
+          <div className="ec-location-list flex flex-wrap gap-2" aria-label="Available collection points">
+            {locationList.map((location, index) => (
+              <span key={location.city + location.location_name + index} className="ec-location-chip rounded-full px-4 py-2.5 text-xs font-bold">
+                <MapPin size={13} /> {location.city} <span aria-hidden="true">·</span> {location.location_name}
+              </span>
+            ))}
+          </div>
         </div>
       </section>
 
-      <footer className="ec-store-footer text-white">
-        <div className="mx-auto grid max-w-7xl gap-9 px-5 py-12 sm:grid-cols-2 lg:grid-cols-4">
-          <div><p className="text-2xl font-black tracking-tight">eCuisine</p><p className="mt-2 text-xs font-bold text-[#f5ca4e]">Good food, better living.</p><p className="mt-4 max-w-xs text-xs leading-6 text-[#c5d5c8]">Thoughtful food choices, made with purpose and care.</p><a href="https://wa.me/2348080942328" target="_blank" rel="noreferrer" className="mt-4 inline-flex items-center gap-2 text-xs font-bold text-[#f5ca4e]">WhatsApp: +234 808 094 2328 <ArrowRight size={13} /></a></div>
-          <div><h3 className="text-xs font-black uppercase tracking-widest">Shop & explore</h3><div className="mt-4 flex flex-col gap-3 text-xs text-[#c5d5c8]"><Link href="/shop">Shop all products</Link><Link href="/cart">Shopping cart</Link><Link href="/checkout">Checkout</Link><Link href="/about">Our story & vision</Link><Link href="/partnerships">Partnership opportunities</Link></div></div>
-          <div><h3 className="text-xs font-black uppercase tracking-widest">Customer care</h3><div className="mt-4 flex flex-col gap-3 text-xs text-[#c5d5c8]"><Link href="/track">Track an order</Link><Link href="/faq">FAQs</Link><Link href="/reviews">Customer reviews</Link><Link href="/contact">Contact us</Link></div></div>
-          <div><h3 className="text-xs font-black uppercase tracking-widest">Follow the journey</h3><div className="mt-4 flex flex-col gap-3 text-xs text-[#c5d5c8]">{[
-            { url: config.social_facebook, label: "Facebook" }, { url: config.social_instagram, label: "Instagram" },
-            { url: config.social_tiktok, label: "TikTok" }, { url: config.social_x, label: "X" },
-            { url: config.social_youtube, label: "YouTube" }, { url: config.social_whatsapp, label: "WhatsApp" }
-          ].filter(item => item.url?.trim()).map(item => <a key={item.label} href={item.url} target="_blank" rel="noreferrer">{item.label}</a>)}</div></div>
+      <footer className="ec-store-footer">
+        <div className="ec-store-footer__main mx-auto grid max-w-7xl gap-10 px-5 py-12 sm:grid-cols-2 lg:grid-cols-[1.25fr_1fr_1fr_1.15fr] lg:gap-12 lg:py-14">
+          <div className="ec-footer-brand">
+            <Link href="/" className="inline-flex items-center gap-3" aria-label="eCuisine home">
+              <span className="grid h-11 w-11 place-items-center rounded-full border-2 border-[#e2bb50] bg-[#087f5b] text-2xl font-black italic text-[#fff0a8] shadow-md">e</span>
+              <span><span className="block text-2xl font-black tracking-[-.05em] text-[#07543f]">eCuisine</span><span className="block text-[9px] font-extrabold uppercase tracking-[.2em] text-[#a77a20]">Good food · Better living</span></span>
+            </Link>
+            <p className="mt-4 max-w-xs text-sm leading-6 text-[#65786a]">Thoughtful food choices, made with purpose and care.</p>
+            <a href="https://wa.me/2348080942328" target="_blank" rel="noreferrer" className="ec-footer-contact mt-5 inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-xs font-extrabold">
+              <MessageCircle size={15} /> +234 808 094 2328
+            </a>
+          </div>
+
+          <nav className="ec-footer-group" aria-label="Customer care">
+            <h3>Customer care</h3>
+            <div className="ec-footer-links">
+              <Link href="/track">Track an order</Link>
+              <Link href="/faq">FAQs</Link>
+              <Link href="/reviews">Customer reviews</Link>
+              <Link href="/contact">Contact us</Link>
+            </div>
+          </nav>
+
+          <nav className="ec-footer-group" aria-label="Shop and explore">
+            <h3>Shop &amp; explore</h3>
+            <div className="ec-footer-links">
+              <Link href="/shop">Shop all products</Link>
+              <Link href="/cart">Shopping cart</Link>
+              <Link href="/checkout">Checkout</Link>
+              <Link href="/about">Our story &amp; vision</Link>
+              <Link href="/partnerships">Partnership opportunities</Link>
+            </div>
+          </nav>
+
+          <div className="ec-footer-group">
+            <h3>Follow our journey</h3>
+            <p className="mt-3 max-w-[230px] text-xs leading-5 text-[#718174]">A little inspiration, updates and new finds from eCuisine.</p>
+            <div className="ec-footer-socials mt-5">
+              {[
+                { url: config.social_facebook, label: "Facebook", Icon: Facebook, style: "facebook" },
+                { url: config.social_instagram, label: "Instagram", Icon: Instagram, style: "instagram" },
+                { url: config.social_tiktok, label: "TikTok", Icon: Music2, style: "tiktok" },
+                { url: config.social_x, label: "X", Icon: null, style: "x" },
+                { url: config.social_youtube, label: "YouTube", Icon: Youtube, style: "youtube" },
+                { url: config.social_whatsapp?.trim() || "https://wa.me/2348080942328", label: "WhatsApp", Icon: MessageCircle, style: "whatsapp" }
+              ].filter(item => item.url?.trim()).map(item => (
+                <a key={item.label} href={item.url} target="_blank" rel="noreferrer" aria-label={item.label} title={item.label} className={`ec-footer-social ec-footer-social--${item.style}`}>
+                  {item.Icon ? <item.Icon size={17} strokeWidth={2.1} /> : <span className="ec-footer-social__x">𝕏</span>}
+                </a>
+              ))}
+            </div>
+          </div>
         </div>
-        <div className="border-t border-white/10 px-5 py-5 text-center text-[10px] text-[#a9bcad]">© {new Date().getFullYear()} eCuisine. All rights reserved.</div>
+        <div className="ec-store-footer__bottom">
+          <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-5 py-5 text-center sm:flex-row sm:text-left">
+            <span>© {new Date().getFullYear()} eCuisine. All rights reserved.</span>
+            <span className="font-semibold text-[#7b8c7e]">Good food. Better living.</span>
+          </div>
+        </div>
       </footer>
     </main>
   );
