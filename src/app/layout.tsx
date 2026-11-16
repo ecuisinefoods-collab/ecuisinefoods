@@ -30,7 +30,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem("ecuisine-theme");document.documentElement.dataset.theme=t==="dark"?"dark":"light";}catch(e){document.documentElement.dataset.theme="light";}})();` }} />
+        <script dangerouslySetInnerHTML={{ __html: `(function(){document.documentElement.dataset.theme="light";document.documentElement.style.colorScheme="light";try{localStorage.setItem("ecuisine-theme","light");}catch(e){}})();` }} />
       </head>
       <body>
         <ThemeProvider>

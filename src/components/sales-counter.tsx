@@ -26,7 +26,7 @@ export function SalesCounter({ total }: { total: number }) {
 
     let frame = 0;
     let start = 0;
-    const duration = 3100;
+    const duration = 3400;
     const animate = (now: number) => {
       if (!start) start = now;
       const progress = Math.min(1, (now - start) / duration);
@@ -50,23 +50,14 @@ export function SalesCounter({ total }: { total: number }) {
   return (
     <section className="ec-journey-quiet" aria-label="eCuisine journey and products sold">
       <div className="ec-journey-quiet__story">
-        <span className="ec-journey-quiet__eyebrow"><span className="ec-journey-quiet__twinkle" aria-hidden="true">✦</span> The eCuisine journey</span>
+        <span className="ec-journey-quiet__eyebrow">The eCuisine journey</span>
         <span className="ec-journey-quiet__title">Every order is part of our story.</span>
         <span className="ec-journey-quiet__ticker" key={activeNote} aria-live="polite">
-          <span className="ec-journey-quiet__ticker-star" aria-hidden="true">✧</span>
           {JOURNEY_NOTES[activeNote]}
         </span>
       </div>
-      <div className="ec-journey-quiet__milestone" aria-label={`${display} products sold`}>
-        <span className="ec-journey-quiet__milestone-orbit" aria-hidden="true">
-          <i /><i /><i />
-        </span>
-        <span className="ec-journey-quiet__milestone-star ec-journey-quiet__milestone-star--one" aria-hidden="true">✦</span>
-        <span className="ec-journey-quiet__milestone-star ec-journey-quiet__milestone-star--two" aria-hidden="true">✧</span>
-        <span className="ec-journey-quiet__milestone-copy">
-          <span className="ec-journey-quiet__number">{display}<sup>+</sup></span>
-          <span className="ec-journey-quiet__label">Products sold</span>
-        </span>
+      <div className="ec-journey-quiet__milestone" aria-label={`${display}+ products sold`}>
+        <span className="ec-journey-quiet__number">{display}<sup>+</sup></span>
       </div>
     </section>
   );
