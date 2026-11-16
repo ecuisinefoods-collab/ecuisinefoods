@@ -1047,8 +1047,8 @@ body {
   border-color: rgba(209,220,212,.86) !important;
   box-shadow: 0 15px 34px rgba(28,51,38,.055), inset 0 1px 0 rgba(255,255,255,.98);
 }
-.admin-premium-shell .text-[#1e3b29], .admin-premium-shell .text-[#203b2a], .admin-premium-shell .text-[#1d3928] { color: #1b3025; }
-.admin-premium-shell .text-[#7b887a], .admin-premium-shell .text-[#929d90], .admin-premium-shell .text-[#899487] { color: #718178; }
+.admin-premium-shell [class~="text-[#1e3b29]"], .admin-premium-shell [class~="text-[#203b2a]"], .admin-premium-shell [class~="text-[#1d3928]"] { color: #1b3025; }
+.admin-premium-shell [class~="text-[#7b887a]"], .admin-premium-shell [class~="text-[#929d90]"], .admin-premium-shell [class~="text-[#899487]"] { color: #718178; }
 
 /* Theme switch controls */
 .ec-theme-toggle {
