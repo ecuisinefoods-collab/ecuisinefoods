@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, BadgePercent, CheckCircle2, ChevronRight, Headphones, MapPin, PackageCheck, ShieldCheck, ShoppingBasket, Sparkles, Sprout, Truck } from "lucide-react";
+import { ArrowRight, BadgePercent, CheckCircle2, ChevronRight, Headphones, MapPin, PackageCheck, ShieldCheck, ShoppingBasket, Sparkles, Sprout, Star, Truck } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { ProductCatalog } from "@/components/product-catalog";
 import { PromoCarousel } from "@/components/promo-carousel";
