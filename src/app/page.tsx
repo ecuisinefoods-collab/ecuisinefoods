@@ -176,7 +176,7 @@ export default async function HomePage() {
       </div>
       <SiteHeader />
 
-      <section className="mx-auto w-full max-w-7xl px-5 py-2 sm:py-3" aria-label="eCuisine all-time sales milestone">
+      <section className="mx-auto w-full max-w-7xl px-5 py-1 sm:py-1.5" aria-label="eCuisine all-time sales milestone">
         <SalesCounter total={completedProductUnits} />
       </section>
 
