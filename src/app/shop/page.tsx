@@ -62,7 +62,7 @@ export default async function ShopPage({searchParams}:{searchParams:Promise<{cat
             <div className="ec-shop-stat rounded-2xl p-4"><p className="text-3xl font-black text-[#087f5b] tabular-nums">{products.length}</p><p className="mt-1 text-[10px] font-bold text-[#788477]">Active products</p></div>
             <div className="ec-shop-stat rounded-2xl p-4"><p className="text-3xl font-black text-[#d69b13] tabular-nums">{inStock}</p><p className="mt-1 text-[10px] font-bold text-[#788477]">With stock available</p></div>
           </div>
-          <div className="mt-4 flex items-start gap-3 rounded-2xl bg-[#edf6e9] p-4"><Truck size={18} className="mt-0.5 shrink-0 text-[#087f5b]"/><div><p className="text-xs font-extrabold text-[#315b43]">Pickup in Jos & Bauchi</p><p className="mt-1 text-[11px] leading-5 text-[#6d816d]">Choose an active pickup point during checkout and wait for confirmation before visiting.</p></div></div>
+          <div className="mt-4 flex items-start gap-3 rounded-2xl bg-[#edf6e9] p-4"><Truck size={18} className="mt-0.5 shrink-0 text-[#087f5b]"/><div><p className="text-xs font-extrabold text-[#315b43]">Delivery & collection options</p><p className="mt-1 text-[11px] leading-5 text-[#6d816d]">See the available fulfilment choices when you place your order.</p></div></div>
         </div>
       </div>
     </section>
@@ -101,7 +101,7 @@ export default async function ShopPage({searchParams}:{searchParams:Promise<{cat
 
     <section className="ec-shop-reassurance py-10 sm:py-14">
       <div className="mx-auto grid max-w-7xl gap-4 px-5 sm:grid-cols-3">
-        {[{icon:PackageCheck,title:"Clear product information",detail:"Pack sizes, prices and stock availability are displayed before checkout."},{icon:Truck,title:"Local pickup choices",detail:"Select from our active pickup locations in Jos or Bauchi."},{icon:Leaf,title:"A growing collection",detail:"New food categories and products will be introduced as they become available."}].map(item=><article key={item.title} className="ec-shop-reassurance-card flex gap-3 rounded-2xl border bg-white p-5"><span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[#edf5e7] text-[#087f5b]"><item.icon size={19}/></span><span><strong className="block text-xs font-extrabold text-[#304936]">{item.title}</strong><span className="mt-2 block text-[11px] leading-5 text-[#7e897f]">{item.detail}</span></span></article>)}
+        {[{icon:PackageCheck,title:"Clear product information",detail:"Pack sizes, prices and stock availability are displayed before checkout."},{icon:Truck,title:"Delivery & collection",detail:"See the available fulfilment choices when you place your order."},{icon:Leaf,title:"A growing collection",detail:"New food categories and products will be introduced as they become available."}].map(item=><article key={item.title} className="ec-shop-reassurance-card flex gap-3 rounded-2xl border bg-white p-5"><span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[#edf5e7] text-[#087f5b]"><item.icon size={19}/></span><span><strong className="block text-xs font-extrabold text-[#304936]">{item.title}</strong><span className="mt-2 block text-[11px] leading-5 text-[#7e897f]">{item.detail}</span></span></article>)}
       </div>
     </section>
   </main>;
