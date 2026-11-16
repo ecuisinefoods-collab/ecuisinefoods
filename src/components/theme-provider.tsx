@@ -18,3 +18,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     </ThemeContext.Provider>
   );
 }
+
+/* The storefront has moved to a permanently light presentation. */
+export function ThemeToggle() {
+  return null;
+}
