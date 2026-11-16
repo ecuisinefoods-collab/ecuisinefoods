@@ -28,23 +28,32 @@ type Order = {
 const money = (value: number) =>
   new Intl.NumberFormat("en-NG", { style: "currency", currency: "NGN", maximumFractionDigits: 0 }).format(value || 0);
 
-const navItems: { label: string; icon: typeof LayoutDashboard; active?: boolean; href?: string; roles?: string[] }[] = [
-  { label: "Overview", icon: LayoutDashboard, active: true },
-  { label: "Orders", icon: ClipboardList, href: "/admin/orders", roles: ["owner","store_manager","order_officer","finance_officer","analyst"] },
-  { label: "Storefront editor", icon: LayoutDashboard, href: "/admin/storefront", roles: ["owner","store_manager"] },
-  { label: "Our Story editor", icon: Users, href: "/admin/story", roles: ["owner","store_manager"] },
-  { label: "Products & stock", icon: Package, href: "/admin/products", roles: ["owner","store_manager"] },
-  { label: "Customer reviews", icon: ClipboardList, href: "/admin/reviews", roles: ["owner","store_manager"] },
-  { label: "Promotions & banners", icon: Megaphone, href: "/admin/promotions", roles: ["owner","marketing_manager"] },
-  { label: "Payment settings", icon: CreditCard, href: "/admin/payments", roles: ["owner","store_manager"] },
-  { label: "Delivery setup", icon: Truck, href: "/admin/delivery", roles: ["owner","store_manager"] },
-  { label: "Pickup locations", icon: MapPin, href: "/admin/pickups", roles: ["owner","store_manager"] },
-  { label: "Inventory & stock history", icon: Boxes, href: "/admin/inventory", roles: ["owner","store_manager","analyst"] },
-  { label: "Finances", icon: Wallet, href: "/admin/finance", roles: ["owner","finance_officer","analyst"] },
-  { label: "Team & permissions", icon: Users, href: "/admin/team", roles: ["owner"] },
-  { label: "AI assistant & inbox", icon: Bot, href: "/admin/assistant", roles: ["owner","store_manager","order_officer"] },
-  { label: "Analytics", icon: BarChart3, href: "/admin/analytics", roles: ["owner","store_manager","finance_officer","analyst"] },
-  { label: "Download records", icon: ClipboardList, href: "/admin/exports", roles: ["owner"] },
+const navGroups: { label: string; items: { label: string; icon: typeof LayoutDashboard; href: string; roles?: string[] }[] }[] = [
+  { label: "Store management", items: [
+    { label: "Products & stock", icon: Package, href: "/admin/products", roles: ["owner","store_manager"] },
+    { label: "Inventory history", icon: Boxes, href: "/admin/inventory", roles: ["owner","store_manager","analyst"] },
+    { label: "Promotions & banners", icon: Megaphone, href: "/admin/promotions", roles: ["owner","marketing_manager"] },
+    { label: "Customer reviews", icon: ClipboardList, href: "/admin/reviews", roles: ["owner","store_manager"] },
+  ]},
+  { label: "Orders & fulfilment", items: [
+    { label: "Orders", icon: ClipboardList, href: "/admin/orders", roles: ["owner","store_manager","order_officer","finance_officer","analyst"] },
+    { label: "Delivery setup", icon: Truck, href: "/admin/delivery", roles: ["owner","store_manager"] },
+    { label: "Pickup locations", icon: MapPin, href: "/admin/pickups", roles: ["owner","store_manager"] },
+    { label: "Payment settings", icon: CreditCard, href: "/admin/payments", roles: ["owner","store_manager"] },
+  ]},
+  { label: "Brand & content", items: [
+    { label: "Storefront editor", icon: LayoutDashboard, href: "/admin/storefront", roles: ["owner","store_manager"] },
+    { label: "Our Story & team", icon: Users, href: "/admin/story", roles: ["owner","store_manager"] },
+  ]},
+  { label: "Reports & finance", items: [
+    { label: "Analytics", icon: BarChart3, href: "/admin/analytics", roles: ["owner","store_manager","finance_officer","analyst"] },
+    { label: "Finances", icon: Wallet, href: "/admin/finance", roles: ["owner","finance_officer","analyst"] },
+    { label: "Download records", icon: ClipboardList, href: "/admin/exports", roles: ["owner"] },
+  ]},
+  { label: "People & AI", items: [
+    { label: "Team & permissions", icon: Users, href: "/admin/team", roles: ["owner"] },
+    { label: "AI assistant & knowledge", icon: Bot, href: "/admin/assistant", roles: ["owner","store_manager","order_officer"] },
+  ]},
 ];
 
 export default function AdminPage() {
@@ -187,8 +196,22 @@ export default function AdminPage() {
     <main className="admin-glass-shell min-h-screen bg-[#f5f7f3] text-[#25392b]">
       <aside className="fixed inset-y-0 left-0 z-20 hidden w-64 flex-col border-r border-[#e7ece4] bg-white px-5 py-6 lg:flex">
         <a href="/" className="flex items-center gap-3"><span className="grid h-11 w-11 place-items-center rounded-2xl bg-[#1d4b34] text-xl font-black text-white">e</span><span><b className="block text-sm text-[#1b3b2a]">eCuisine</b><small className="text-[10px] text-[#849082]">Admin workspace</small></span></a>
-        <p className="mb-3 mt-10 text-[9px] font-extrabold uppercase tracking-[.2em] text-[#9aa597]">Workspace</p>
-        <nav className="space-y-1">{navItems.filter((item) => !item.roles || item.roles.includes(profile.role)).map((item) => { const content = <><item.icon size={16}/>{item.label}{!item.active && !item.href && <span className="ml-auto text-[9px] text-[#a6afa2]">Soon</span>}</>; const cls = `flex items-center gap-3 rounded-xl px-3 py-3 text-xs font-semibold ${item.active ? "bg-[#eaf2e8] text-[#245b39]" : item.href ? "text-[#52705a] hover:bg-[#f2f6ef]" : "text-[#7b887c]"}`; return item.href ? <Link key={item.label} href={item.href} className={cls}>{content}</Link> : <div key={item.label} className={cls}>{content}</div>; })}</nav>
+        <p className="mb-3 mt-9 text-[9px] font-extrabold uppercase tracking-[.2em] text-[#9aa597]">Main menu</p>
+        <nav className="space-y-2">
+          <Link href="/admin" className="flex items-center gap-3 rounded-xl bg-[#eaf2e8] px-3 py-3 text-xs font-bold text-[#245b39]"><LayoutDashboard size={16}/> Overview</Link>
+          {navGroups.map((group) => {
+            const visibleItems = group.items.filter((item) => !item.roles || item.roles.includes(profile.role));
+            if (!visibleItems.length) return null;
+            return <details key={group.label} open={group.label === "Store management"} className="group rounded-xl border border-[#edf1ea] bg-[#fbfcfa] px-2 py-1">
+              <summary className="flex cursor-pointer list-none items-center justify-between rounded-lg px-2 py-2.5 text-[10px] font-extrabold uppercase tracking-[.09em] text-[#718171] hover:text-[#315b3e]">
+                {group.label}<span className="text-base transition-transform group-open:rotate-180">⌄</span>
+              </summary>
+              <div className="space-y-1 pb-1">
+                {visibleItems.map((item) => <Link key={item.href} href={item.href} className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-[11px] font-semibold text-[#52705a] transition hover:bg-[#edf4ea] hover:text-[#245b39]"><item.icon size={15}/>{item.label}</Link>)}
+              </div>
+            </details>;
+          })}
+        </nav>
         <div className="mt-auto rounded-2xl bg-[#f0f5ee] p-4"><div className="flex items-center gap-2 text-xs font-bold text-[#315b3e]"><ShieldCheck size={15}/> Role-based access</div><p className="mt-2 text-[10px] leading-5 text-[#738271]">Your {profile.role.replaceAll("_"," ")} role controls what you can view and change across the business.</p></div>
       </aside>
 

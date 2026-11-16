@@ -7,6 +7,7 @@ import { supabase } from "@/lib/supabase";
 import { ProductCatalog } from "@/components/product-catalog";
 import { PromoCarousel } from "@/components/promo-carousel";
 import { SiteHeader } from "@/components/site-header";
+import { SalesCounter } from "@/components/sales-counter";
 
 type Variant = {
   id: string; pack_size: string; price: number; sale_price: number | null;
@@ -68,17 +69,19 @@ const comingSoonCategories = [
 export default async function HomePage() {
   let products: Product[] = [];
   let locations: { city: string; location_name: string }[] = [];
+  let completedProductUnits = 0;
   let config: StoreConfig = { ...defaults };
 
   if (supabase) {
-    const [settingsResult, productsResult, locationsResult] = await Promise.all([
+    const [settingsResult, productsResult, locationsResult, salesResult] = await Promise.all([
       supabase.from("site_settings").select("setting_key,setting_value")
         .in("setting_key", ["storefront_config"]),
       supabase.from("products")
         .select("id,name,slug,category,short_description,description,ingredients,highlights,image_url,is_featured,created_at,product_variants(id,pack_size,price,sale_price,sale_starts_at,sale_ends_at,stock_quantity)")
         .eq("is_active", true).order("created_at", { ascending: false }).limit(60),
       supabase.from("pickup_locations")
-        .select("city,location_name").eq("is_active", true).order("city").order("sort_order")
+        .select("city,location_name").eq("is_active", true).order("city").order("sort_order"),
+      supabase.rpc("get_public_completed_product_units")
     ]);
 
     const raw = settingsResult.data?.find(row => row.setting_key === "storefront_config")?.setting_value;
@@ -87,6 +90,7 @@ export default async function HomePage() {
     }
     products = (productsResult.data ?? []) as Product[];
     locations = locationsResult.data ?? [];
+    completedProductUnits = Number(salesResult.data ?? 0);
   }
 
   const featured = products.filter(product => product.is_featured).slice(0, 8);
@@ -166,6 +170,10 @@ export default async function HomePage() {
             <span><strong className="block text-[11px] font-extrabold sm:text-sm">{item.title}</strong><small className="mt-1 block text-[10px] leading-4 text-[#849184]">{item.detail}</small></span>
           </div>
         ))}
+      </section>
+
+      <section className="mx-auto max-w-7xl px-5 pb-8 sm:pb-10">
+        <SalesCounter total={completedProductUnits} />
       </section>
 
       <section className="mx-auto max-w-7xl px-5 pb-5">
