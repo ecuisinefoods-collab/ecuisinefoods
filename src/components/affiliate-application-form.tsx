@@ -28,6 +28,8 @@ export function AffiliateApplicationForm() {
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
+    if (preferredActivities.length < 2) { setError("Please select at least two areas where you can contribute."); return; }
+    if (skills.trim().length < 15) { setError("Please describe your relevant skills or experience (at least 15 characters)."); return; }
     if (website.trim()) {
       setSuccess(true);
       return;
@@ -121,13 +123,13 @@ export function AffiliateApplicationForm() {
         <input maxLength={500} value={promotionChannels} onChange={e=>setPromotionChannels(e.target.value)} placeholder="For example: social posts, videos, a blog, community groups" className="mt-2 w-full rounded-xl border border-[#dce5db] bg-[#fbfcfa] px-4 py-3 text-sm text-[#203b2b] outline-none focus:border-[#4c805b]"/>
       </label>
       <div className="mt-5 rounded-2xl border border-[#e5ebe2] bg-[#f8faf6] p-4">
-        <p className="text-xs font-bold text-[#405648]">What kind of partner work can you take on?</p>
+        <p className="text-xs font-bold text-[#405648]">What kind of partner work can you take on? (Choose at least two)</p>
         <div className="mt-3 grid gap-2 sm:grid-cols-2">
           {["Product promotion","Social media engagement","Content creation","Campaign support","Community support","Customer feedback"].map(activity=><label key={activity} className="flex items-center gap-2 text-xs font-medium text-[#526352]"><input type="checkbox" checked={preferredActivities.includes(activity)} onChange={e=>setPreferredActivities(current=>e.target.checked?[...current,activity]:current.filter(value=>value!==activity))} className="h-4 w-4 accent-[#0b6849]"/>{activity}</label>)}
         </div>
       </div>
       <label className="mt-4 block text-xs font-bold text-[#405648]">Relevant skills and experience
-        <textarea maxLength={1200} rows={3} value={skills} onChange={e=>setSkills(e.target.value)} placeholder="For example: video editing, copywriting, community management, customer support…" className="mt-2 w-full resize-y rounded-xl border border-[#dce5db] bg-[#fbfcfa] px-4 py-3 text-sm text-[#203b2b] outline-none focus:border-[#4c805b]"/>
+        <textarea required minLength={15} maxLength={1200} rows={3} value={skills} onChange={e=>setSkills(e.target.value)} placeholder="For example: video editing, copywriting, community management, customer support…" className="mt-2 w-full resize-y rounded-xl border border-[#dce5db] bg-[#fbfcfa] px-4 py-3 text-sm text-[#203b2b] outline-none focus:border-[#4c805b]"/>
       </label>
       <label className="mt-4 block text-xs font-bold text-[#405648]">Time you can reliably commit
         <select value={availability} onChange={e=>setAvailability(e.target.value)} className="mt-2 w-full rounded-xl border border-[#dce5db] bg-[#fbfcfa] px-4 py-3 text-sm text-[#203b2b] outline-none focus:border-[#4c805b]">
@@ -148,7 +150,7 @@ export function AffiliateApplicationForm() {
       </div>
       {error ? <p className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-xs leading-5 text-red-700" role="alert">{error}</p> : null}
       <button type="submit" disabled={busy} className="mt-5 inline-flex w-full items-center justify-center gap-3 rounded-xl bg-[#0b6849] px-5 py-4 text-sm font-extrabold text-white shadow-lg shadow-[#0b6849]/15 transition hover:-translate-y-0.5 hover:bg-[#084f39] disabled:cursor-wait disabled:opacity-65 sm:w-auto">
-        {busy ? <><LoaderCircle size={16} className="animate-spin"/> Sending application…</> : <>Submit affiliate application <Send size={15}/></>}
+        {busy ? <><LoaderCircle size={16} className="animate-spin"/> Sending application…</> : <>Submit partner application <Send size={15}/></>}
       </button>
       <p className="mt-4 text-[10px] leading-5 text-[#8c998d]">We use these details only to review and respond to your application. Commission rates, referral tracking and payout arrangements are confirmed with accepted affiliates before promotion begins.</p>
     </form>
