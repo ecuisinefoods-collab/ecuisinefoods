@@ -88,6 +88,22 @@ export function CheckoutForm({ locations, deliveryZones }: { locations: Location
 
   useEffect(()=>{
     let active=true;
+    const loadCustomerDetails=async()=>{
+      if(!supabase)return;
+      const {data:{user}}=await supabase.auth.getUser();
+      if(!user||!active)return;
+      if(user.email)setEmail(current=>current||user.email||"");
+      const {data}=await supabase.from("customer_profiles").select("full_name,phone").eq("user_id",user.id).maybeSingle();
+      if(!active||!data)return;
+      if(data.full_name)setName(current=>current||data.full_name);
+      if(data.phone)setPhone(current=>current||data.phone);
+    };
+    void loadCustomerDetails();
+    return ()=>{active=false;};
+  },[]);
+
+  useEffect(()=>{
+    let active=true;
     const loadPaymentSettings=async()=>{
       if(!supabase)return;
       const settingKeys=["payment_bank_name","payment_account_name","payment_account_number","payment_transfer_instructions","payment_bank_transfer_enabled","payment_cash_pickup_enabled","payment_cash_delivery_enabled"];
@@ -189,6 +205,7 @@ export function CheckoutForm({ locations, deliveryZones }: { locations: Location
         {order.payment_method==="bank_transfer"&&<div className="mt-5 rounded-2xl border border-[#dce8d6] bg-[#f2f8ef] p-4"><p className="text-[10px] font-black uppercase tracking-[.15em] text-[#5b785c]">Bank transfer details · Awaiting verification</p><p className="mt-3 text-sm font-bold text-[#244b34]">{paymentSettings.bank_name}</p><p className="mt-1 text-xs text-[#677867]">Account name: <b>{paymentSettings.account_name}</b></p><p className="mt-1 text-xs text-[#677867]">Account number: <b className="font-mono text-sm select-all">{paymentSettings.account_number}</b></p><div className="mt-4 rounded-xl bg-white/80 p-3"><p className="text-[10px] font-black uppercase tracking-wide text-[#6c816c]">Amount to transfer</p><p className="mt-1 text-2xl font-black text-[#245b42]">{money(order.total)}</p></div><div className="mt-3 rounded-xl border border-dashed border-[#a9c4a7] bg-white/80 p-3"><p className="text-[10px] font-black uppercase tracking-wide text-[#6c816c]">Transfer narration — enter this exactly</p><p className="mt-2 break-all font-mono text-base font-black text-[#244b34] select-all">{order.payment_reference||"Reference unavailable — please contact eCuisine before transferring."}</p><p className="mt-2 text-[11px] leading-5 text-[#677867]">Use this exact reference in the narration/description field in your banking app so we can match your payment to this order.</p></div>{paymentSettings.transfer_instructions&&<p className="mt-3 text-xs leading-5 text-[#677867]">{paymentSettings.transfer_instructions}</p>}<p className="mt-3 text-[11px] font-semibold text-[#8a6122]">Your order remains pending until eCuisine verifies the payment. Never share your bank PIN, password or OTP.</p></div>}
         {order.payment_method!=="bank_transfer"&&<div className="mt-5 rounded-2xl bg-[#f6f6ee] p-4 text-xs leading-5 text-[#68766b]">Payment due: {order.payment_method==="cash"?"Cash on pickup":"Cash on delivery"}. No online payment has been taken.</div>}
         <div className="mt-7 flex flex-col gap-3 sm:flex-row"><a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 rounded-full bg-[#1f9d55] px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-[#1f9d55]/20"><MessageCircle size={16}/>{order.payment_method==="bank_transfer"?"I have made the transfer — send screenshot on WhatsApp":"Send order details on WhatsApp"}</a><Link href={"/track?code="+encodeURIComponent(order.tracking_code)} className="inline-flex items-center justify-center gap-2 rounded-full border border-[#cbd8c8] bg-white/75 px-6 py-3.5 text-sm font-bold text-[#245b42]"><PackageCheck size={16}/> Track this order</Link></div>{order.payment_method==="bank_transfer"&&<p className="mt-3 rounded-xl bg-[#eff8f0] p-3 text-xs leading-5 text-[#56705a]">After WhatsApp opens, tap the attachment/paperclip icon, choose your Gallery or Photos, select the transfer receipt screenshot, and send it to eCuisine for verification.</p>}
+        <div className="mt-4 rounded-xl border border-[#e3ebde] bg-[#edf4e9] p-4"><p className="text-sm font-bold text-[#2b4a33]">Keep your orders together</p><p className="mt-1 text-xs leading-5 text-[#738271]">Create an eCuisine account using the same email address to save this order to your account history.</p><Link href="/account" className="mt-3 inline-flex items-center gap-2 text-xs font-bold text-[#245b42]">Create my account <PackageCheck size={14}/></Link></div>
         <div className="mt-5 rounded-xl bg-[#f5f4eb] p-4"><p className="text-[10px] font-bold uppercase tracking-wider text-[#8b8b72]">Private tracking code</p><p className="mt-1 break-all font-mono text-sm font-semibold text-[#344b38]">{order.tracking_code}</p><p className="mt-1 text-xs text-[#829080]">Keep this code safe. It is required to view your order progress.</p></div>
       </section>:!cart.length?<div className="mt-6 rounded-2xl border border-[#e8e9e1] bg-white/75 p-8 text-center shadow-xl backdrop-blur-xl"><ShoppingBag className="mx-auto text-[#8a9689]"/><p className="mt-3 font-semibold text-[#526052]">Your cart is empty</p><Link href="/shop" className="mt-4 inline-block rounded-full bg-[#245b42] px-5 py-3 text-sm font-bold text-white">Browse products</Link></div>:<div className="mt-6 grid gap-6 lg:grid-cols-[1.15fr_.85fr]">
         <form className="space-y-5 rounded-3xl border border-white/70 bg-white/70 p-5 shadow-xl shadow-[#506f56]/10 backdrop-blur-2xl sm:p-7" onSubmit={submitOrder}>
