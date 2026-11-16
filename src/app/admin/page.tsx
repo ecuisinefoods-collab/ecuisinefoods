@@ -4,7 +4,7 @@ import { FormEvent, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import {
-  Activity, ArrowDownRight, ArrowUpRight, BarChart3, Boxes, CalendarDays, Truck, MapPin,
+  Activity, ArrowDownRight, ArrowUpRight, BarChart3, Boxes, CalendarDays, Truck, MapPin, Bot,
   ChevronRight, CircleDollarSign, ClipboardList, LayoutDashboard, LogOut,
   Megaphone, Package, ShieldCheck, ShoppingBag, Users, Wallet, CreditCard,
 } from "lucide-react";
@@ -42,6 +42,7 @@ const navItems: { label: string; icon: typeof LayoutDashboard; active?: boolean;
   { label: "Inventory & stock history", icon: Boxes, href: "/admin/inventory", roles: ["owner","store_manager","analyst"] },
   { label: "Finances", icon: Wallet, href: "/admin/finance", roles: ["owner","finance_officer","analyst"] },
   { label: "Team & permissions", icon: Users, href: "/admin/team", roles: ["owner"] },
+  { label: "AI assistant & inbox", icon: Bot, href: "/admin/assistant", roles: ["owner","store_manager","order_officer"] },
   { label: "Analytics", icon: BarChart3, href: "/admin/analytics", roles: ["owner","store_manager","finance_officer","analyst"] },
   { label: "Download records", icon: ClipboardList, href: "/admin/exports", roles: ["owner"] },
 ];
