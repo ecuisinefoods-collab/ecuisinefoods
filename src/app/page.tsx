@@ -291,9 +291,9 @@ export default async function HomePage() {
       </section>
 
       <footer className="ec-store-footer">
-        <div className="ec-store-footer__main mx-auto grid max-w-7xl gap-10 px-5 py-12 sm:grid-cols-2 lg:grid-cols-[1.25fr_1fr_1fr_1.15fr] lg:gap-12 lg:py-14">
+        <div className="ec-store-footer__main mx-auto grid max-w-7xl gap-10 px-5 py-12 sm:grid-cols-2 lg:grid-cols-[1.2fr_1fr_1fr_1fr_1.1fr] lg:gap-9 lg:py-14">
           <div className="ec-footer-brand">
-            <Link href="/" className="inline-flex min-h-14 items-center" aria-label="eCuisine home">
+            <Link href="/" className="ec-footer-brand__lockup inline-flex min-h-14 items-center" aria-label="eCuisine home">
               {storeLogoUrl
                 ? <img src={storeLogoUrl} alt="eCuisine brand logo" className="ec-footer-brand__logo h-14 w-auto max-w-[230px] object-contain" />
                 : <span className="grid h-12 w-12 place-items-center rounded-full border-2 border-[#e2bb50] bg-[#087f5b] text-2xl font-black italic text-[#fff0a8] shadow-md" aria-hidden="true">e</span>}
@@ -321,8 +321,16 @@ export default async function HomePage() {
               <Link href="/cart">Shopping cart</Link>
               <Link href="/checkout">Checkout</Link>
               <Link href="/about">Our story &amp; vision</Link>
-              <Link href="/partnerships">Partnership opportunities</Link>
-              <Link href="/affiliates">Partner programme</Link>
+
+            </div>
+          </nav>
+
+          <nav className="ec-footer-group" aria-label="Partnership program">
+            <h3>Partnership program</h3>
+            <div className="ec-footer-links">
+              <Link href="/partnerships">Become a partner</Link>
+              <Link href="/affiliates">Affiliate program</Link>
+              <Link href="/partner">Partner login</Link>
             </div>
           </nav>
 
