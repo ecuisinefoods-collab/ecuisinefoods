@@ -9,6 +9,7 @@ type Member = { name: string; role: string; bio: string; image_url: string };
 type StoryConfig = {
   eyebrow:string; title:string; highlight:string; intro:string; hero_image:string;
   origin_title:string; origin_text:string; purpose_title:string; purpose_text:string;
+  ceo_eyebrow:string; ceo_heading:string; ceo_name:string; ceo_role:string; ceo_image:string; ceo_message:string;
   team_eyebrow:string; team_title:string; team_text:string; members:Member[];
   values:{title:string;text:string}[]; closing_title:string; closing_text:string;
 };
@@ -19,6 +20,8 @@ const defaults:StoryConfig={
  origin_text:"At eCuisinefoods, our story is shaped by a simple belief: good food should come with care, clarity and a sense of trust. We are building a brand that brings useful food choices and a more considered shopping experience closer to the people we serve.",
  purpose_title:"Rooted in community. Growing with purpose.",
  purpose_text:"With our presence in Jos and Bauchi, we are working to make it easier for customers to discover our products and collect their orders locally. Every step forward is guided by the same promise: keep listening, keep improving and keep putting customers first.",
+ ceo_eyebrow:"A personal note",ceo_heading:"A message from our CEO",ceo_name:"",ceo_role:"Chief Executive Officer · eCuisinefoods",ceo_image:"",
+ ceo_message:"To every customer, family and friend of eCuisinefoods,\n\nThank you for giving us a place in your everyday lives. We believe thoughtful food choices should be easier to discover, easier to understand and more convenient to enjoy. That belief guides the way we are building eCuisinefoods.\n\nOur promise is simple: to keep listening, to communicate honestly and to serve with care. We know trust is earned through the details — the information we share, the way we handle each order and the attention we give when someone needs help.\n\nWe are building this brand one thoughtful decision and one customer relationship at a time. Your trust is something we never take for granted.\n\nThank you for being part of our journey. We look forward to growing with you.\n\nWith gratitude,",
  team_eyebrow:"The people behind the promise",team_title:"Good people. One shared purpose.",
  team_text:"Behind eCuisinefoods is a team brought together by a shared commitment to thoughtful food, genuine service and doing the little things well. From the care that goes into each decision to the conversations we have with customers, our people help shape the experience we want every customer to remember.",
  members:[],
@@ -73,6 +76,18 @@ export default function AdminStoryPage(){
    else setStory(current=>({...current,members:current.members.map((member,index)=>index===memberIndex?{...member,image_url:data.publicUrl}:member)}));
    setMessage("Image uploaded. Save the page to publish it.");
   }
+  setUploading(false);
+ };
+ const uploadCeo=async(file:File|undefined)=>{
+  if(!file||!supabase)return;
+  if(!file.type.startsWith("image/")){setError("Choose an image file.");return;}
+  if(file.size>5*1024*1024){setError("Images must be 5 MB or smaller.");return;}
+  setUploading(true);setError("");setMessage("");
+  const extension=(file.name.split(".").pop()||"jpg").toLowerCase();
+  const path="about/ceo-"+crypto.randomUUID()+"."+extension;
+  const {error:uploadError}=await supabase.storage.from("product-images").upload(path,file,{cacheControl:"31536000",upsert:false,contentType:file.type});
+  if(uploadError)setError(uploadError.message);
+  else{const {data}=supabase.storage.from("product-images").getPublicUrl(path);patch("ceo_image",data.publicUrl);setMessage("CEO portrait uploaded. Save the page to publish it.");}
   setUploading(false);
  };
  const save=async(event:FormEvent<HTMLFormElement>)=>{
