@@ -110,7 +110,7 @@ export function ProductCatalog({ products, initialCategory = "All products", ini
             <Link href={"/products/"+product.slug} className="ec-product-card-image relative flex aspect-[4/3] items-center justify-center overflow-hidden p-5">
               {product.image_url
                 ? <img src={product.image_url} alt={product.name} loading="lazy" className="relative z-10 h-full w-full object-contain transition duration-500 group-hover:scale-105"/>
-                : <div className="relative z-10 text-center"><span className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-white text-[#087f5b] shadow-md"><ShoppingBag size={25}/></span><p className="mt-3 text-[10px] font-black uppercase tracking-[.2em] text-[#8a744b]">eCuisinefoods</p><p className="mt-1 text-xs font-semibold text-[#6e8167]">Product image coming soon</p></div>}
+                : <div className="relative z-10 text-center"><span className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-white text-[#087f5b] shadow-md"><ShoppingBag size={25}/></span><p className="mt-3 text-[10px] font-black uppercase tracking-[.2em] text-[#8a744b]">eCuisine</p><p className="mt-1 text-xs font-semibold text-[#6e8167]">Product image coming soon</p></div>}
               <div className="absolute left-3 top-3 flex flex-col items-start gap-2">
                 {product.is_featured&&<span className="inline-flex items-center gap-1 rounded-full bg-white/95 px-3 py-1.5 text-[9px] font-black text-[#6e633b] shadow-sm"><Sparkles size={11}/> Featured</span>}
                 {discount>0&&<span className="inline-flex items-center gap-1 rounded-full bg-[#bd5636] px-3 py-1.5 text-[9px] font-black text-white shadow-sm"><Tag size={11}/> Up to {discount}% off</span>}
