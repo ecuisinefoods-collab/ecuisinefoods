@@ -13,9 +13,7 @@ function readJsonEnv(name: string): Record<string, string> {
     return value && typeof value === "object" ? value : {};
   } catch { return {}; }
 }
-const publishableKeys = readJsonEnv("SUPABASE_PUBLISHABLE_KEYS");
 const secretKeys = readJsonEnv("SUPABASE_SECRET_KEYS");
-const ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY") ?? publishableKeys.default ?? "";
 const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? secretKeys.default ?? "";
 
 function send(body: Record<string, unknown>, status: number, origin: string) {
@@ -84,7 +82,7 @@ Deno.serve(async (req: Request) => {
   }
   if (req.method !== "POST") return send({ error: "Method not allowed." }, 405, corsOrigin);
   if (origin && !ALLOWED.has(origin)) return send({ error: "Origin not allowed." }, 403, corsOrigin);
-  if (!SUPABASE_URL || !ANON_KEY || !SERVICE_KEY) {
+  if (!SUPABASE_URL || !SERVICE_KEY) {
     return send({ error: "The secure knowledge service is not configured." }, 503, corsOrigin);
   }
 
@@ -95,7 +93,7 @@ Deno.serve(async (req: Request) => {
     const token = authorization.replace(/^Bearer\s+/i, "");
     if (!token) return send({ error: "Please sign in as an eCuisine administrator." }, 401, corsOrigin);
 
-    const authClient = createClient(SUPABASE_URL, ANON_KEY, {
+    const authClient = createClient(SUPABASE_URL, SERVICE_KEY, {
       auth: { autoRefreshToken: false, persistSession: false },
     });
     const { data: authData, error: authError } = await authClient.auth.getUser(token);
