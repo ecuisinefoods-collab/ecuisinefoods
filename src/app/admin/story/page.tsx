@@ -9,6 +9,7 @@ type Member = { name: string; role: string; bio: string; image_url: string };
 type StoryConfig = {
   eyebrow:string; title:string; highlight:string; intro:string; hero_image:string;
   origin_title:string; origin_text:string; purpose_title:string; purpose_text:string;
+  ceo_eyebrow:string; ceo_heading:string; ceo_name:string; ceo_role:string; ceo_image:string; ceo_message:string;
   team_eyebrow:string; team_title:string; team_text:string; members:Member[];
   values:{title:string;text:string}[]; closing_title:string; closing_text:string;
 };
@@ -19,6 +20,8 @@ const defaults:StoryConfig={
  origin_text:"At eCuisinefoods, our story is shaped by a simple belief: good food should come with care, clarity and a sense of trust. We are building a brand that brings useful food choices and a more considered shopping experience closer to the people we serve.",
  purpose_title:"Rooted in community. Growing with purpose.",
  purpose_text:"With our presence in Jos and Bauchi, we are working to make it easier for customers to discover our products and collect their orders locally. Every step forward is guided by the same promise: keep listening, keep improving and keep putting customers first.",
+ ceo_eyebrow:"A personal note",ceo_heading:"A message from our CEO",ceo_name:"",ceo_role:"Chief Executive Officer · eCuisinefoods",ceo_image:"",
+ ceo_message:"To every customer, family and friend of eCuisinefoods,\n\nThank you for giving us a place in your everyday lives. We believe thoughtful food choices should be easier to discover, easier to understand and more convenient to enjoy. That belief guides the way we are building eCuisinefoods.\n\nOur promise is simple: to keep listening, to communicate honestly and to serve with care. We know trust is earned through the details — the information we share, the way we handle each order and the attention we give when someone needs help.\n\nWe are building this brand one thoughtful decision and one customer relationship at a time. Your trust is something we never take for granted.\n\nThank you for being part of our journey. We look forward to growing with you.\n\nWith gratitude,",
  team_eyebrow:"The people behind the promise",team_title:"Good people. One shared purpose.",
  team_text:"Behind eCuisinefoods is a team brought together by a shared commitment to thoughtful food, genuine service and doing the little things well. From the care that goes into each decision to the conversations we have with customers, our people help shape the experience we want every customer to remember.",
  members:[],
@@ -75,6 +78,18 @@ export default function AdminStoryPage(){
   }
   setUploading(false);
  };
+ const uploadCeo=async(file:File|undefined)=>{
+  if(!file||!supabase)return;
+  if(!file.type.startsWith("image/")){setError("Choose an image file.");return;}
+  if(file.size>5*1024*1024){setError("Images must be 5 MB or smaller.");return;}
+  setUploading(true);setError("");setMessage("");
+  const extension=(file.name.split(".").pop()||"jpg").toLowerCase();
+  const path="about/ceo-"+crypto.randomUUID()+"."+extension;
+  const {error:uploadError}=await supabase.storage.from("product-images").upload(path,file,{cacheControl:"31536000",upsert:false,contentType:file.type});
+  if(uploadError)setError(uploadError.message);
+  else{const {data}=supabase.storage.from("product-images").getPublicUrl(path);patch("ceo_image",data.publicUrl);setMessage("CEO portrait uploaded. Save the page to publish it.");}
+  setUploading(false);
+ };
  const save=async(event:FormEvent<HTMLFormElement>)=>{
   event.preventDefault();if(!supabase||!authorized)return;
   setSaving(true);setError("");setMessage("");
@@ -95,6 +110,24 @@ export default function AdminStoryPage(){
     <div className="mt-5"><p className="text-xs font-bold text-[#405443]">Hero image</p><p className="mt-1 text-[10px] text-[#899487]">A bright, high-quality food, ingredients or brand photograph works best. Maximum 5 MB.</p><label className="mt-3 flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-[#b9cbb6] bg-[#f7faf5] px-4 py-4 text-xs font-bold text-[#42664a]"><ImagePlus size={16}/>{uploading?"Uploading image…":"Upload hero image"}<input type="file" accept="image/*" disabled={uploading} onChange={e=>void upload(e.target.files?.[0])} className="sr-only"/></label>{story.hero_image&&<div className="mt-3 flex items-center gap-3"><img src={story.hero_image} alt="Hero preview" className="h-24 w-32 rounded-xl object-cover"/><button type="button" onClick={()=>patch("hero_image","")} className="text-xs font-bold text-red-600">Remove image</button></div>}</div>
    </section>
    <section className="rounded-2xl border border-[#e4e9e1] bg-white p-5 shadow-sm sm:p-7"><h2 className="font-bold">Our story and community</h2><div className="mt-5 grid gap-4 sm:grid-cols-2">{textFields.slice(4,8).map(([key,label,hint])=><label key={key} className="block text-xs font-bold text-[#405443]">{label}<span className="mt-1 block text-[10px] font-normal text-[#899487]">{hint}</span>{key.endsWith("_text")?<textarea rows={4} value={String(story[key])} onChange={e=>patchText(key,e.target.value)} className="mt-2 w-full rounded-xl border border-[#dfe6dc] bg-[#fbfcfa] px-4 py-3 text-sm font-normal"/>:<input value={String(story[key])} onChange={e=>patchText(key,e.target.value)} className="mt-2 w-full rounded-xl border border-[#dfe6dc] bg-[#fbfcfa] px-4 py-3 text-sm font-normal"/>}</label>)}</div></section>
+   <section className="rounded-2xl border border-[#e4e9e1] bg-white p-5 shadow-sm sm:p-7">
+    <p className="text-[10px] font-extrabold uppercase tracking-[.18em] text-[#a77c1d]">Executive message</p>
+    <h2 className="mt-1 text-xl font-bold text-[#24432f]">A message from the CEO</h2>
+    <p className="mt-2 text-sm leading-6 text-[#7d897a]">Add the CEO's approved name, portrait and personal message. The draft is editable and will appear on the public Our Story page.</p>
+    <div className="mt-5 grid gap-4 sm:grid-cols-2">
+     <label className="block text-sm font-bold text-[#405443]">Section eyebrow<input value={story.ceo_eyebrow} onChange={e=>patch("ceo_eyebrow",e.target.value)} className="mt-2 w-full rounded-xl border border-[#dfe6dc] bg-[#fbfcfa] px-4 py-3 text-base font-normal"/></label>
+     <label className="block text-sm font-bold text-[#405443]">Section heading<input value={story.ceo_heading} onChange={e=>patch("ceo_heading",e.target.value)} className="mt-2 w-full rounded-xl border border-[#dfe6dc] bg-[#fbfcfa] px-4 py-3 text-base font-normal"/></label>
+     <label className="block text-sm font-bold text-[#405443]">CEO full name<input value={story.ceo_name} onChange={e=>patch("ceo_name",e.target.value)} placeholder="Enter the CEO's approved name" className="mt-2 w-full rounded-xl border border-[#dfe6dc] bg-[#fbfcfa] px-4 py-3 text-base font-normal"/></label>
+     <label className="block text-sm font-bold text-[#405443]">Title / role<input value={story.ceo_role} onChange={e=>patch("ceo_role",e.target.value)} className="mt-2 w-full rounded-xl border border-[#dfe6dc] bg-[#fbfcfa] px-4 py-3 text-base font-normal"/></label>
+     <label className="block text-sm font-bold text-[#405443] sm:col-span-2">Message from the CEO<textarea rows={9} value={story.ceo_message} onChange={e=>patch("ceo_message",e.target.value)} className="mt-2 w-full rounded-xl border border-[#dfe6dc] bg-[#fbfcfa] px-4 py-3 text-base font-normal leading-7"/></label>
+    </div>
+    <div className="mt-5">
+     <p className="text-sm font-bold text-[#405443]">CEO portrait</p>
+     <p className="mt-1 text-sm leading-6 text-[#899487]">Use a clear professional portrait. Maximum 5 MB.</p>
+     <label className="mt-3 inline-flex cursor-pointer items-center gap-2 rounded-xl border border-dashed border-[#b9cbb6] bg-[#f7faf5] px-5 py-4 text-sm font-bold text-[#42664a]"><ImagePlus size={17}/>{uploading?"Uploading portrait…":"Upload CEO portrait"}<input type="file" accept="image/jpeg,image/png,image/webp" disabled={uploading} onChange={e=>void uploadCeo(e.target.files?.[0])} className="sr-only"/></label>
+     {story.ceo_image&&<div className="mt-4 flex flex-wrap items-center gap-4"><img src={story.ceo_image} alt="CEO portrait preview" className="h-28 w-24 rounded-xl object-cover"/><button type="button" onClick={()=>patch("ceo_image","")} className="text-sm font-bold text-red-600">Remove portrait</button></div>}
+    </div>
+   </section>
    <section className="rounded-2xl border border-[#e4e9e1] bg-white p-5 shadow-sm sm:p-7"><h2 className="font-bold">Our values</h2><p className="mt-1 text-xs text-[#899487]">Three short value cards appear on the public page.</p><div className="mt-5 grid gap-4 md:grid-cols-3">{story.values.map((value,index)=><div key={index} className="rounded-xl border border-[#edf0e9] p-4"><label className="block text-xs font-bold">Value {index+1} title<input value={value.title} onChange={e=>updateValue(index,{title:e.target.value})} className="mt-2 w-full rounded-lg border px-3 py-2 text-sm font-normal"/></label><label className="mt-3 block text-xs font-bold">Short description<textarea rows={4} value={value.text} onChange={e=>updateValue(index,{text:e.target.value})} className="mt-2 w-full rounded-lg border px-3 py-2 text-sm font-normal"/></label></div>)}</div></section>
    <section className="rounded-2xl border border-[#e4e9e1] bg-white p-5 shadow-sm sm:p-7"><div className="flex items-center gap-2"><Users size={18}/><h2 className="font-bold">Meet our team</h2></div><div className="mt-5 grid gap-4 sm:grid-cols-2">{textFields.slice(8,11).map(([key,label,hint])=><label key={key} className={key==="team_text"?"sm:col-span-2 block text-xs font-bold text-[#405443]":"block text-xs font-bold text-[#405443]"}>{label}<span className="mt-1 block text-[10px] font-normal text-[#899487]">{hint}</span>{key==="team_text"?<textarea rows={3} value={String(story[key])} onChange={e=>patchText(key,e.target.value)} className="mt-2 w-full rounded-xl border border-[#dfe6dc] bg-[#fbfcfa] px-4 py-3 text-sm font-normal"/>:<input value={String(story[key])} onChange={e=>patchText(key,e.target.value)} className="mt-2 w-full rounded-xl border border-[#dfe6dc] bg-[#fbfcfa] px-4 py-3 text-sm font-normal"/>}</label>)}</div>
     <div className="mt-6 flex flex-wrap items-center justify-between gap-3"><div><h3 className="text-sm font-bold">Team profiles ({story.members.length})</h3><p className="mt-1 text-xs text-[#899487]">Add only real team members and approved photos. Their details appear on the public page.</p></div><button type="button" onClick={()=>patch("members",[...story.members,{name:"",role:"",bio:"",image_url:""}])} className="inline-flex items-center gap-2 rounded-xl bg-[#eaf2e7] px-4 py-3 text-xs font-bold text-[#286043]"><Plus size={15}/> Add team member</button></div>
