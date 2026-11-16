@@ -25,7 +25,7 @@ export default function AffiliatesPage() {
               <a href="#affiliate-application" className="inline-flex items-center gap-2 rounded-xl bg-[#e7c96e] px-5 py-3.5 text-xs font-black text-[#173b2b] shadow-lg transition hover:-translate-y-0.5 hover:bg-[#f4da89]">Apply for partnership <ArrowRight size={15}/></a>
               <Link href="/about" className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-5 py-3.5 text-xs font-bold text-white transition hover:bg-white/10">Meet eCuisine</Link><Link href="/partner" className="inline-flex items-center gap-2 rounded-xl border border-[#e7c96e]/40 bg-[#e7c96e]/10 px-5 py-3.5 text-xs font-bold text-[#f0d98c] transition hover:bg-[#e7c96e]/20">Partner login <ArrowRight size={14}/></Link>
             </div>
-            <p className="mt-5 text-[11px] leading-5 text-[#a9bcae]">No payment is required to apply. Partner responsibilities and any commercial terms are agreed with accepted partners before work begins.</p>
+            <p className="mt-5 text-[11px] leading-5 text-[#a9bcae]">No payment is required to apply. Approved affiliates earn 15% commission on eligible product sales from referred orders after payment is confirmed and the order is completed. Delivery charges are excluded.</p>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
             <article className="rounded-3xl border border-white/10 bg-white/[.06] p-5 backdrop-blur">
@@ -36,7 +36,7 @@ export default function AffiliatesPage() {
             <article className="rounded-3xl border border-white/10 bg-white/[.06] p-5 backdrop-blur sm:translate-y-8">
               <span className="grid h-11 w-11 place-items-center rounded-2xl bg-[#e7c96e]/15 text-[#f0d98c]"><BadgeCheck size={20}/></span>
               <h2 className="mt-4 text-base font-extrabold text-white">Performance with purpose</h2>
-              <p className="mt-2 text-xs leading-6 text-[#c5d4c7]">Every approved partner receives a unique referral code, trackable product links and a clear view of attributed visits and orders.</p>
+              <p className="mt-2 text-xs leading-6 text-[#c5d4c7]">Every approved affiliate receives a unique referral code, shareable product links, 30-day referral attribution and a dashboard for visits, orders and commission earnings.</p>
             </article>
           </div>
         </div>
@@ -46,7 +46,7 @@ export default function AffiliatesPage() {
         <div className="max-w-2xl">
           <p className="text-[10px] font-black uppercase tracking-[.2em] text-[#9a7832]">How it works</p>
           <h2 className="mt-3 text-3xl font-black tracking-tight text-[#173c2b] sm:text-4xl">A professional way to work together.</h2>
-          <p className="mt-3 text-sm leading-7 text-[#718174]">We review every application, agree expectations and provide the tools partners need to deliver consistently.</p>
+          <p className="mt-3 text-sm leading-7 text-[#718174]">We review every application and provide the tools partners need to promote eCuisine, track referrals and earn commission.</p>
         </div>
         <div className="mt-8 grid gap-4 md:grid-cols-3">
           {steps.map((step,index)=><article key={step.title} className="rounded-3xl border border-[#e1e9df] bg-white p-6 shadow-[0_12px_35px_rgba(23,61,39,.045)]">
