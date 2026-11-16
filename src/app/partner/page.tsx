@@ -41,19 +41,18 @@ export default function PartnerDashboardPage(){
   const {data:profile,error:profileError}=await supabase.from("partner_profiles").select("id,partner_code,status").eq("id",claim).maybeSingle();
   if(profileError||!profile){setError(profileError?.message||"Partner profile could not be loaded.");setLoading(false);return;}
   if(profile.status!=="active"){setError("Your partner access is currently paused. Please contact eCuisine.");setLoading(false);return;}
-  const [taskResult,submissionResult,productResult,clickResult,orderResult]=await Promise.all([
+  const [taskResult,submissionResult,productResult,referralResult]=await Promise.all([
    supabase.from("partner_tasks").select("id,title,description,task_type,priority,status,due_at,reference_url,product_id").eq("assigned_partner_id",profile.id).neq("status","cancelled").order("due_at",{ascending:true}),
    supabase.from("partner_task_submissions").select("id,task_id,status,submission_text,proof_url,submitted_at").eq("partner_id",profile.id).order("submitted_at",{ascending:false}),
    supabase.from("products").select("id,name,slug,image_url").eq("is_active",true).order("name").limit(60),
-   supabase.from("partner_referral_clicks").select("id",{count:"exact",head:true}).eq("partner_id",profile.id),
-   supabase.from("orders").select("id",{count:"exact",head:true}).eq("partner_profile_id",profile.id)
+   supabase.rpc("get_my_partner_referral_stats")
   ]);
   if(taskResult.error)setError(taskResult.error.message);
   else setTasks((taskResult.data||[]) as Task[]);
   if(submissionResult.error)setError(submissionResult.error.message);
   else setSubmissions((submissionResult.data||[]) as Submission[]);
   setProducts((productResult.data||[]) as Product[]);
-  setReferralStats({clicks:clickResult.count||0,orders:orderResult.count||0});
+  setReferralStats({clicks:Number(referralResult.data?.clicks||0),orders:Number(referralResult.data?.orders||0)});
   setPartner(profile as Partner);
   setLoading(false);
  },[]);
