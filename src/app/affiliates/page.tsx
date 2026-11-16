@@ -18,7 +18,7 @@ export default function AffiliatesPage() {
         <div className="pointer-events-none absolute -bottom-36 left-[12%] h-80 w-80 rounded-full border border-[#e3c66f]/20" />
         <div className="relative mx-auto grid max-w-6xl gap-10 lg:grid-cols-[1.1fr_.9fr] lg:items-center">
           <div>
-            <span className="inline-flex items-center gap-2 rounded-full border border-[#e5c978]/25 bg-white/5 px-4 py-2 text-[10px] font-black uppercase tracking-[.2em] text-[#f0d98c]"><HeartHandshake size={14}/> eCuisine Partner Programme</span>
+            <span className="inline-flex items-center gap-2 rounded-full border border-[#e5c978]/25 bg-white/5 px-4 py-2 text-[10px] font-black uppercase tracking-[.2em] text-[#f0d98c]"><HeartHandshake size={14}/> eCuisine Affiliate Programme</span>
             <h1 className="mt-6 max-w-3xl text-4xl font-black leading-[1.04] tracking-[-.05em] sm:text-6xl">A considered partnership. A shared purpose.</h1>
             <p className="mt-5 max-w-xl text-sm leading-7 text-[#d4e0d5] sm:text-base">Join a considered partnership built around quality, consistency and measurable contribution. Promote products, create thoughtful content, support social channels and take part in campaigns—with clear briefs, agreed deadlines and meaningful reviews.</p>
             <div className="mt-8 flex flex-wrap gap-3">
@@ -45,8 +45,8 @@ export default function AffiliatesPage() {
       <section className="mx-auto max-w-6xl px-5 py-12 sm:py-16">
         <div className="max-w-2xl">
           <p className="text-[10px] font-black uppercase tracking-[.2em] text-[#9a7832]">How it works</p>
-          <h2 className="mt-3 text-3xl font-black tracking-tight text-[#173c2b] sm:text-4xl">A professional way to work together.</h2>
-          <p className="mt-3 text-sm leading-7 text-[#718174]">We review every application and provide the tools partners need to promote eCuisine, track referrals and earn commission.</p>
+          <h2 className="mt-3 text-3xl font-black tracking-tight text-[#173c2b] sm:text-4xl">A clear path to becoming an eCuisine affiliate.</h2>
+          <p className="mt-3 text-sm leading-7 text-[#718174]">We review every application and equip approved affiliates to promote eCuisine, track referrals and earn commission.</p>
         </div>
         <div className="mt-8 grid gap-4 md:grid-cols-3">
           {steps.map((step,index)=><article key={step.title} className="rounded-3xl border border-[#e1e9df] bg-white p-6 shadow-[0_12px_35px_rgba(23,61,39,.045)]">
@@ -61,7 +61,7 @@ export default function AffiliatesPage() {
         <div className="lg:sticky lg:top-28">
           <p className="text-[10px] font-black uppercase tracking-[.2em] text-[#9a7832]">Your next step</p>
           <h2 className="mt-3 text-3xl font-black leading-tight tracking-tight text-[#173c2b]">Let’s build something meaningful.</h2>
-          <p className="mt-4 text-sm leading-7 text-[#718174]">Complete the application and tell us about your strengths, experience, availability and the kind of work you can reliably deliver. Approved partners receive access to a dashboard with assigned activities and deadlines.</p>
+          <p className="mt-4 text-sm leading-7 text-[#718174]">Complete the application and tell us about your strengths, experience, availability and the kind of work you can reliably deliver. Approved affiliates receive Affiliate Hub access with assigned activities and deadlines.</p>
           <div className="mt-6 rounded-2xl border border-[#e2eadf] bg-[#edf4e9] p-5">
             <div className="flex items-center gap-2 text-sm font-extrabold text-[#315b3e]"><Sparkles size={16}/> A clear process</div>
             <p className="mt-2 text-xs leading-6 text-[#6e806f]">An application is not automatic approval. We will contact you with the next steps and agreed terms if your profile is a fit.</p>
