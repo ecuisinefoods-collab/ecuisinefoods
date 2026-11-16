@@ -1434,3 +1434,22 @@ html[data-theme="dark"] .ec-sales-editorial__number{color:#9fdaa9;text-shadow:no
 html[data-theme="dark"] .ec-sales-editorial__controls>button{background:#203b2a;color:#f0d98e;border-color:#48604a}
 @media(max-width:640px){.ec-sales-editorial__body{grid-template-columns:minmax(0,1fr);gap:12px;padding:19px 17px}.ec-sales-editorial__figure{display:grid;grid-template-columns:auto 1fr;align-items:baseline;justify-items:end;gap:4px 10px;padding:12px 0 0;border-left:0;border-top:1px solid rgba(181,151,76,.3);text-align:right}.ec-sales-editorial__label{grid-column:1;grid-row:1}.ec-sales-editorial__number{grid-column:2;grid-row:1/span 2;font-size:46px}.ec-sales-editorial__caption{grid-column:1;grid-row:2;margin:0}.ec-sales-editorial__ticker{align-items:flex-end;min-height:0;padding:11px}.ec-sales-editorial__controls{gap:5px}.ec-sales-editorial__controls>button{width:26px;height:26px}.ec-sales-editorial__dots{display:none}}
 @media(prefers-reduced-motion:reduce){.ec-sales-editorial__ticker-copy{animation:none}.ec-sales-editorial__controls>button,.ec-sales-editorial__dots button{transition:none}}
+
+
+/* Hand-drawn pantry illustrations: warm editorial ink, no photo tiles or 3D effects */
+.ec-category-drawing{position:relative;display:grid;place-items:center;align-self:center;width:100%;height:94px;color:#315d3e;overflow:visible}
+.ec-category-drawing:before{content:"";position:absolute;width:88px;height:78px;border-radius:48% 52% 44% 56%;background:radial-gradient(circle at 40% 35%,rgba(235,207,139,.36),rgba(224,235,213,.32) 68%,transparent 70%);transform:rotate(-8deg)}
+.ec-category-drawing svg{position:relative;width:min(100%,180px);height:100%;overflow:visible;filter:drop-shadow(0 5px 3px rgba(66,70,39,.09));transition:transform .25s ease}
+.ec-category-tile:hover .ec-category-drawing svg{transform:translateY(-3px) rotate(-2deg) scale(1.04)}
+.ec-category-drawing--grains{color:#b28b42}
+.ec-category-drawing--spices{color:#a75c3c}
+.ec-category-drawing--drinks{color:#6b9564}
+.ec-category-drawing--snacks{color:#b98a45}
+.ec-category-drawing--cereal,.ec-category-drawing--natural{color:#a88748}
+.ec-category-tile{background:linear-gradient(145deg,rgba(255,255,255,.98),rgba(249,248,237,.94));border-color:rgba(105,132,91,.17);box-shadow:0 8px 24px rgba(44,77,48,.045)}
+.ec-category-tile:hover{box-shadow:0 13px 28px rgba(44,77,48,.09);border-color:rgba(178,139,66,.38)}
+.ec-category-tile>span:last-child{color:#254832}
+html[data-theme="dark"] .ec-category-tile{background:linear-gradient(145deg,#1d3426,#263b2b);border-color:rgba(213,194,139,.18)}
+html[data-theme="dark"] .ec-category-tile>span:last-child{color:#edf2e7}
+html[data-theme="dark"] .ec-category-drawing:before{background:radial-gradient(circle at 40% 35%,rgba(212,183,113,.17),rgba(117,155,112,.13) 68%,transparent 70%)}
+@media(prefers-reduced-motion:reduce){.ec-category-drawing svg,.ec-category-tile:hover .ec-category-drawing svg{transition:none;transform:none}}
