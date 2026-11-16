@@ -1,14 +1,10 @@
 import Link from "next/link";
-import {
-  ArrowRight, BadgePercent, CheckCircle2, ChevronRight, Headphones, Leaf,
-  MapPin, PackageCheck, ShieldCheck, ShoppingBasket, Sparkles, Sprout, Star, Truck
-} from "lucide-react";
+import { ArrowRight, BadgePercent, CheckCircle2, ChevronRight, Headphones, MapPin, PackageCheck, ShieldCheck, Sparkles, Truck } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { ProductCatalog } from "@/components/product-catalog";
 import { PromoCarousel } from "@/components/promo-carousel";
 import { SiteHeader } from "@/components/site-header";
 import { SalesCounter } from "@/components/sales-counter";
-import { CEOHomeFeature } from "@/components/ceo-home-feature";
 
 type Variant = {
   id: string; pack_size: string; price: number; sale_price: number | null;
@@ -60,72 +56,22 @@ function hasDiscount(product: Product) {
   );
 }
 
-function categoryArtClass(category: string, index: number) {
-  const value = category.toLowerCase();
-  if (/tom brown|cereal|porridge|pap/.test(value)) return "ec-category-art--cereal";
-  if (/grain|staple|rice|maize|yam|flour/.test(value)) return "ec-category-art--grains";
-  if (/spice|seasoning|pepper|herb/.test(value)) return "ec-category-art--spices";
-  if (/beverage|drink|juice|tea|coffee/.test(value)) return "ec-category-art--drinks";
-  if (/snack|nut|biscuit|treat/.test(value)) return "ec-category-art--snacks";
-  return ["ec-category-art--natural","ec-category-art--grains","ec-category-art--spices","ec-category-art--drinks","ec-category-art--snacks","ec-category-art--cereal"][index % 6];
-}
-
-function CategoryIllustration({ kind }: { kind: string }) {
-  const type = kind.replace("ec-category-art--", "");
-  return (
-    <span className={`ec-category-drawing ec-category-drawing--${type}`} aria-hidden="true">
-      <svg viewBox="0 0 180 116" role="presentation" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M24 92C42 101 137 103 157 89" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="2 5" opacity=".35"/>
-        <circle cx="91" cy="54" r="43" fill="currentColor" opacity=".055"/>
-        {type === "grains" && <>
-          <path d="M90 92C88 65 82 38 62 15M90 91C95 61 107 36 126 17M89 91C85 60 89 33 91 12" stroke="#477D50" strokeWidth="3" strokeLinecap="round"/>
-          {[0,1,2,3,4].map(n=><g key={n} transform={`translate(${62+n*6} ${22+n*5}) rotate(-35)`}><path d="M0 0C-12 -12 -10 -24 0 -29C10 -23 12 -11 0 0Z" fill="#D9B75E" stroke="#9D7733" strokeWidth="1.5"/></g>)}
-          {[0,1,2,3,4].map(n=><g key={n} transform={`translate(${126-n*5} ${23+n*5}) rotate(35)`}><path d="M0 0C-12 -12 -10 -24 0 -29C10 -23 12 -11 0 0Z" fill="#E8C976" stroke="#9D7733" strokeWidth="1.5"/></g>)}
-          <path d="M72 93L107 93" stroke="#9D7733" strokeWidth="2" strokeLinecap="round"/>
-        </>}
-        {type === "spices" && <>
-          <path d="M52 58Q90 83 128 58L118 87Q90 102 62 87Z" fill="#D8A34B" stroke="#98662E" strokeWidth="2"/>
-          <path d="M52 58Q90 78 128 58" stroke="#98662E" strokeWidth="2"/>
-          <path d="M89 54L119 18" stroke="#7D5839" strokeWidth="5" strokeLinecap="round"/>
-          <path d="M78 54C62 43 67 26 80 27C91 27 92 41 78 54Z" fill="#B84F37" stroke="#873C2E" strokeWidth="1.5"/>
-          <path d="M96 52C88 36 100 23 111 31C120 39 110 49 96 52Z" fill="#6B8B4C" stroke="#46663D" strokeWidth="1.5"/>
-          <circle cx="73" cy="65" r="3" fill="#E9D18D"/><circle cx="88" cy="68" r="3" fill="#E9D18D"/><circle cx="105" cy="65" r="3" fill="#E9D18D"/>
-        </>}
-        {type === "drinks" && <>
-          <path d="M67 25H113L107 88Q90 99 73 88Z" fill="#F2D78E" fillOpacity=".75" stroke="#8A7042" strokeWidth="2"/>
-          <path d="M70 50H110L107 85Q90 95 74 85Z" fill="#D98A43" fillOpacity=".8"/>
-          <path d="M101 25L119 9" stroke="#527D50" strokeWidth="4" strokeLinecap="round"/>
-          <path d="M91 25L91 11" stroke="#527D50" strokeWidth="2" strokeLinecap="round"/>
-          <path d="M76 54Q90 62 106 54" stroke="#FFF4C9" strokeWidth="2" opacity=".9"/>
-          <circle cx="82" cy="68" r="3" fill="#FFF4C9"/><circle cx="99" cy="77" r="2.5" fill="#FFF4C9"/>
-        </>}
-        {type === "snacks" && <>
-          <path d="M48 60Q90 99 132 60L119 88Q90 104 61 88Z" fill="#E4BD77" stroke="#96703B" strokeWidth="2"/>
-          <path d="M48 60Q90 82 132 60" stroke="#96703B" strokeWidth="2"/>
-          <path d="M61 58Q51 39 68 31Q85 27 88 52Z" fill="#D69B4D" stroke="#96622F" strokeWidth="2"/>
-          <path d="M87 53Q78 32 97 24Q116 23 114 49Z" fill="#C87943" stroke="#96622F" strokeWidth="2"/>
-          <path d="M101 58Q102 38 120 39Q136 48 119 64Z" fill="#E4C06D" stroke="#96622F" strokeWidth="2"/>
-          <path d="M65 43L77 48M94 35L105 41M111 49L121 52" stroke="#FFF0C4" strokeWidth="2" strokeLinecap="round"/>
-        </>}
-        {(type === "cereal" || type === "natural") && <>
-          <path d="M48 54Q90 92 132 54L121 83Q90 101 59 83Z" fill="#E9D49B" stroke="#9B7845" strokeWidth="2"/>
-          <path d="M48 54Q90 78 132 54" stroke="#9B7845" strokeWidth="2"/>
-          <path d="M58 53Q57 32 78 33Q91 35 88 58Z" fill="#C88B45" stroke="#9B7845" strokeWidth="1.5"/>
-          <path d="M83 55Q83 27 105 31Q122 38 111 60Z" fill="#D8B45F" stroke="#9B7845" strokeWidth="1.5"/>
-          <circle cx="72" cy="48" r="3" fill="#F8EBC7"/><circle cx="101" cy="45" r="3" fill="#F8EBC7"/><circle cx="91" cy="64" r="2.5" fill="#B67D3B"/>
-          <path d="M44 34C37 24 42 16 52 17M132 32C141 23 139 15 130 12" stroke="#6D995D" strokeWidth="2" strokeLinecap="round"/>
-        </>}
-      </svg>
-    </span>
-  );
-}
-
 const comingSoonCategories = [
-  { name: "Grains & staples", description: "Everyday pantry essentials", icon: Sprout },
-  { name: "Spices & seasonings", description: "A little more flavour", icon: Sparkles },
-  { name: "Beverages", description: "Something to sip", icon: ShoppingBasket },
-  { name: "Snacks", description: "Little bites for any time", icon: Star }
+  { name: "Grains & staples", description: "Everyday pantry essentials" },
+  { name: "Spices & seasonings", description: "A little more flavour" },
+  { name: "Beverages", description: "Something to sip" },
+  { name: "Snacks", description: "Little bites for any time" }
 ];
+
+function categoryDescription(category: string) {
+  const value = category.toLowerCase();
+  if (/grain|staple|rice|maize|yam|flour/.test(value)) return "Everyday essentials for a well-stocked pantry.";
+  if (/spice|seasoning|pepper|herb/.test(value)) return "A little more flavour for meals made with care.";
+  if (/beverage|drink|juice|tea|coffee/.test(value)) return "Refreshing favourites and feel-good sips.";
+  if (/snack|nut|biscuit|treat/.test(value)) return "Thoughtful little bites for any time of day.";
+  if (/cereal|porridge|pap|tom brown/.test(value)) return "Wholesome choices to brighten your mornings.";
+  return "Explore thoughtful food choices in this collection.";
+}
 
 export default async function HomePage() {
   let products: Product[] = [];
@@ -251,22 +197,29 @@ export default async function HomePage() {
             <div><p className="ec-kicker">Explore the pantry</p><h2 className="mt-2 text-3xl font-black tracking-tight sm:text-4xl">Shop by category</h2><p className="mt-2 text-sm text-[#748277]">Find what you need, all in one place.</p></div>
             <Link href="/shop" className="hidden items-center gap-2 text-xs font-extrabold text-[#087f5b] sm:inline-flex">All products <ArrowRight size={14} /></Link>
           </div>
-          <div className="mt-7 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-            {liveCategories.map((category, index) => {
-              const artwork = categoryArtClass(category, index);
-              return (
-                <Link key={category} href={"/shop?category=" + encodeURIComponent(category)} className="ec-category-tile group flex min-h-[142px] flex-col justify-between rounded-2xl border p-4 transition hover:-translate-y-1">
-                  <CategoryIllustration kind={artwork} />
-                  <span className="mt-5 flex items-center justify-between gap-2 text-xs font-extrabold"><span>{category}</span><ArrowRight size={14} className="shrink-0 transition group-hover:translate-x-1" /></span>
-                </Link>
-              );
-            })}
-            {comingSoonCategories.filter(item => !liveCategories.some(category => category.toLowerCase().includes(item.name.split(" ")[0].toLowerCase()))).slice(0, Math.max(0, 5 - liveCategories.length)).map((item, index) => (
-              <div key={item.name} className="ec-category-tile ec-category-coming flex min-h-[142px] flex-col justify-between rounded-2xl border p-4">
-                <span aria-hidden="true" className={`ec-category-art ${categoryArtClass(item.name, index)}`} />
-                <span><span className="block text-xs font-extrabold">{item.name}</span><span className="mt-1 block text-[10px] text-[#8a9589]">{item.description} · Coming soon</span></span>
-              </div>
+          <div className="ec-category-word-grid mt-8">
+            {liveCategories.map((category, index) => (
+              <Link
+                key={category}
+                href={"/shop?category=" + encodeURIComponent(category)}
+                className={`ec-category-word ec-category-word--${index % 5} group`}
+              >
+                <span className="ec-category-word__index">COLLECTION / {String(index + 1).padStart(2, "0")}</span>
+                <span className="ec-category-word__name">{category}</span>
+                <span className="ec-category-word__description">{categoryDescription(category)}</span>
+                <span className="ec-category-word__action">Explore collection <ArrowRight size={14} /></span>
+              </Link>
             ))}
+            {comingSoonCategories
+              .filter(item => !liveCategories.some(category => category.toLowerCase().includes(item.name.split(" ")[0].toLowerCase())))
+              .slice(0, Math.max(0, 5 - liveCategories.length))
+              .map((item, index) => (
+                <div key={item.name} className={`ec-category-word ec-category-word--${(liveCategories.length + index) % 5} ec-category-word--coming`}>
+                  <span className="ec-category-word__index">COMING SOON</span>
+                  <span className="ec-category-word__name">{item.name}</span>
+                  <span className="ec-category-word__description">{item.description}</span>
+                </div>
+              ))}
           </div>
         </div>
       </section>
@@ -312,8 +265,6 @@ export default async function HomePage() {
           {discounted.length ? <div className="mt-6"><ProductCatalog products={catalog(discounted)} /></div> : <div className="ec-home-empty mt-6"><BadgePercent size={25} /><strong>There are no product markdowns right now.</strong><span>Check back for special prices and limited-time deals.</span></div>}
         </div>
       </section>
-
-      <CEOHomeFeature />
 
       <section className="ec-why-section py-14 sm:py-20">
         <div className="mx-auto grid max-w-7xl gap-9 px-5 md:grid-cols-[.95fr_1.05fr] md:items-center">
