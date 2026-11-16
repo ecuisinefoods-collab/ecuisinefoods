@@ -115,6 +115,10 @@ export default async function HomePage() {
       </div>
       <SiteHeader />
 
+      <section className="mx-auto w-full max-w-7xl px-5 py-5 sm:py-7" aria-label="eCuisine all-time sales milestone">
+        <SalesCounter total={completedProductUnits} />
+      </section>
+
       <section className={`ec-home-hero relative isolate overflow-hidden ${videoEnabled ? "ec-home-hero--video" : ""}`}>
         {config.hero_video_fallback_url && (
           <div className="ec-hero-fallback absolute inset-0" style={{ backgroundImage: `url("${config.hero_video_fallback_url}")` }} />
@@ -170,10 +174,6 @@ export default async function HomePage() {
             <span><strong className="block text-[11px] font-extrabold sm:text-sm">{item.title}</strong><small className="mt-1 block text-[10px] leading-4 text-[#849184]">{item.detail}</small></span>
           </div>
         ))}
-      </section>
-
-      <section className="mx-auto max-w-7xl px-5 pb-8 sm:pb-10">
-        <SalesCounter total={completedProductUnits} />
       </section>
 
       <section className="mx-auto max-w-7xl px-5 pb-5">
