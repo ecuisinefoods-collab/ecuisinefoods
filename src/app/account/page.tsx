@@ -84,6 +84,7 @@ export default function AccountPage() {
     }
     let active = true;
     const loadAccount = async () => {
+      if (!supabase || !user) return;
       setPageLoading(true);
       setError("");
       try {
