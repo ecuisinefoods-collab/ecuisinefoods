@@ -94,7 +94,6 @@ export default async function HomePage() {
   const latest = [...products].sort((a, b) =>
     new Date(b.created_at ?? 0).getTime() - new Date(a.created_at ?? 0).getTime()
   ).slice(0, 8);
-  const heroProduct = featured[0] ?? products[0] ?? null;
   const liveCategories = Array.from(new Set(products.map(product => product.category).filter(Boolean)));
   const locationList = locations.length ? locations : [
     { city: "Jos", location_name: "Terminus" },
