@@ -3,6 +3,7 @@ import { useCallback,useEffect,useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { ArrowLeft,RefreshCw,TrendingUp,ShoppingBag,Wallet,Package } from "lucide-react";
+import { SiteTrafficAnalytics } from "@/components/admin/site-traffic-analytics";
 type Order={id:string;total:number;status:string;created_at:string};
 type Tx={id:string;transaction_type:string;category:string;amount:number;transaction_date:string};
 const money=(n:number)=>new Intl.NumberFormat("en-NG",{style:"currency",currency:"NGN",maximumFractionDigits:0}).format(n||0);
