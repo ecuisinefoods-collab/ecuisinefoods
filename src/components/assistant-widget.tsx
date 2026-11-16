@@ -99,7 +99,7 @@ export function AssistantWidget(){
      <textarea rows={1} value={draft} onChange={e=>setDraft(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();void sendMessage(e as unknown as FormEvent<HTMLFormElement>);}}} placeholder="Ask eCuisine a question…" aria-label="Message the eCuisine assistant" className="max-h-28 min-h-11 flex-1 resize-y bg-transparent px-2 py-3 text-[15px] leading-6 text-[#294432] outline-none placeholder:text-[#97a398]"/>
      <button type="submit" disabled={busy||!draft.trim()} aria-label="Send message" className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-[#176044] text-white hover:bg-[#10482f] disabled:opacity-40"><Send size={18}/></button>
     </div>
-    <p className="mt-2 px-1 text-[11px] text-[#8a9689]">Please don’t share passwords, PINs or banking codes in chat.</p>
+    <p className="mt-2 px-1 text-xs leading-5 text-[#8a9689]">Chats are saved so eCuisine support can help when needed. Please don’t share passwords, PINs, OTPs or banking codes.</p>
    </form>
   </section>}
   <button type="button" onClick={()=>setOpen(value=>!value)} aria-label={open?"Close eCuisine assistant":"Chat with eCuisine assistant"} className="fixed bottom-[104px] right-4 z-[81] flex items-center gap-3 rounded-full border-2 border-white bg-[#174d35] px-4 py-3.5 text-white shadow-[0_12px_35px_rgba(15,54,31,.3)] transition hover:-translate-y-1 sm:bottom-6 sm:right-6">
