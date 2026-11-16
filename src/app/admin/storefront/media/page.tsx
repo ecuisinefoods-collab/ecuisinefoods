@@ -5,7 +5,11 @@ import Link from "next/link";
 import { ArrowLeft, CheckCircle2, Film, ImagePlus, LoaderCircle, Save, Trash2, UploadCloud } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
-function promotionStoragePath(url: string, bucket: string): string | null {\n  try { const parsed = new URL(url); const marker = `/storage/v1/object/public/${bucket}/`; const index = parsed.pathname.indexOf(marker); return index >= 0 ? decodeURIComponent(parsed.pathname.slice(index + marker.length)) : null; } catch { return null; }\n}\n\ntype StorefrontConfig = Record<string, unknown> & {
+function promotionStoragePath(url: string, bucket: string): string | null {
+  try { const parsed = new URL(url); const marker = `/storage/v1/object/public/${bucket}/`; const index = parsed.pathname.indexOf(marker); return index >= 0 ? decodeURIComponent(parsed.pathname.slice(index + marker.length)) : null; } catch { return null; }
+}
+
+type StorefrontConfig = Record<string, unknown> & {
   hero_video_url?: string;
   hero_video_fallback_url?: string;
 };
