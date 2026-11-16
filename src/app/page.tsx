@@ -8,6 +8,7 @@ import { ProductCatalog } from "@/components/product-catalog";
 import { PromoCarousel } from "@/components/promo-carousel";
 import { SiteHeader } from "@/components/site-header";
 import { SalesCounter } from "@/components/sales-counter";
+import { CEOHomeFeature } from "@/components/ceo-home-feature";
 
 type Variant = {
   id: string; pack_size: string; price: number; sale_price: number | null;
@@ -261,6 +262,8 @@ export default async function HomePage() {
           {discounted.length ? <div className="mt-6"><ProductCatalog products={catalog(discounted)} /></div> : <div className="ec-home-empty mt-6"><BadgePercent size={25} /><strong>There are no product markdowns right now.</strong><span>Check back for special prices and limited-time deals.</span></div>}
         </div>
       </section>
+
+      <CEOHomeFeature />
 
       <section className="ec-why-section py-14 sm:py-20">
         <div className="mx-auto grid max-w-7xl gap-9 px-5 md:grid-cols-[.95fr_1.05fr] md:items-center">
