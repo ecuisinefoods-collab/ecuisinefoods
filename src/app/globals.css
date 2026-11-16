@@ -203,3 +203,54 @@ body{font-feature-settings:"ss01" on;-webkit-font-smoothing:antialiased}
 .admin-glass-shell input,.admin-glass-shell select,.admin-glass-shell textarea{border-radius:13px}
 @media(max-width:640px){.storefront-glass .hero-product-scene{min-height:300px;border-radius:1.5rem}.storefront-glass .hero-product-scene:after{inset:8px;border-radius:1.1rem}.storefront-glass .product-card{border-radius:1rem}}
 @media(prefers-reduced-motion:reduce){.storefront-glass *,.admin-glass-shell *{animation:none!important;transition:none!important}}
+
+
+/* eCuisinefoods vibrant supermarket redesign */
+:root{
+ --brand-primary:#087f5b;
+ --brand-dark:#07543f;
+ --brand-accent:#f2b705;
+ --brand-background:#fff9e8;
+ --brand-surface:#ffffff;
+ --brand-text:#183d2b;
+ --ec-orange:#f47b20;
+}
+.storefront-glass{background:#fffdf6;color:#183d2b}
+.storefront-glass .store-hero{background:linear-gradient(120deg,#fff8df 0%,#f0f8ed 54%,#fff0df 100%)}
+.storefront-glass .hero-grain{opacity:.13;background-image:radial-gradient(#f2b705 .8px,transparent .8px);background-size:18px 18px}
+.storefront-glass .site-header{background:rgba(255,255,255,.96);border-bottom:1px solid #e8f0e7;box-shadow:0 8px 28px rgba(7,84,63,.08)}
+.storefront-glass .nav-link:hover{color:#f47b20}
+.storefront-glass .product-card{border:1px solid #e8efe6;background:#fff;box-shadow:0 10px 28px rgba(7,84,63,.07)}
+.storefront-glass .product-card:hover{border-color:#f2c94c;box-shadow:0 20px 44px rgba(7,84,63,.13)}
+.storefront-glass .product-card-media{background:linear-gradient(145deg,#fffdf4,#f0f7ed)}
+.storefront-glass .empty-store-state{border-color:#f1d989;background:#fffdf4}
+.storefront-brand-video{z-index:0;opacity:.94}
+.store-hero:has(.storefront-brand-video) .hero-grain{z-index:1}
+.store-hero:has(.storefront-brand-video) .mx-auto{position:relative;z-index:2}
+.store-hero:has(.storefront-brand-video) h1,
+.store-hero:has(.storefront-brand-video) p,
+.store-hero:has(.storefront-brand-video) .hero-product-scene,
+.store-hero:has(.storefront-brand-video) .hero-product-scene+div{color:#fff}
+.store-hero:has(.storefront-brand-video) h1{ text-shadow:0 3px 24px rgba(0,0,0,.25); }
+.store-hero:has(.storefront-brand-video) .hero-product-scene{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.45)}
+.store-hero:has(.storefront-brand-video) .hero-product-scene>span{color:#07543f}
+.mobile-store-nav a:focus-visible,.floating-whatsapp:focus-visible{outline:3px solid #f2b705;outline-offset:3px}
+@media(max-width:640px){
+ body:has(.mobile-store-nav){padding-bottom:76px}
+ .storefront-brand-video{display:none}
+ .storefront-glass .site-header>div{gap:.65rem}
+ .storefront-glass .brand-lockup img{max-width:145px}
+ .storefront-glass .site-header nav{gap:1rem;font-size:11px}
+ .floating-whatsapp{bottom:88px}
+}
+@media(prefers-reduced-motion:reduce){.floating-whatsapp,.mobile-store-nav{transition:none}}
+
+.storefront-brand-mobile-fallback{display:none;z-index:0}
+@media(max-width:640px){
+ .storefront-brand-mobile-fallback{display:block;filter:brightness(.55)}
+ .store-hero:has(.storefront-brand-mobile-fallback) .mx-auto{position:relative;z-index:2}
+ .store-hero:has(.storefront-brand-mobile-fallback) h1,.store-hero:has(.storefront-brand-mobile-fallback) p{color:#fff;text-shadow:0 2px 18px rgba(0,0,0,.3)}
+ .store-hero:has(.storefront-brand-mobile-fallback) .hero-product-scene{background:rgba(255,255,255,.16)}
+}
+
+@media(max-width:640px){.discount-mascot{bottom:88px!important;left:10px!important;transform:scale(.86);transform-origin:bottom left}.discount-mascot:hover{transform:scale(.9)}}

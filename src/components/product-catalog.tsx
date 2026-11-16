@@ -13,11 +13,11 @@ const KEY = "ecuisinefoods-cart-v1";
 function readCart(): CartItem[] { try { return JSON.parse(localStorage.getItem(KEY) || "[]") as CartItem[]; } catch { return []; } }
 const money = (n:number) => "₦" + n.toLocaleString("en-NG");
 
-export function ProductCatalog({ products, initialCategory = "All products" }: { products: Product[]; initialCategory?: string }) {
+export function ProductCatalog({ products, initialCategory = "All products", initialSearch = "" }: { products: Product[]; initialCategory?: string; initialSearch?: string }) {
   const [cart,setCart]=useState<CartItem[]>([]);
   const [filter,setFilter]=useState(initialCategory);
   const [availability,setAvailability]=useState<"all"|"in-stock"|"on-sale">("all");
-  const [search,setSearch]=useState("");
+  const [search,setSearch]=useState(initialSearch);
   const [sort,setSort]=useState("featured");
   const [notice,setNotice]=useState("");
   useEffect(()=>{setCart(readCart());},[]);
