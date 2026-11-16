@@ -10,6 +10,7 @@ type Conversation={id:string;status:string;needs_human:boolean;handoff_reason:st
 type ChatMessage={id:string;role:string;content:string;created_at:string};
 const blankKnowledge={title:"",category:"General",content:"",is_active:true,sort_order:100};
 const dateLabel=(value:string)=>new Date(value).toLocaleString("en-NG",{dateStyle:"medium",timeStyle:"short"});
+const whatsappNumber=(value:string)=>{const digits=value.replace(/\\D/g,"");if(digits.startsWith("0"))return "234"+digits.slice(1);if(digits.length===10)return "234"+digits;return digits;};
 
 export default function AssistantAdminPage(){
  const [role,setRole]=useState("");
