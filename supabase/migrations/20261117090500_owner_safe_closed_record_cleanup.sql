@@ -33,5 +33,5 @@ begin
     'declined_applications',v_applications,'assistant_rate_limits',v_rate_limits);
 end;
 $$;
-revoke all on function public.admin_cleanup_closed_records() from public;
+revoke all on function public.admin_cleanup_closed_records() from public, anon;
 grant execute on function public.admin_cleanup_closed_records() to authenticated;
