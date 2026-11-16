@@ -58,7 +58,7 @@ function getOutputText(payload: Record<string, unknown>): string {
 async function businessContext(db: ReturnType<typeof createClient>) {
   const results = await Promise.all([
     db.from("assistant_knowledge").select("title,category,content").eq("is_active", true).order("sort_order"),
-    db.from("products").select("name,category,short_description,description,ingredients,nutrition_info,highlights,usage_instructions,storage_instructions,allergy_info,product_variants(pack_size,price,sale_price,stock_quantity)").eq("is_active", true).order("name"),
+    db.from("products").select("name,category,short_description,description,ingredients,nutrition_info,highlights,usage_instructions,storage_instructions,allergy_info,product_variants(pack_size,price,sale_price,stock_quantity,sale_starts_at,sale_ends_at)").eq("is_active", true).order("name"),
     db.from("pickup_locations").select("city,location_name,address,instructions,opening_hours").eq("is_active", true).order("city").order("sort_order"),
     db.from("delivery_zones").select("state,city,area_name,delivery_fee,minimum_order_amount,estimated_days").eq("is_active", true).order("state").order("city"),
     db.from("site_settings").select("setting_key,setting_value").in("setting_key", [
@@ -78,7 +78,11 @@ async function businessContext(db: ReturnType<typeof createClient>) {
   for (const p of products) {
     const variants = Array.isArray(p.product_variants) ? p.product_variants : [];
     const packs = variants.map((v: Record<string, unknown>) => {
-      const price = Number(v.sale_price ?? v.price);
+      const now = Date.now();
+      const startsAt = v.sale_starts_at ? Date.parse(String(v.sale_starts_at)) : Number.NEGATIVE_INFINITY;
+      const endsAt = v.sale_ends_at ? Date.parse(String(v.sale_ends_at)) : Number.POSITIVE_INFINITY;
+      const saleIsActive = v.sale_price != null && now >= startsAt && now <= endsAt;
+      const price = Number(saleIsActive ? v.sale_price : v.price);
       const priceText = Number.isFinite(price) ? "₦" + price.toLocaleString("en-NG") : "check product page";
       return String(v.pack_size) + ": " + priceText + "; stock " + (Number(v.stock_quantity) > 0 ? "available" : "out of stock");
     }).join("; ");
