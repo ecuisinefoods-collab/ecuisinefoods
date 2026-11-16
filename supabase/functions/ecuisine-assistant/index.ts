@@ -133,6 +133,8 @@ async function businessContext(db: ReturnType<typeof createClient>) {
 }
 
 Deno.serve(async (req: Request) => {
+  let dbClient: ReturnType<typeof createClient> | null = null;
+  let activeConversationId: string | null = null;
   const origin = req.headers.get("origin") ?? "";
   const corsOrigin = origin || "https://ecuisinefoods.onrender.com";
   if (req.method === "OPTIONS") {
@@ -155,11 +157,13 @@ Deno.serve(async (req: Request) => {
     const action = clean(body.action, 20) || "chat";
     const conversationId = body.conversation_id;
     if (!uuid(conversationId)) return send({ error: "A valid chat reference is required." }, 400, corsOrigin);
+    activeConversationId = conversationId;
 
     const ip = req.headers.get("cf-connecting-ip") ||
       req.headers.get("x-real-ip") ||
       req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
     const db = createClient(URL, DB_KEY, { auth: { autoRefreshToken: false, persistSession: false } });
+    dbClient = db;
     const { data: allowed, error: rateError } = await db.rpc("consume_ecuisine_assistant_rate_limit", {
       p_ip_hash: await digest(ip), p_max_requests: 24,
     });
@@ -219,10 +223,20 @@ Deno.serve(async (req: Request) => {
     if (userInsertError) throw userInsertError;
 
     if (!OPENAI_KEY) {
+      const fallbackReply = "Thanks for your message. Our AI assistant is being connected. I've flagged your question for the eCuisine team. You can also reach us on WhatsApp at +234 808 094 2328.";
+      await db.from("assistant_messages").insert({
+        conversation_id: conversationId, role: "assistant", content: fallbackReply,
+      });
+      await db.from("assistant_conversations").update({
+        needs_human: true, status: "open",
+        handoff_reason: "The AI service key has not yet been configured.",
+        updated_at: new Date().toISOString(),
+        last_message_at: new Date().toISOString(),
+      }).eq("id", conversationId);
       return send({
-        reply: "Thanks for your message. Our AI assistant is waiting for its secure connection to be completed. For help right now, please chat with our team on WhatsApp at +234 808 094 2328.",
-        needs_human: true, handoff_reason: "AI API key has not been configured.", setup_required: true,
-        conversation_id: conversationId,
+        reply: fallbackReply,
+        needs_human: true, handoff_reason: "The AI service key has not yet been configured.",
+        setup_required: true, conversation_id: conversationId,
       }, 200, corsOrigin);
     }
 
@@ -294,9 +308,28 @@ Deno.serve(async (req: Request) => {
     return send({ reply, needs_human: needsHuman, handoff_reason: reason, conversation_id: conversationId }, 200, corsOrigin);
   } catch (error) {
     console.error("eCuisine assistant error", error);
+    const fallbackReply = "I'm sorry—I couldn't complete that response right now. I've flagged this chat for the eCuisine team. You can also reach us on WhatsApp at +234 808 094 2328.";
+    if (dbClient && activeConversationId) {
+      try {
+        await Promise.all([
+          dbClient.from("assistant_messages").insert({
+            conversation_id: activeConversationId, role: "assistant", content: fallbackReply,
+          }),
+          dbClient.from("assistant_conversations").update({
+            needs_human: true, status: "open",
+            handoff_reason: "The assistant service could not complete a response.",
+            updated_at: new Date().toISOString(),
+            last_message_at: new Date().toISOString(),
+          }).eq("id", activeConversationId),
+        ]);
+      } catch (handoffError) {
+        console.error("Unable to persist assistant fallback handoff", handoffError);
+      }
+    }
     return send({
-      reply: "I'm sorry—I couldn't complete that response right now. Our team can help you on WhatsApp at +234 808 094 2328.",
-      needs_human: true, error: "Assistant temporarily unavailable.",
+      reply: fallbackReply, needs_human: true,
+      handoff_reason: "The assistant service could not complete a response.",
+      error: "Assistant temporarily unavailable.",
     }, 200, corsOrigin);
   }
 });
