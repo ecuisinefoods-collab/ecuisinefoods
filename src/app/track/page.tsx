@@ -2,7 +2,7 @@
 
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, CheckCircle2, Circle, ClipboardList, Headset, MapPin, PackageCheck, Search, Truck } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Circle, Headset, MapPin, Package, Search, Truck } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
 type TrackingItem = { product_name: string; pack_size: string; quantity: number };
@@ -21,9 +21,9 @@ type TrackingResult = {
   items?: TrackingItem[];
 };
 
-const moneyDate = (value?: string) => value
+const formatDate = (value?: string) => value
   ? new Date(value).toLocaleString("en-NG", { dateStyle: "medium", timeStyle: "short" })
-  : "Not available";
+  : "Date unavailable";
 
 export default function TrackOrderPage() {
   const [code, setCode] = useState("");
@@ -50,9 +50,9 @@ export default function TrackOrderPage() {
         p_tracking_code: value,
       });
       if (rpcError) {
-        setError("We could not check this order right now. Please try again or contact eCuisine support.");
+        setError("We could not check this order right now. Please try again or contact our team.");
       } else if (!data?.found) {
-        setError("We could not find an order with that tracking code. Check the private code from your order confirmation and try again.");
+        setError("We could not find an order with that tracking code. Check your confirmation message and try again.");
       } else {
         setResult(data as TrackingResult);
       }
@@ -83,173 +83,157 @@ export default function TrackOrderPage() {
   );
   const currentIndex = result ? steps.indexOf(result.status || "New") : -1;
   const isCancelled = result?.status === "Cancelled";
-  const supportText = result
-    ? "Hello eCuisine, I need help with order #" + result.order_number
-      + ". Current order status: " + (result.status || "Not available")
-      + ". Payment status: " + (result.payment_status || "Not available")
-      + ". Please assist me."
-    : "Hello eCuisine, I need help tracking my order.";
-  const supportUrl = "https://wa.me/2348080942328?text=" + encodeURIComponent(supportText);
   const destination = result
     ? isDelivery
       ? [result.delivery_area, result.delivery_city, result.delivery_state].filter(Boolean).join(" · ")
       : [result.pickup_city, result.pickup_location_name].filter(Boolean).join(" · ")
     : "";
+  const supportText = result
+    ? "Hello eCuisine, I need help with order #" + result.order_number
+      + ". Current status: " + (result.status || "Not available")
+      + ". Payment status: " + (result.payment_status || "Not available") + "."
+    : "Hello eCuisine, I need help tracking my order.";
+  const supportUrl = "https://wa.me/2348080942328?text=" + encodeURIComponent(supportText);
 
   return (
-    <main className="storefront-glass min-h-screen bg-[#fbfaf7] px-4 py-10 sm:px-6">
-      <div className="mx-auto max-w-4xl">
-        <Link href="/" className="inline-flex items-center gap-2 text-sm font-semibold text-[#42694b]">
+    <main className="min-h-screen bg-[#f5f7f2] px-4 pb-24 pt-7 sm:px-6 sm:pt-10">
+      <div className="mx-auto max-w-5xl">
+        <Link href="/" className="inline-flex items-center gap-2 text-sm font-semibold text-[#41634b] transition hover:text-[#173e2d]">
           <ArrowLeft size={15} /> Back to store
         </Link>
 
-        <section className="mt-7 overflow-hidden rounded-3xl border border-white/70 bg-white/75 shadow-2xl shadow-[#506f56]/10 backdrop-blur-2xl">
-          <div className="bg-[#173e2d] px-6 py-7 text-white sm:px-9">
-            <div className="flex items-center gap-3">
-              <span className="grid h-12 w-12 place-items-center rounded-2xl bg-white/10">
-                <Truck size={23} />
+        <section className="mt-6 overflow-hidden rounded-[30px] border border-white bg-white shadow-[0_24px_80px_rgba(24,57,37,.08)]">
+          <div className="relative overflow-hidden bg-gradient-to-br from-[#173e2d] via-[#20553c] to-[#2a6748] px-6 py-9 text-white sm:px-10 sm:py-12">
+            <div className="pointer-events-none absolute -right-14 -top-24 h-64 w-64 rounded-full border border-white/10" />
+            <div className="pointer-events-none absolute -right-2 -top-12 h-40 w-40 rounded-full border border-white/10" />
+            <div className="relative max-w-2xl">
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[.18em] text-[#d8e8d7]">
+                <Truck size={13} /> eCuisine order care
               </span>
-              <div>
-                <p className="text-[10px] font-bold uppercase tracking-[.2em] text-[#d2e3d1]">eCuisine order care</p>
-                <h1 className="mt-1 text-3xl font-semibold tracking-tight">Track your order</h1>
-              </div>
+              <h1 className="mt-5 text-3xl font-semibold tracking-tight sm:text-5xl">Your order, at a glance.</h1>
+              <p className="mt-4 max-w-xl text-sm leading-7 text-[#e2eee1] sm:text-base">
+                See where your order is, check its payment status and find your pickup or delivery details in one place.
+              </p>
             </div>
-            <p className="mt-4 max-w-2xl text-sm leading-6 text-[#e4eee2]">
-              See the latest order progress, payment status and your selected pickup or delivery details.
-              You can track an order without creating an account.
-            </p>
           </div>
 
-          <div className="p-5 sm:p-9">
-            <form onSubmit={submit} className="rounded-2xl border border-[#e2e9df] bg-[#f8faf6] p-4 sm:p-5">
-              <label htmlFor="tracking-code" className="block text-xs font-bold text-[#526552]">
-                Private tracking code
-              </label>
-              <div className="mt-2 flex flex-col gap-3 sm:flex-row">
+          <div className="grid gap-8 p-5 sm:p-9 lg:grid-cols-[.85fr_1.15fr]">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[.16em] text-[#82917f]">Find an order</p>
+              <h2 className="mt-2 text-2xl font-semibold tracking-tight text-[#1d3b29]">Enter your tracking code</h2>
+              <p className="mt-3 text-sm leading-6 text-[#788577]">
+                Use the private code from your order confirmation. No customer account is needed.
+              </p>
+              <form onSubmit={submit} className="mt-6 space-y-3">
+                <label htmlFor="tracking-code" className="block text-xs font-bold text-[#526552]">Private tracking code</label>
                 <input
                   id="tracking-code"
                   required
                   autoComplete="off"
                   value={code}
                   onChange={event => setCode(event.target.value)}
-                  placeholder="Paste the code from your order confirmation"
-                  className="min-w-0 flex-1 rounded-xl border border-[#dce5d9] bg-white px-4 py-3 text-sm text-[#203329] outline-none focus:border-[#245b42]"
+                  placeholder="Paste your tracking code"
+                  className="w-full rounded-2xl border border-[#dce5d9] bg-[#fbfcfa] px-4 py-3.5 text-sm text-[#203329] outline-none transition placeholder:text-[#a0aa9e] focus:border-[#6e9b76] focus:bg-white focus:ring-4 focus:ring-[#e8f1e6]"
                 />
                 <button
                   type="submit"
                   disabled={loading}
-                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#245b42] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#173e2d] disabled:cursor-not-allowed disabled:opacity-50"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[#245b42] px-5 py-3.5 text-sm font-bold text-white shadow-lg shadow-[#245b42]/15 transition hover:-translate-y-0.5 hover:bg-[#173e2d] disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  <Search size={15} /> {loading ? "Checking order…" : "Track order"}
+                  <Search size={16} /> {loading ? "Checking order…" : "Track my order"}
                 </button>
+              </form>
+              <p className="mt-4 text-[11px] leading-5 text-[#96a092]">Keep your tracking code private. Anyone with the code may be able to view the order summary.</p>
+              {error && (
+                <div role="alert" className="mt-5 rounded-2xl border border-red-100 bg-red-50 p-4 text-sm leading-6 text-red-700">
+                  {error}
+                </div>
+              )}
+              <div className="mt-7 rounded-2xl bg-[#f2f6ef] p-4">
+                <p className="text-sm font-bold text-[#294b32]">Order more easily next time</p>
+                <p className="mt-1 text-xs leading-5 text-[#768575]">Create an eCuisine account to keep your order history together.</p>
+                <Link href="/account" className="mt-3 inline-flex text-xs font-bold text-[#245b42] hover:underline">Open my account <span aria-hidden="true">→</span></Link>
               </div>
-              <p className="mt-2 text-[11px] leading-5 text-[#879286]">
-                Your tracking code is private. Keep it safe and do not post it publicly.
-              </p>
-            </form>
+            </div>
 
-            {error && (
-              <div role="alert" className="mt-5 rounded-xl border border-red-100 bg-red-50 p-4 text-sm text-red-700">
-                {error}
-              </div>
-            )}
-
-            {result && (
-              <section className="mt-7" aria-live="polite">
-                <div className="flex flex-wrap items-start justify-between gap-4 border-b border-[#e9eee6] pb-5">
-                  <div>
-                    <p className="text-[10px] font-black uppercase tracking-[.18em] text-[#879286]">Order reference</p>
-                    <h2 className="mt-1 text-2xl font-bold text-[#173e2d]">#{result.order_number}</h2>
-                    <p className="mt-1 text-xs text-[#829080]">Placed {moneyDate(result.created_at)}</p>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    <span className={"rounded-full px-3 py-1.5 text-xs font-bold " + (isCancelled ? "bg-red-50 text-red-700" : "bg-[#edf5ea] text-[#245b42]")}>
-                      {result.status || "Status unavailable"}
-                    </span>
-                    <span className="rounded-full bg-[#fff7e8] px-3 py-1.5 text-xs font-bold text-[#806126]">
-                      Payment: {result.payment_status || "Not available"}
-                    </span>
-                  </div>
+            <div className="min-h-[260px] rounded-[24px] border border-[#e8eee5] bg-[#fbfcfa] p-5 sm:p-6">
+              {!result ? (
+                <div className="flex h-full min-h-[230px] flex-col items-center justify-center text-center">
+                  <span className="grid h-16 w-16 place-items-center rounded-3xl bg-[#edf4ea] text-[#4c7654]"><Package size={27} /></span>
+                  <h3 className="mt-5 text-lg font-semibold text-[#284432]">Your delivery updates live here</h3>
+                  <p className="mt-2 max-w-sm text-sm leading-6 text-[#8a9588]">Enter your tracking code to see the latest progress and order details.</p>
                 </div>
-
-                <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                  <div className="rounded-2xl bg-[#f7f8f3] p-4">
-                    <p className="text-[10px] font-black uppercase tracking-wider text-[#899487]">Fulfilment</p>
-                    <p className="mt-1 text-sm font-bold capitalize text-[#263d2d]">
-                      {result.fulfillment_method === "delivery" ? "Home delivery" : "Pickup"}
-                    </p>
-                  </div>
-                  <div className="rounded-2xl bg-[#f7f8f3] p-4">
-                    <p className="flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-[#899487]">
-                      <MapPin size={12} /> {isDelivery ? "Delivery area" : "Pickup location"}
-                    </p>
-                    <p className="mt-1 text-sm font-bold text-[#263d2d]">{destination || "Details unavailable"}</p>
-                  </div>
-                </div>
-
-                <div className="mt-7">
-                  <div className="flex items-center gap-2">
-                    <PackageCheck size={18} className="text-[#245b42]" />
-                    <h3 className="font-bold text-[#203329]">Order progress</h3>
-                  </div>
-                  {isCancelled ? (
-                    <p className="mt-3 rounded-xl border border-red-100 bg-red-50 p-4 text-sm leading-6 text-red-700">
-                      This order is cancelled. Contact our team on WhatsApp if you need an explanation or help with next steps.
-                    </p>
-                  ) : currentIndex < 0 ? (
-                    <p className="mt-3 rounded-xl bg-[#fff7e8] p-4 text-sm leading-6 text-[#795b21]">
-                      Your order currently has the status “{result.status}”. Contact our team for help understanding this update.
-                    </p>
-                  ) : (
-                    <ol className="mt-4 grid gap-3 sm:grid-cols-5">
-                      {steps.map((step, index) => {
-                        const complete = index <= currentIndex;
-                        const current = index === currentIndex;
-                        return (
-                          <li key={step} className={"rounded-2xl border p-3 " + (current ? "border-[#8fb497] bg-[#edf5ea]" : complete ? "border-[#d7e5d4] bg-[#f7faf5]" : "border-[#e7ebe4] bg-white")}>
-                            <span className={"inline-flex h-7 w-7 items-center justify-center rounded-full " + (complete ? "bg-[#245b42] text-white" : "bg-[#eef1eb] text-[#9aa598]")}>
-                              {complete ? <CheckCircle2 size={16} /> : <Circle size={15} />}
-                            </span>
-                            <p className={"mt-2 text-xs font-bold leading-5 " + (complete ? "text-[#245b42]" : "text-[#899487]")}>{step}</p>
-                            {current && <p className="mt-1 text-[10px] font-semibold uppercase tracking-wide text-[#628064]">Current stage</p>}
-                          </li>
-                        );
-                      })}
-                    </ol>
-                  )}
-                </div>
-
-                <div className="mt-7">
-                  <h3 className="font-bold text-[#203329]">Items in this order</h3>
-                  <div className="mt-3 space-y-2">
-                    {(result.items || []).map((item, index) => (
-                      <div key={index} className="flex items-center justify-between gap-3 rounded-xl border border-[#edf0e9] bg-white p-3 text-sm">
-                        <span className="min-w-0 text-[#405044]">{item.product_name} <span className="text-[#899288]">· {item.pack_size}</span></span>
-                        <b className="shrink-0 text-[#315b43]">× {item.quantity}</b>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="mt-7 flex flex-col gap-3 rounded-2xl bg-[#f1f6ee] p-4 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="flex items-start gap-3">
-                    <Headset size={19} className="mt-0.5 shrink-0 text-[#245b42]" />
+              ) : (
+                <section aria-live="polite">
+                  <div className="flex flex-wrap items-start justify-between gap-3 border-b border-[#e6ece2] pb-5">
                     <div>
-                      <p className="text-sm font-bold text-[#244b34]">Need help with this order?</p>
-                      <p className="mt-1 text-xs leading-5 text-[#68766b]">Message our team with this order number and its latest status already included.</p>
+                      <p className="text-[10px] font-black uppercase tracking-[.16em] text-[#94a092]">Order reference</p>
+                      <h2 className="mt-1 text-2xl font-bold tracking-tight text-[#1e3e2b]">#{result.order_number}</h2>
+                      <p className="mt-1 text-xs text-[#899586]">Placed {formatDate(result.created_at)}</p>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <span className={"rounded-full px-3 py-1.5 text-[11px] font-bold " + (isCancelled ? "bg-red-50 text-red-700" : "bg-[#eaf3e7] text-[#2c6540]")}>
+                        {result.status || "Status unavailable"}
+                      </span>
+                      <span className="rounded-full bg-[#fff5e5] px-3 py-1.5 text-[11px] font-bold capitalize text-[#896326]">
+                        Payment: {result.payment_status || "Unknown"}
+                      </span>
                     </div>
                   </div>
-                  <a href={supportUrl} target="_blank" rel="noopener noreferrer" className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-[#16834a] px-5 py-3 text-xs font-bold text-white">
-                    <Headset size={14} /> Contact order support
-                  </a>
-                </div>
-              </section>
-            )}
 
-            <div className="mt-7 flex flex-wrap gap-4 border-t border-[#e9eee6] pt-5 text-sm">
-              <Link href="/faq" className="font-bold text-[#245b42]">Read the FAQs</Link>
-              <Link href="/contact" className="font-bold text-[#245b42]">Contact eCuisine</Link>
-              <Link href="/shop" className="inline-flex items-center gap-1 font-bold text-[#245b42]"><ClipboardList size={14} /> Continue shopping</Link>
+                  <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                    <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-[#edf0e9]">
+                      <p className="text-[10px] font-black uppercase tracking-wider text-[#98a294]">How you receive it</p>
+                      <p className="mt-1 text-sm font-bold capitalize text-[#294431]">{isDelivery ? "Home delivery" : "Pickup"}</p>
+                    </div>
+                    <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-[#edf0e9]">
+                      <p className="flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-[#98a294]"><MapPin size={12} /> {isDelivery ? "Delivery area" : "Pickup location"}</p>
+                      <p className="mt-1 text-sm font-bold text-[#294431]">{destination || "Details unavailable"}</p>
+                    </div>
+                  </div>
+
+                  <div className="mt-7">
+                    <h3 className="font-bold text-[#203b2b]">Order progress</h3>
+                    {isCancelled ? (
+                      <p className="mt-3 rounded-2xl border border-red-100 bg-red-50 p-4 text-sm leading-6 text-red-700">This order is cancelled. Contact our team on WhatsApp if you need help with next steps.</p>
+                    ) : currentIndex < 0 ? (
+                      <p className="mt-3 rounded-2xl bg-[#fff6e7] p-4 text-sm leading-6 text-[#80612c]">Your order currently shows “{result.status}”. Contact the team if you need help understanding this update.</p>
+                    ) : (
+                      <ol className="mt-4 grid gap-2 sm:grid-cols-5">
+                        {steps.map((step, index) => {
+                          const complete = index <= currentIndex;
+                          const current = index === currentIndex;
+                          return (
+                            <li key={step} className={"rounded-2xl border p-3 " + (current ? "border-[#9abb9e] bg-[#edf5ea]" : complete ? "border-[#e0eadc] bg-white" : "border-[#e9eee6] bg-white/50")}>
+                              <span className={"inline-flex h-7 w-7 items-center justify-center rounded-full " + (complete ? "bg-[#245b42] text-white" : "bg-[#eff2ed] text-[#a1aa9e]")}>
+                                {complete ? <CheckCircle2 size={16} /> : <Circle size={15} />}
+                              </span>
+                              <p className={"mt-2 text-[11px] font-bold leading-5 " + (complete ? "text-[#245b42]" : "text-[#929d91]")}>{step}</p>
+                              {current && <p className="mt-1 text-[9px] font-bold uppercase tracking-wider text-[#6f8d70]">Current stage</p>}
+                            </li>
+                          );
+                        })}
+                      </ol>
+                    )}
+                  </div>
+
+                  <div className="mt-7">
+                    <h3 className="font-bold text-[#203b2b]">Items in this order</h3>
+                    <div className="mt-3 space-y-2">
+                      {(result.items || []).map((item, index) => (
+                        <div key={index} className="flex items-center justify-between gap-3 rounded-xl bg-white px-4 py-3 text-sm ring-1 ring-[#edf0e9]">
+                          <span className="min-w-0 text-[#48584b]">{item.product_name} <span className="text-[#98a194]">· {item.pack_size}</span></span>
+                          <b className="shrink-0 text-[#315b43]">× {item.quantity}</b>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <a href={supportUrl} target="_blank" rel="noopener noreferrer" className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[#eaf4e8] px-5 py-3 text-sm font-bold text-[#245b42] transition hover:bg-[#dfeedd]">
+                    <Headset size={16} /> Get help with this order
+                  </a>
+                </section>
+              )}
             </div>
           </div>
         </section>
