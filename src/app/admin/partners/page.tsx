@@ -33,7 +33,9 @@ export default function AdminPartnersPage(){
    supabase.from("partner_profiles").select("id,partner_code,status,created_at,affiliate_applications(full_name,email)").order("created_at",{ascending:false}),
    supabase.from("partner_tasks").select("id,title,task_type,priority,status,due_at,assigned_partner_id").order("created_at",{ascending:false}).limit(100),
    supabase.from("products").select("id,name").eq("is_active",true).order("name"),
-   supabase.from("partner_task_submissions").select("id,task_id,partner_id,submission_text,proof_url,status,submitted_at,reviewer_note,partner_profiles!partner_task_submissions_partner_id_fkey(partner_code,affiliate_applications(full_name)),partner_tasks!partner_task_submissions_task_id_fkey(title)").order("submitted_at",{ascending:false}).limit(100)
+   supabase.from("partner_task_submissions").select("id,task_id,partner_id,submission_text,proof_url,status,submitted_at,reviewer_note,partner_profiles!partner_task_submissions_partner_id_fkey(partner_code,affiliate_applications(full_name)),partner_tasks!partner_task_submissions_task_id_fkey(title)").order("submitted_at",{ascending:false}).limit(100),
+   supabase.from("partner_referral_clicks").select("partner_id"),
+   supabase.from("orders").select("partner_profile_id").not("partner_profile_id","is",null)
   ]);
   if(partnerResult.error)setError(partnerResult.error.message);else {const clicks=(clickResult.data||[]) as {partner_id:string}[];const orders=(orderResult.data||[]) as {partner_profile_id:string}[];setPartners(((partnerResult.data||[]) as unknown as Partner[]).map(p=>({...p,click_count:clicks.filter(c=>c.partner_id===p.id).length,order_count:orders.filter(o=>o.partner_profile_id===p.id).length})));}
   if(taskResult.error)setError(taskResult.error.message);else setTasks((taskResult.data||[]) as Task[]);
