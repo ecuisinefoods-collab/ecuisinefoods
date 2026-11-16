@@ -32,6 +32,7 @@ const navItems: { label: string; icon: typeof LayoutDashboard; active?: boolean;
   { label: "Overview", icon: LayoutDashboard, active: true },
   { label: "Orders", icon: ClipboardList, href: "/admin/orders", roles: ["owner","store_manager","order_officer","finance_officer","analyst"] },
   { label: "Storefront editor", icon: LayoutDashboard, href: "/admin/storefront", roles: ["owner","store_manager"] },
+  { label: "Our Story editor", icon: Users, href: "/admin/story", roles: ["owner","store_manager"] },
   { label: "Products & stock", icon: Package, href: "/admin/products", roles: ["owner","store_manager"] },
   { label: "Customer reviews", icon: ClipboardList, href: "/admin/reviews", roles: ["owner","store_manager"] },
   { label: "Promotions & banners", icon: Megaphone, href: "/admin/promotions", roles: ["owner","marketing_manager"] },
