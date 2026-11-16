@@ -331,12 +331,12 @@ export default async function HomePage() {
             </div>
           </nav>
 
-          <nav className="ec-footer-group" aria-label="Partnership program">
-            <h3>Partnership program</h3>
+          <nav className="ec-footer-group" aria-label="Affiliate programme">
+            <h3>Affiliate programme</h3>
             <div className="ec-footer-links">
-              <Link href="/partnerships">Become a partner</Link>
-              <Link href="/affiliates">Affiliate program</Link>
-              <Link href="/partner">Partner login</Link>
+              <Link href="/affiliates">Become an affiliate</Link>
+              <Link href="/affiliates">Affiliate programme</Link>
+              <Link href="/affiliate">Affiliate Hub login</Link>
             </div>
           </nav>
 
