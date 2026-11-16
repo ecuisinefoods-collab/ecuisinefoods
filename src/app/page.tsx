@@ -99,6 +99,12 @@ export default async function HomePage() {
     completedProductUnits = Number(salesResult.data ?? 0);
   }
 
+  // The homepage hero tagline and calls to action use the approved brand wording.
+  config.hero_title = "Nourish your day,";
+  config.hero_highlight = "live a little better.";
+  config.hero_primary_cta = "Shop our products";
+  config.hero_secondary_cta = "Our story";
+
   const featured = products.filter(product => product.is_featured).slice(0, 8);
   const discounted = products.filter(hasDiscount).slice(0, 8);
   const latest = [...products].sort((a, b) =>
@@ -134,9 +140,9 @@ export default async function HomePage() {
             <p className="ec-hero-eyebrow inline-flex items-center gap-2 rounded-full border px-4 py-2 text-[10px] font-extrabold uppercase tracking-[.16em]">
               <Sprout size={15} /> {config.hero_eyebrow}
             </p>
-            <h1 className="ec-hero-title mt-6 text-[3.2rem] font-black leading-[.98] tracking-[-.065em] sm:text-6xl lg:text-[5rem]">
-              {config.hero_title}
-              <span className="ec-hero-highlight block">{config.hero_highlight}</span>
+            <h1 aria-label="Nourish your day, live a little better." className="ec-hero-title ec-typewriter-title mt-6 text-[3.2rem] font-black leading-[.98] tracking-[-.065em] sm:text-6xl lg:text-[5rem]">
+              <span className="ec-typewriter-line block" aria-hidden="true">{Array.from(config.hero_title).map((letter, index) => <span key={index} className="ec-typewriter-letter" style={{ animationDelay: `${0.35 + index * 0.065}s` }}>{letter === " " ? "\u00a0" : letter}</span>)}</span>
+              <span className="ec-hero-highlight ec-typewriter-line block" aria-hidden="true">{Array.from(config.hero_highlight).map((letter, index) => <span key={index} className="ec-typewriter-letter" style={{ animationDelay: `${1.65 + index * 0.065}s` }}>{letter === " " ? "\u00a0" : letter}</span>)}</span>
             </h1>
             <p className="ec-hero-description mt-5 max-w-xl text-sm leading-7 sm:text-base">
               {config.hero_description}
