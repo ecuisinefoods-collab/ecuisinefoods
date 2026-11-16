@@ -96,12 +96,12 @@ export default function AffiliateApplicationsPage() {
         <Link href="/admin" className="inline-flex items-center gap-2 text-sm font-semibold text-[#42694b]"><ArrowLeft size={16}/> Admin dashboard</Link>
         <div className="mt-6 flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[.2em] text-[#9b7835]">Partner growth</p>
+            <p className="text-[10px] font-black uppercase tracking-[.2em] text-[#9b7835]">Affiliate programme</p>
             <h1 className="mt-2 text-3xl font-black tracking-tight text-[#1e352b] sm:text-4xl">Affiliate applications</h1>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-[#758276]">Review people who have applied to promote eCuisine and update their application status.</p>
           </div>
           <div className="flex flex-wrap gap-2">
-            <Link href="/admin/partners" className="inline-flex items-center gap-2 rounded-xl bg-[#0b6849] px-4 py-3 text-xs font-bold text-white">Partner operations <Users size={14}/></Link><Link href="/affiliates" target="_blank" className="inline-flex items-center gap-2 rounded-xl border border-[#d9e0db] bg-white px-4 py-3 text-xs font-bold text-[#344c3c]">Open public page <ExternalLink size={14}/></Link>
+            <Link href="/admin/partners" className="inline-flex items-center gap-2 rounded-xl bg-[#0b6849] px-4 py-3 text-xs font-bold text-white">Affiliate management <Users size={14}/></Link><Link href="/affiliates" target="_blank" className="inline-flex items-center gap-2 rounded-xl border border-[#d9e0db] bg-white px-4 py-3 text-xs font-bold text-[#344c3c]">Open public page <ExternalLink size={14}/></Link>
             <button type="button" onClick={()=>{setLoading(true);void load();}} className="inline-flex items-center gap-2 rounded-xl border border-[#d9e0db] bg-white px-4 py-3 text-xs font-bold text-[#344c3c]"><RefreshCw size={14}/> Refresh</button>
           </div>
         </div>
