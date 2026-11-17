@@ -103,6 +103,42 @@ export default async function ShopPage({searchParams}:{searchParams:Promise<{cat
               <path d="M326 188h15" stroke="#f8e7a8" strokeWidth="4" strokeLinecap="round" opacity=".9"/>
             </svg>
             <div className={styles.cartNote}><span className={styles.cartNoteDot}/><span>GOOD FOOD, BETTER LIVING</span></div>
+
+            <svg className={styles.shopMascot} viewBox="0 0 230 300" role="img" aria-labelledby="shop-mascot-title shop-mascot-desc" xmlns="http://www.w3.org/2000/svg">
+              <title id="shop-mascot-title">eCuisine welcome mascot</title>
+              <desc id="shop-mascot-desc">A cheerful three-dimensional green food mascot holding a Welcome to Shop sign.</desc>
+              <defs>
+                <linearGradient id="mascotBody" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#b9e98b"/><stop offset=".48" stopColor="#69bd70"/><stop offset="1" stopColor="#218453"/></linearGradient>
+                <linearGradient id="mascotSide" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#8bd77c"/><stop offset="1" stopColor="#287b4d"/></linearGradient>
+                <linearGradient id="mascotBoard" x1="0" y1="0" x2="0" y2="1"><stop stopColor="#fffdf2"/><stop offset="1" stopColor="#f3e6bd"/></linearGradient>
+                <linearGradient id="mascotHat" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#fff"/><stop offset="1" stopColor="#dfe9dd"/></linearGradient>
+                <filter id="mascotShadow" x="-30%" y="-30%" width="160%" height="170%"><feGaussianBlur stdDeviation="5"/></filter>
+              </defs>
+              <ellipse cx="113" cy="281" rx="69" ry="10" fill="#234b32" opacity=".15" filter="url(#mascotShadow)"/>
+              <g className={styles.mascotFloat}>
+                <path d="M80 208q-27 13-31 39-2 12 9 15 12 3 17-10l17-27M151 208q27 13 31 39 2 12-9 15-12 3-17-10l-17-27" fill="none" stroke="#2d8d57" strokeWidth="17" strokeLinecap="round"/>
+                <path d="M86 242l-8 28q-3 11 8 13l18 2q12 1 13-11l1-27M132 245l5 27q2 12 14 10l17-4q11-3 7-14l-10-26" fill="#246f49"/>
+                <path d="M60 135q0-59 54-70 57 11 58 70l-5 76q-3 42-52 45-49-3-52-45z" fill="url(#mascotBody)" stroke="#287d4c" strokeWidth="3"/>
+                <path d="M119 69q34 8 43 43l-2 90q-4 43-43 52 20-32 17-94 2-57-15-91" fill="#287e4e" opacity=".25"/>
+                <ellipse cx="91" cy="150" rx="7" ry="10" fill="#173d2b"/><ellipse cx="137" cy="150" rx="7" ry="10" fill="#173d2b"/>
+                <circle cx="93" cy="146" r="2.5" fill="#fff"/><circle cx="139" cy="146" r="2.5" fill="#fff"/>
+                <path d="M102 170q12 14 25 0" fill="none" stroke="#174b31" strokeWidth="4" strokeLinecap="round"/>
+                <ellipse cx="78" cy="169" rx="10" ry="6" fill="#f58b78" opacity=".65"/><ellipse cx="151" cy="169" rx="10" ry="6" fill="#f58b78" opacity=".65"/>
+                <path d="M113 73q-7-18 4-31 16 9 13 27" fill="#318b4d"/><path d="M117 48q-1-17 15-22 6 17-10 27" fill="#77bd51"/>
+                <path d="M87 82q-3-24 22-30 18 3 22 21-21-7-44 9" fill="url(#mascotHat)" stroke="#d4dfd2" strokeWidth="2"/>
+                <path d="M81 78q30-11 62 1l-2 12q-31-9-59 1z" fill="#fff" stroke="#d4dfd2" strokeWidth="2"/>
+                <g className={styles.mascotSign}>
+                  <path d="M44 178q-10-12-19-4-8 8 3 18l18 17M185 178q10-12 19-4 8 8-3 18l-18 17" fill="none" stroke="#2d8d57" strokeWidth="13" strokeLinecap="round"/>
+                  <rect x="24" y="177" width="183" height="73" rx="14" fill="#9a6b2e" opacity=".25" transform="translate(0 5)"/>
+                  <rect x="21" y="171" width="183" height="73" rx="14" fill="url(#mascotBoard)" stroke="#d6b65f" strokeWidth="4"/>
+                  <path d="M34 182h157" stroke="#fff" strokeWidth="3" opacity=".9" strokeLinecap="round"/>
+                  <text x="112" y="201" fill="#d18d19" fontSize="10" fontWeight="900" letterSpacing="1.3" textAnchor="middle">HEY THERE!</text>
+                  <text x="112" y="222" fill="#07543f" fontSize="17" fontWeight="1000" textAnchor="middle">WELCOME TO</text>
+                  <text x="112" y="238" fill="#e28b2e" fontSize="17" fontWeight="1000" textAnchor="middle">SHOP!</text>
+                </g>
+                <path d="M69 115q7-18 22-21" fill="none" stroke="#fff" strokeWidth="6" opacity=".3" strokeLinecap="round"/>
+              </g>
+            </svg>
           </div>
         </div>
       </div>
