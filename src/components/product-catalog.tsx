@@ -19,7 +19,7 @@ export function ProductCatalog({ products, initialCategory = "All products", ini
   const [availability,setAvailability]=useState<"all"|"in-stock"|"on-sale">("all");
   const [search,setSearch]=useState(initialSearch);
   const [sort,setSort]=useState("featured");
-  const [notice,setNotice]=useState("");
+  const [notice,setNotice]=useState("");\n  const [askCheckout,setAskCheckout]=useState(false);
   const [buyingProduct,setBuyingProduct]=useState<Product|null>(null);
   const [selectedVariantId,setSelectedVariantId]=useState("");
   const [buyQuantity,setBuyQuantity]=useState(1);
