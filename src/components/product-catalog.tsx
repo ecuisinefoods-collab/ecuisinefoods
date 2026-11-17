@@ -83,7 +83,7 @@ export function ProductCatalog({ products, initialCategory = "All products", ini
   const selectedAlreadyInCart=selectedVariant?cart.find(item=>item.variant_id===selectedVariant.id)?.qty??0:0;
   const remainingSelectedStock=selectedVariant?Math.max(0,selectedVariant.stock_quantity-selectedAlreadyInCart):0;
 
-  return <div className="ec-catalogue">
+  return <><div className="ec-catalogue">
     <div className="ec-catalogue-toolbar rounded-3xl border bg-white p-3 shadow-sm sm:p-4">
       <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_auto_auto]">
         <label className="ec-catalogue-search flex min-w-0 items-center gap-3 rounded-2xl border px-4 py-3.5">
@@ -203,6 +203,7 @@ export function ProductCatalog({ products, initialCategory = "All products", ini
         <button type="button" onClick={()=>setBuyingProduct(null)} className="mt-3 w-full rounded-xl px-4 py-3 text-xs font-bold text-[#6e7c70] hover:bg-[#f3f6f1]">Continue shopping</button>
       </section>
     </div>}
+  </>;
 }
 
 export function CartPage(){
