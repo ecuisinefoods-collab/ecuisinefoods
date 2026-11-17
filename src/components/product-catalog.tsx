@@ -105,7 +105,10 @@ export function ProductCatalog({ products, initialCategory = "All products", ini
           const variants=product.product_variants??[];
           const available=variants.some(variant=>variant.stock_quantity>0);
           const discount=saleLabel(product);
-          const startingPrice=variants.length?Math.min(...variants.map(getEffectivePrice)):null;
+          const prices=variants.map(getEffectivePrice).filter(price=>Number.isFinite(price)&&price>0);
+          const startingPrice=prices.length?Math.min(...prices):null;
+          const highestPrice=prices.length?Math.max(...prices):null;
+          const packSizes=Array.from(new Set(variants.map(variant=>variant.pack_size).filter(Boolean)));
           return <article key={product.id} className="ec-product-card group overflow-hidden rounded-[1.45rem] border bg-white transition duration-300">
             <Link href={"/products/"+product.slug} className="ec-product-card-image relative flex aspect-[4/3] items-center justify-center overflow-hidden p-5">
               {product.image_url
@@ -126,8 +129,12 @@ export function ProductCatalog({ products, initialCategory = "All products", ini
               <h3 className="mt-2 text-base font-extrabold leading-snug text-[#203329]">{product.name}</h3>
               <p className="mt-2 line-clamp-2 min-h-10 text-xs leading-5 text-[#778176]">{product.short_description||product.description||"View product information and the pack sizes currently listed."}</p>
               <div className="mt-4 flex items-end justify-between gap-3 border-t border-[#eef1e9] pt-3">
-                <div><p className="text-[9px] font-bold uppercase tracking-wider text-[#9aa397]">{startingPrice!==null?"From":"Price"}</p><p className="mt-1 text-lg font-black text-[#087f5b]">{startingPrice!==null?money(startingPrice):"To be announced"}</p></div>
-                <Link href={"/products/"+product.slug} className="inline-flex items-center gap-1 text-[11px] font-extrabold text-[#245b42]">Product details <ArrowRight size={13}/></Link>
+                <div className="min-w-0">
+                  <p className="text-[9px] font-bold uppercase tracking-wider text-[#788579]">{startingPrice!==null?(startingPrice===highestPrice?"Price":"Price range"):"Price"}</p>
+                  <p className="mt-1 whitespace-nowrap font-sans text-[19px] font-semibold leading-tight tracking-normal tabular-nums text-[#087f5b]">{startingPrice!==null?(startingPrice===highestPrice?money(startingPrice):money(startingPrice)+" – "+money(highestPrice!)):"To be announced"}</p>
+                  {packSizes.length>0&&<p className="mt-1.5 text-[11px] font-medium text-[#667568]">Available sizes: <span className="font-semibold text-[#344b3a]">{packSizes.join(" · ")}</span></p>}
+                </div>
+                <Link href={"/products/"+product.slug} className="inline-flex shrink-0 items-center gap-1 text-[11px] font-extrabold text-[#245b42]">Product details <ArrowRight size={13}/></Link>
               </div>
               {variants.length ? <div className="mt-4 space-y-2">
                 {variants.map(variant=><div key={variant.id} className="ec-pack-row flex items-center justify-between gap-3 rounded-xl px-3 py-2.5">
