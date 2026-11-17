@@ -19,7 +19,8 @@ export function ProductCatalog({ products, initialCategory = "All products", ini
   const [availability,setAvailability]=useState<"all"|"in-stock"|"on-sale">("all");
   const [search,setSearch]=useState(initialSearch);
   const [sort,setSort]=useState("featured");
-  const [notice,setNotice]=useState("");\n  const [askCheckout,setAskCheckout]=useState(false);
+  const [notice,setNotice]=useState("");
+  const [askCheckout,setAskCheckout]=useState(false);
   const [buyingProduct,setBuyingProduct]=useState<Product|null>(null);
   const [selectedVariantId,setSelectedVariantId]=useState("");
   const [buyQuantity,setBuyQuantity]=useState(1);
@@ -47,7 +48,7 @@ export function ProductCatalog({ products, initialCategory = "All products", ini
       : [...cart,{variant_id:variant.id,product_id:product.id,name:product.name,pack_size:variant.pack_size,price:getEffectivePrice(variant),original_price:Number(variant.price),qty:quantityToAdd,stock_quantity:variant.stock_quantity,image_url:product.image_url}]
     );
     setNotice(product.name+" · "+variant.pack_size+" × "+quantityToAdd+" added to your cart");
-    window.setTimeout(()=>setNotice(""),3200);
+    setAskCheckout(true);
   }
   function openBuyOptions(product:Product) {
     const variants=product.product_variants??[];
@@ -182,7 +183,9 @@ export function ProductCatalog({ products, initialCategory = "All products", ini
           <div><p className="text-[9px] font-black uppercase tracking-[.18em] text-[#a17c20]">eCuisine · Your selection</p><h2 id="ec-buy-options-title" className="mt-1 text-xl font-black text-[#173e2d]">{buyingProduct.name}</h2><p className="mt-1 text-xs text-[#778477]">Choose the pack size and quantity you need.</p></div>
           <button type="button" onClick={()=>setBuyingProduct(null)} aria-label="Close product options" className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-[#dfe8dc] bg-white text-[#4c6651]"><span aria-hidden="true" className="text-xl leading-none">×</span></button>
         </div>
-        {buyingProduct.product_variants?.length?<>
+        {buyingProduct.product_variants?.length?<> 
+          <div className="mt-5 flex items-center gap-4 rounded-2xl border border-[#e7ecdf] bg-white p-3">{buyingProduct.image_url?<img src={buyingProduct.image_url} alt={buyingProduct.name} className="h-24 w-24 rounded-xl bg-[#f4f7ef] object-contain p-2"/>:<div className="grid h-24 w-24 place-items-center rounded-xl bg-[#f4f7ef] text-[#8a9b86]"><ShoppingBag size={26}/></div>}<div><p className="font-extrabold text-[#203b2a]">{buyingProduct.name}</p><p className="mt-1 text-xs text-[#71816f]">Selected product</p></div></div>
+
           <label className="mt-6 block text-xs font-bold text-[#405443]">Pack size
             <select value={selectedVariantId} onChange={event=>{setSelectedVariantId(event.target.value);setBuyQuantity(1);}} className="mt-2 w-full rounded-xl border border-[#dfe7dc] bg-white px-4 py-3 text-sm font-semibold text-[#25392b] outline-none focus:border-[#4c805b]">
               {buyingProduct.product_variants.map(variant=><option key={variant.id} value={variant.id} disabled={variant.stock_quantity<=0}>{variant.pack_size} · {money(getEffectivePrice(variant))}{variant.stock_quantity>0?" · "+variant.stock_quantity+" available":" · Out of stock"}</option>)}
@@ -202,6 +205,7 @@ export function ProductCatalog({ products, initialCategory = "All products", ini
         <button type="button" onClick={()=>setBuyingProduct(null)} className="mt-3 w-full rounded-xl px-4 py-3 text-xs font-bold text-[#6e7c70] hover:bg-[#f3f6f1]">Continue shopping</button>
       </section>
     </div>}
+    {askCheckout&&<div className="fixed inset-0 z-[120] flex items-center justify-center bg-[#10251a]/65 p-4 backdrop-blur-sm"><section role="dialog" aria-modal="true" aria-labelledby="ec-added-title" className="w-full max-w-sm rounded-[1.6rem] bg-[#fffefa] p-6 text-center shadow-2xl"><span className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-[#eaf5e7] text-[#287548]"><Check size={23}/></span><h2 id="ec-added-title" className="mt-4 text-xl font-black text-[#173e2d]">Added to your cart!</h2><p className="mt-2 text-sm leading-6 text-[#71816f]">Would you like to check out now?</p><div className="mt-5 grid grid-cols-2 gap-3"><button type="button" onClick={()=>{setAskCheckout(false);setNotice("");}} className="rounded-xl border border-[#dce5d8] px-4 py-3 text-sm font-bold text-[#45634d]">No, keep shopping</button><button type="button" onClick={()=>{setAskCheckout(false);window.location.assign("/checkout");}} className="rounded-xl bg-[#087f5b] px-4 py-3 text-sm font-black text-white">Yes, check out</button></div></section></div>}
   </>;
 }
 
