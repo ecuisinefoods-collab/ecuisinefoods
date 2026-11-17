@@ -2,7 +2,6 @@
 
 import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
-import { supabase } from "@/lib/supabase";
 
 const VISITOR_KEY = "ecuisine_analytics_visitor_v1";
 
@@ -23,28 +22,49 @@ export function SiteVisitTracker() {
   const lastRecordedPath = useRef<string | null>(null);
 
   useEffect(() => {
-    if (!supabase || !pathname || pathname === lastRecordedPath.current) return;
-    if (pathname === "/admin" || pathname.startsWith("/admin/") || pathname.startsWith("/api/")) return;
-    if (pathname.startsWith("/_next/")) return;
+    if (!pathname || pathname === lastRecordedPath.current) return;
+    if (pathname.startsWith("/api/") || pathname.startsWith("/_next/")) return;
+    // Keep internal admin activity out of the public storefront audience figures.
+    if (pathname === "/admin" || pathname.startsWith("/admin/")) return;
 
-    lastRecordedPath.current = pathname;
+    let cancelled = false;
     const visitorId = getVisitorId();
     let referrerHost: string | null = null;
     try {
       const referrer = document.referrer ? new URL(document.referrer) : null;
-      if (referrer && referrer.origin !== window.location.origin) referrerHost = referrer.hostname.slice(0, 180);
+      if (referrer && referrer.origin !== window.location.origin) {
+        referrerHost = referrer.hostname.slice(0, 180);
+      }
     } catch {
       referrerHost = null;
     }
     const params = new URLSearchParams(window.location.search);
     const campaignSource = (params.get("utm_source") || "").trim().slice(0, 100) || null;
 
-    void supabase.from("site_visit_events").insert({
-      visitor_id: visitorId,
-      page_path: pathname.slice(0, 240),
-      referrer_host: referrerHost,
-      campaign_source: campaignSource,
+    // Use the same-origin endpoint so the browser can report failures and the
+    // server can reliably persist events even when client auth state is changing.
+    void fetch("/api/analytics/visit", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        visitorId,
+        pagePath: pathname.slice(0, 240),
+        referrerHost,
+        campaignSource,
+      }),
+      keepalive: true,
+      credentials: "same-origin",
+    }).then(async (response) => {
+      if (!response.ok) {
+        const result = await response.json().catch(() => null);
+        throw new Error(result?.error || `Visit tracking failed (${response.status})`);
+      }
+      if (!cancelled) lastRecordedPath.current = pathname;
+    }).catch((error) => {
+      console.warn("[eCuisine analytics] Could not record this visit:", error);
     });
+
+    return () => { cancelled = true; };
   }, [pathname]);
 
   return null;
