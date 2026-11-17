@@ -1892,9 +1892,7 @@ input[type="submit"]:active:not(:disabled) {
   .ec-secondary-cta,
   .site-header a[href="/cart"],
   .site-header a[href="/account"],
-  .site-header button[type="submit"],
-  button[type="submit"],
-  input[type="submit"] {
+  .site-header button[type="submit"] {
     transition: none !important;
   }
 }
@@ -1906,6 +1904,7 @@ input[type="submit"]:active:not(:disabled) {
 .ec-catalogue-cart,
 .ec-shop-buy-button,
 .ec-shop-buy-confirm,
+.ec-buy-now,
 .site-header a[href="/cart"],
 .site-header button[type="submit"] {
   position: relative;
