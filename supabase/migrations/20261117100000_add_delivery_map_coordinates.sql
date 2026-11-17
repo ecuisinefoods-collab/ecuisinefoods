@@ -7,13 +7,15 @@ alter table public.orders
   check (
     (delivery_latitude is null and delivery_longitude is null)
     or (
-      delivery_latitude between -90 and 90
+      delivery_latitude is not null
+      and delivery_longitude is not null
+      and delivery_latitude between -90 and 90
       and delivery_longitude between -180 and 180
     )
   );
 
--- Extend the existing transactional order RPC without changing its stock,
--- coupon, payment-verification, or delivery-fee calculation logic.
+-- Extend the existing transactional order RPC while preserving stock,
+-- coupon, payment verification, and server-side delivery-fee calculation.
 do $migration$
 declare
   v_definition text;
@@ -28,42 +30,8 @@ begin
 
   v_definition := replace(
     v_definition,
-    'v_zone_id:=nullif(p_order->>''delivery_zone_id'','''')::uuid;',
-    'v_zone_id:=nullif(p_order->>''delivery_zone_id'','''')::uuid;'
-  );
-
-  v_definition := replace(
-    v_definition,
-    'v_landmark:=nullif(btrim(coalesce(p_order->>''house_number_landmark'','''')) ,'''');',
-    'v_landmark:=nullif(btrim(coalesce(p_order->>''house_number_landmark'','''')) ,'''');'
-  );
-
-  -- Insert coordinate parsing immediately after the existing landmark parsing.
-  v_definition := replace(
-    v_definition,
-    'v_landmark:=nullif(btrim(coalesce(p_order->>''house_number_landmark'','''')) ,'''');',
-    'v_landmark:=nullif(btrim(coalesce(p_order->>''house_number_landmark'','''')) ,'''');'
-  );
-
-  -- The current function uses this exact compact expression for landmark parsing.
-  v_definition := replace(
-    v_definition,
-    'v_landmark:=nullif(btrim(coalesce(p_order->>''house_number_landmark'','''')) ,'''');',
-    'v_landmark:=nullif(btrim(coalesce(p_order->>''house_number_landmark'','''')) ,'''');'
-  );
-
-  -- Use the actual expression as emitted by pg_get_functiondef.
-  v_definition := replace(
-    v_definition,
-    'v_landmark:=nullif(btrim(coalesce(p_order->>''house_number_landmark'','''')) ,'''');',
-    'v_landmark:=nullif(btrim(coalesce(p_order->>''house_number_landmark'','''')) ,'''');'
-  );
-
-  -- This insertion point is the full, existing delivery-address assignment.
-  v_definition := replace(
-    v_definition,
-    'v_landmark:=nullif(btrim(coalesce(p_order->>''house_number_landmark'','''')) ,'''');',
-    'v_landmark:=nullif(btrim(coalesce(p_order->>''house_number_landmark'','''')) ,'''');'
+    'v_zone_id:=nullif(p_order->>''delivery_zone_id'','''')::uuid; v_street:=',
+    'v_zone_id:=nullif(p_order->>''delivery_zone_id'','''')::uuid; v_lat:=nullif(p_order->>''delivery_latitude'','''')::numeric; v_lng:=nullif(p_order->>''delivery_longitude'','''')::numeric; if v_lat is null or v_lng is null or v_lat not between -90 and 90 or v_lng not between -180 and 180 then raise exception ''Choose your delivery location on the map.''; end if; v_street:='
   );
 
   v_definition := replace(
@@ -79,20 +47,10 @@ begin
   );
 
   if position('v_lat numeric' in v_definition) = 0
+     or position('Choose your delivery location on the map.' in v_definition) = 0
      or position('delivery_latitude,delivery_longitude' in v_definition) = 0
      or position('v_lat,v_lng,v_street' in v_definition) = 0 then
     raise exception 'Could not safely extend create_order_request; no function changes were applied.';
-  end if;
-
-  -- Add parsing and range checks before the delivery zone lookup.
-  v_definition := replace(
-    v_definition,
-    'v_zone_id:=nullif(p_order->>''delivery_zone_id'','''')::uuid; v_street:=',
-    'v_zone_id:=nullif(p_order->>''delivery_zone_id'','''')::uuid; v_lat:=nullif(p_order->>''delivery_latitude'','''')::numeric; v_lng:=nullif(p_order->>''delivery_longitude'','''')::numeric; if v_lat is null or v_lng is null or v_lat not between -90 and 90 or v_lng not between -180 and 180 then raise exception ''Choose your delivery location on the map.''; end if; v_street:='
-  );
-
-  if position('Choose your delivery location on the map.' in v_definition) = 0 then
-    raise exception 'Could not add delivery coordinate validation to create_order_request.';
   end if;
 
   execute v_definition;
