@@ -1806,11 +1806,11 @@ button:not(:disabled),input[type="button"],input[type="submit"],a[class*="rounde
   position:relative;
   isolation:isolate;
   overflow:hidden;
-  background-image:linear-gradient(180deg,rgba(255,255,255,.34) 0%,rgba(255,255,255,.12) 32%,rgba(255,255,255,0) 62%,rgba(8,36,22,.075) 100%);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.64),inset 0 -1px 0 rgba(10,44,27,.08),0 5px 14px rgba(30,68,41,.075);
   transition:transform .24s cubic-bezier(.2,.75,.25,1),box-shadow .24s ease,filter .24s ease;
   -webkit-tap-highlight-color:transparent;
 }
+button:not(:disabled)::before,input[type="button"]::before,input[type="submit"]::before,a[class*="rounded-"][class*="px-"]::before{content:"";position:absolute;inset:1px;border-radius:inherit;pointer-events:none;z-index:0;background:linear-gradient(180deg,rgba(255,255,255,.34) 0%,rgba(255,255,255,.12) 32%,rgba(255,255,255,0) 62%,rgba(8,36,22,.075) 100%)}
 button:not(:disabled)::after,input[type="button"]::after,input[type="submit"]::after,a[class*="rounded-"][class*="px-"]::after{
   content:"";position:absolute;inset:1px;border-radius:inherit;pointer-events:none;z-index:0;
   background:linear-gradient(112deg,transparent 8%,rgba(255,255,255,.04) 32%,rgba(255,255,255,.36) 48%,rgba(255,255,255,.07) 62%,transparent 86%);
