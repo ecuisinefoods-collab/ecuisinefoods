@@ -299,7 +299,7 @@ export default async function HomePage() {
       <footer className="ec-store-footer">
         <div className="ec-store-footer__main mx-auto grid max-w-7xl gap-10 px-5 py-12 sm:grid-cols-2 lg:grid-cols-[1.2fr_1fr_1fr_1fr_1.1fr] lg:gap-9 lg:py-14">
           <div className="ec-footer-brand">
-            <Link href="/" className="ec-footer-brand__lockup inline-flex min-h-20 items-center rounded-2xl bg-white px-4 py-3 shadow-xl ring-1 ring-white/30" aria-label="eCuisine home">
+            <Link href="/" className="ec-footer-brand__lockup inline-flex min-h-20 items-center bg-transparent p-0 shadow-none ring-0" aria-label="eCuisine home">
               {storeLogoUrl
                 ? <img src={storeLogoUrl} alt="eCuisinefoods — Good food, better living" className="ec-footer-brand__logo h-16 w-auto max-w-[280px] object-contain" />
                 : <span className="grid h-12 w-12 place-items-center rounded-full border-2 border-[#e2bb50] bg-[#087f5b] text-2xl font-black italic text-[#fff0a8] shadow-md" aria-hidden="true">e</span>}

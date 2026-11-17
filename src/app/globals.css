@@ -1764,3 +1764,9 @@ html[data-theme="dark"] .ec-category-word--coming{background:linear-gradient(135
   .ec-product-image-stage { aspect-ratio: 1 / 1; min-height: 330px; }
   .ec-purchase-actions { grid-template-columns: 1fr 1fr; }
 }
+
+
+/* Footer brand mark: show the original transparent PNG directly, without a backing panel or decorative effects. */
+.ec-store-footer .ec-footer-brand__lockup{background:transparent!important;border:0!important;border-radius:0!important;padding:0!important;box-shadow:none!important;outline:0!important;}
+.ec-store-footer .ec-footer-brand__logo{display:block;max-height:76px;max-width:300px;object-fit:contain;object-position:left center;filter:none!important;mix-blend-mode:normal!important;opacity:1!important;transform:none!important;}
+.ec-store-footer .ec-footer-brand__lockup:hover .ec-footer-brand__logo{filter:none!important;transform:none!important;}
