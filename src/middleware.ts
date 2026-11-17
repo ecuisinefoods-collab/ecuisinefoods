@@ -1,4 +1,5 @@
-import { NextFetchEvent, NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import type { NextFetchEvent } from "next/server";
 
 const VISITOR_COOKIE = "ecuisine_analytics_visitor_v2";
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -80,8 +81,9 @@ export function middleware(request: NextRequest, event: NextFetchEvent) {
   const campaignSource =
     request.nextUrl.searchParams.get("utm_source")?.trim().slice(0, 100) || null;
 
+  const baseUrl = supabaseUrl.endsWith("/") ? supabaseUrl.slice(0, -1) : supabaseUrl;
   const insert = fetch(
-    `${supabaseUrl.replace(/\\/$/, "")}/rest/v1/site_visit_events`,
+    `${baseUrl}/rest/v1/site_visit_events`,
     {
       method: "POST",
       headers: {
