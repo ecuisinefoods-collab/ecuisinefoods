@@ -85,7 +85,7 @@ export default function ProductsAdminPage() {
   const saveCategory = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!supabase || !authorized) return;
-    const name = newCategoryName.trim().replace(/\\s+/g, " ");
+    const name = newCategoryName.trim().replace(/\s+/g, " ");
     if (!name) return;
     if (categories.some(category => category.name.toLowerCase() === name.toLowerCase())) {
       setError("That category already exists. Choose it from the category list.");
