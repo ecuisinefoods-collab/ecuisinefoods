@@ -15,6 +15,9 @@ export default function DeliveryAdminPage(){
  const reset=()=>{setForm(blank);setEditing(null);setBoundary([]);};
  async function save(e:FormEvent){e.preventDefault();if(!supabase)return;setSaving(true);setError("");setMessage("");const payload={state:form.state,city:form.city.trim(),area_name:form.area_name.trim(),delivery_fee:Number(form.delivery_fee),minimum_order_amount:Number(form.minimum_order_amount||0),estimated_days:form.estimated_days.trim()||null,instructions:form.instructions.trim()||null,is_active:form.is_active,updated_at:new Date().toISOString()};if(!payload.city||!payload.area_name||!Number.isFinite(payload.delivery_fee)||payload.delivery_fee<0){setError("Enter a city/area and a valid non-negative delivery fee.");setSaving(false);return;}
  if(boundary.length<3){setError("Draw the coverage boundary on the map using at least three points before saving this delivery area.");setSaving(false);return;}
+ const uniquePoints=new Set(boundary.map(([lng,lat])=>lng.toFixed(6)+","+lat.toFixed(6)));
+ const polygonArea=boundary.reduce((sum,point,index)=>{const next=boundary[(index+1)%boundary.length];return sum+point[0]*next[1]-next[0]*point[1];},0);
+ if(uniquePoints.size<3||Math.abs(polygonArea)<1e-10){setError("The boundary needs at least three distinct points that form an area. Please adjust the map outline.");setSaving(false);return;}
  const ring: number[][]=[...boundary.map(point=>[point[0],point[1]])];
  const first=ring[0];const last=ring[ring.length-1];
  if(first[0]!==last[0]||first[1]!==last[1])ring.push(first);
