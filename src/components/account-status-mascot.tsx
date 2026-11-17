@@ -24,7 +24,7 @@ export default function AccountStatusMascot({ status, compact = false }: { statu
         <div className={`mascot-glow absolute inset-[11%] rounded-full bg-gradient-to-br from-[#e3f8d3] via-[#f4fae9] to-white ring-1 ${item.ring}`} />
         <div className="mascot-shadow absolute bottom-[7%] left-[24%] h-[7%] w-[52%] rounded-[50%] bg-[#275b31]/20 blur-md" />
         <img
-          src="/eCuisine-3d-mascot.webp"
+          src="/affiliate-sad-mascot.svg"
           alt={`eCuisine 3D mascot representing an ${item.title.toLowerCase()} account`}
           draggable={false}
           className="mascot-character relative z-10 h-full w-full select-none object-contain"
