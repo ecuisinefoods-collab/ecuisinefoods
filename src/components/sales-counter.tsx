@@ -3,8 +3,6 @@
 import { useEffect, useState } from "react";
 
 const LIFETIME_SALES_MILESTONE = 2500;
-const AFFILIATE_MILESTONE = 30;
-const CUSTOMER_MILESTONE = 550;
 const JOURNEY_NOTES = [
   "Good food. Better everyday choices.",
   "Every order helps shape our next chapter.",
@@ -13,31 +11,16 @@ const JOURNEY_NOTES = [
   "Growing through every customer story."
 ];
 
-type MilestoneCounts = {
-  affiliates: number;
-  products: number;
-  customers: number;
-};
-
 export function SalesCounter({ total }: { total: number }) {
-  const [counts, setCounts] = useState<MilestoneCounts>({
-    affiliates: 0,
-    products: 0,
-    customers: 0
-  });
+  const [count, setCount] = useState(0);
   const [activeNote, setActiveNote] = useState(0);
   const websiteSales = Math.max(0, Math.floor(Number.isFinite(total) ? total : 0));
-  const targets: MilestoneCounts = {
-    affiliates: AFFILIATE_MILESTONE,
-    products: Math.max(LIFETIME_SALES_MILESTONE, websiteSales),
-    customers: CUSTOMER_MILESTONE
-  };
-  const format = (value: number) => new Intl.NumberFormat("en-NG").format(value);
+  const allTimeSales = Math.max(LIFETIME_SALES_MILESTONE, websiteSales);
+  const display = new Intl.NumberFormat("en-NG").format(count);
 
   useEffect(() => {
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reducedMotion) {
-      setCounts(targets);
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setCount(allTimeSales);
       return;
     }
 
@@ -48,17 +31,13 @@ export function SalesCounter({ total }: { total: number }) {
       if (!start) start = now;
       const progress = Math.min(1, (now - start) / duration);
       const eased = 1 - Math.pow(1 - progress, 4);
-      setCounts({
-        affiliates: Math.round(targets.affiliates * eased),
-        products: Math.round(targets.products * eased),
-        customers: Math.round(targets.customers * eased)
-      });
+      setCount(Math.round(allTimeSales * eased));
       if (progress < 1) frame = window.requestAnimationFrame(animate);
     };
 
     frame = window.requestAnimationFrame(animate);
     return () => window.cancelAnimationFrame(frame);
-  }, [targets.affiliates, targets.products, targets.customers]);
+  }, [allTimeSales]);
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -69,7 +48,7 @@ export function SalesCounter({ total }: { total: number }) {
   }, []);
 
   return (
-    <section className="ec-journey-quiet" aria-label="eCuisine community milestones">
+    <section className="ec-journey-quiet" aria-label="eCuisine products sold milestone">
       <div className="ec-journey-quiet__story">
         <span className="ec-journey-quiet__eyebrow">The eCuisine journey</span>
         <span className="ec-journey-quiet__title">Every order is part of our story.</span>
@@ -78,18 +57,10 @@ export function SalesCounter({ total }: { total: number }) {
         </span>
       </div>
 
-      <div className="ec-journey-quiet__stats" role="group" aria-label="eCuisine milestones">
-        <div className="ec-journey-quiet__stat" aria-label={`${format(counts.affiliates)} plus affiliates`}>
-          <span className="ec-journey-quiet__number">{format(counts.affiliates)}<span className="ec-journey-quiet__plus">+</span></span>
-          <span className="ec-journey-quiet__sold-label">AFFILIATES</span>
-        </div>
-        <div className="ec-journey-quiet__stat" aria-label={`${format(counts.products)} plus products sold`}>
-          <span className="ec-journey-quiet__number">{format(counts.products)}<span className="ec-journey-quiet__plus">+</span></span>
+      <div className="ec-journey-quiet__stats" role="group" aria-label="Products sold">
+        <div className="ec-journey-quiet__stat" aria-label={`${display} plus products sold`}>
+          <span className="ec-journey-quiet__number">{display}<span className="ec-journey-quiet__plus">+</span></span>
           <span className="ec-journey-quiet__sold-label">PRODUCTS SOLD</span>
-        </div>
-        <div className="ec-journey-quiet__stat" aria-label={`${format(counts.customers)} plus customers`}>
-          <span className="ec-journey-quiet__number">{format(counts.customers)}<span className="ec-journey-quiet__plus">+</span></span>
-          <span className="ec-journey-quiet__sold-label">CUSTOMERS</span>
         </div>
       </div>
     </section>
