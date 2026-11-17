@@ -1,5 +1,3 @@
-"use server";
-
 import { CheckoutForm } from "@/components/checkout-form";
 import { SiteHeader } from "@/components/site-header";
 import { supabase } from "@/lib/supabase";
