@@ -11,6 +11,9 @@ export function AffiliateApplicationForm() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [bankName, setBankName] = useState("");
+  const [bankAccountName, setBankAccountName] = useState("");
+  const [bankAccountNumber, setBankAccountNumber] = useState("");
   const [socialHandle, setSocialHandle] = useState("");
   const [primaryPlatform, setPrimaryPlatform] = useState(platforms[0]);
   const [audienceSize, setAudienceSize] = useState(audienceOptions[0]);
@@ -28,6 +31,8 @@ export function AffiliateApplicationForm() {
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
+    const bankFields = [bankName.trim(), bankAccountName.trim(), bankAccountNumber.trim()];
+    if (bankFields.some(Boolean) && (!bankFields.every(Boolean) || !/^[0-9]{10}$/.test(bankAccountNumber.trim()))) { setError("Enter all three bank details and a valid 10-digit Nigerian account number, or leave all three blank for now."); return; }
     if (preferredActivities.length < 2) { setError("Please select at least two areas where you can contribute."); return; }
     if (skills.trim().length < 15) { setError("Please describe your relevant skills or experience (at least 15 characters)."); return; }
     if (website.trim()) {
@@ -44,6 +49,9 @@ export function AffiliateApplicationForm() {
       full_name: fullName.trim(),
       email: email.trim(),
       phone: phone.trim() || null,
+      bank_name: bankName.trim() || null,
+      bank_account_name: bankAccountName.trim() || null,
+      bank_account_number: bankAccountNumber.trim() || null,
       social_handle: socialHandle.trim() || null,
       primary_platform: primaryPlatform,
       audience_size: audienceSize,
@@ -64,6 +72,9 @@ export function AffiliateApplicationForm() {
     setFullName("");
     setEmail("");
     setPhone("");
+    setBankName("");
+    setBankAccountName("");
+    setBankAccountNumber("");
     setSocialHandle("");
     setPrimaryPlatform(platforms[0]);
     setAudienceSize(audienceOptions[0]);
@@ -104,7 +115,16 @@ export function AffiliateApplicationForm() {
         <label className="block text-xs font-bold text-[#405648]">Phone / WhatsApp
           <input type="tel" maxLength={40} autoComplete="tel" value={phone} onChange={e=>setPhone(e.target.value)} placeholder="+234 ..." className="mt-2 w-full rounded-xl border border-[#dce5db] bg-[#fbfcfa] px-4 py-3 text-sm text-[#203b2b] outline-none focus:border-[#4c805b]"/>
         </label>
-        <label className="block text-xs font-bold text-[#405648]">Social handle or website
+        <div className="mt-4 rounded-2xl border border-[#e5ebe2] bg-[#f8faf6] p-4 sm:col-span-2">
+        <p className="text-xs font-bold text-[#405648]">Bank details for Friday payouts <span className="font-normal text-[#89968a]">(optional now; you can add them later in Affiliate Hub)</span></p>
+        <div className="mt-3 grid gap-3 sm:grid-cols-3">
+          <label className="block text-xs font-bold text-[#405648]">Bank name<input maxLength={100} value={bankName} onChange={e=>setBankName(e.target.value)} placeholder="e.g. Access Bank" className="mt-2 w-full rounded-xl border border-[#dce5db] bg-white px-3 py-3 text-sm font-normal"/></label>
+          <label className="block text-xs font-bold text-[#405648]">Account holder name<input maxLength={120} value={bankAccountName} onChange={e=>setBankAccountName(e.target.value)} placeholder="Name on bank account" className="mt-2 w-full rounded-xl border border-[#dce5db] bg-white px-3 py-3 text-sm font-normal"/></label>
+          <label className="block text-xs font-bold text-[#405648]">10-digit account number<input inputMode="numeric" pattern="[0-9]{10}" maxLength={10} value={bankAccountNumber} onChange={e=>setBankAccountNumber(e.target.value.replace(/\\D/g,"").slice(0,10))} placeholder="0123456789" className="mt-2 w-full rounded-xl border border-[#dce5db] bg-white px-3 py-3 text-sm font-normal"/></label>
+        </div>
+        <p className="mt-2 text-[10px] leading-5 text-[#879487]">These details are used by eCuisine administrators to make your manual bank transfer. They are not displayed publicly.</p>
+      </div>
+      <label className="block text-xs font-bold text-[#405648]">Social handle or website
           <input maxLength={160} value={socialHandle} onChange={e=>setSocialHandle(e.target.value)} placeholder="@yourhandle or yoursite.com" className="mt-2 w-full rounded-xl border border-[#dce5db] bg-[#fbfcfa] px-4 py-3 text-sm text-[#203b2b] outline-none focus:border-[#4c805b]"/>
         </label>
         <label className="block text-xs font-bold text-[#405648]">Main platform <span className="text-[#b27636]">*</span>
