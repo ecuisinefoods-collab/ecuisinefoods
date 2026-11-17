@@ -37,23 +37,16 @@ create policy "Affiliate admins can review appeals" on public.affiliate_appeals 
 using((select private.has_admin_role(array['owner','store_manager','marketing_manager'])))
 with check((select private.has_admin_role(array['owner','store_manager','marketing_manager'])));
 
-create or replace function public.submit_my_affiliate_appeal(p_appeal_text text) returns uuid
-language plpgsql security definer set search_path=''
-as $$
-declare v_partner_id uuid; v_appeal_id uuid;
-begin
- if auth.uid() is null then raise exception 'Sign in to submit an appeal.'; end if;
- if char_length(btrim(coalesce(p_appeal_text,'')))<30 or char_length(btrim(p_appeal_text))>3000 then raise exception 'Please explain your appeal in at least 30 characters (maximum 3,000).'; end if;
- select id into v_partner_id from public.partner_profiles where user_id=auth.uid() and status in ('suspended','banned') limit 1;
- if v_partner_id is null then raise exception 'An appeal is available only for a suspended or banned affiliate account.'; end if;
- insert into public.affiliate_appeals(partner_profile_id,user_id,appeal_text) values(v_partner_id,auth.uid(),btrim(p_appeal_text)) returning id into v_appeal_id;
- return v_appeal_id;
-end;
-$$;
-revoke all on function public.submit_my_affiliate_appeal(text) from public,anon;
-grant execute on function public.submit_my_affiliate_appeal(text) to authenticated;
+drop policy if exists "Affiliates can submit own restriction appeals" on public.affiliate_appeals;
+create policy "Affiliates can submit own restriction appeals" on public.affiliate_appeals for insert to authenticated
+with check (
+ user_id=(select auth.uid()) and
+ exists(select 1 from public.partner_profiles p where p.id=affiliate_appeals.partner_profile_id
+ and p.user_id=(select auth.uid()) and p.status in ('suspended','banned'))
+);
+grant insert on public.affiliate_appeals to authenticated;
 
-create or replace function public.log_affiliate_account_status_change() returns trigger
+create or replace function private.log_affiliate_account_status_change() returns trigger
 language plpgsql security definer set search_path=''
 as $$
 begin
@@ -66,9 +59,9 @@ begin
 end;
 $$;
 drop trigger if exists partner_profile_status_audit on public.partner_profiles;
-create trigger partner_profile_status_audit after update of status on public.partner_profiles for each row execute function public.log_affiliate_account_status_change();
+create trigger partner_profile_status_audit after update of status on public.partner_profiles for each row execute function private.log_affiliate_account_status_change();
 
-create or replace function public.log_affiliate_appeal_review() returns trigger
+create or replace function private.log_affiliate_appeal_review() returns trigger
 language plpgsql security definer set search_path=''
 as $$
 begin
@@ -81,7 +74,7 @@ begin
 end;
 $$;
 drop trigger if exists affiliate_appeal_review_audit on public.affiliate_appeals;
-create trigger affiliate_appeal_review_audit after update of status on public.affiliate_appeals for each row execute function public.log_affiliate_appeal_review();
+create trigger affiliate_appeal_review_audit after update of status on public.affiliate_appeals for each row execute function private.log_affiliate_appeal_review();
 
 -- Existing linked affiliates can see restrictions and appeal; first-time claims remain active-only.
 create or replace function private.claim_ecuisine_partner_account() returns uuid
@@ -105,5 +98,5 @@ $$;
 revoke all on function private.claim_ecuisine_partner_account() from public;
 grant execute on function private.claim_ecuisine_partner_account() to authenticated;
 
-revoke all on function public.log_affiliate_account_status_change() from public, anon, authenticated;
-revoke all on function public.log_affiliate_appeal_review() from public, anon, authenticated;
+revoke all on function private.log_affiliate_account_status_change() from public, anon, authenticated;
+revoke all on function private.log_affiliate_appeal_review() from public, anon, authenticated;
