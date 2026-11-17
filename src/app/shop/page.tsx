@@ -1,9 +1,11 @@
+import Image from "next/image";
 import { SiteHeader } from "@/components/site-header";
 import { ProductCatalog } from "@/components/product-catalog";
 import { supabase } from "@/lib/supabase";
 import { ArrowRight, BadgePercent, Coffee, Cookie, Leaf, PackageCheck, ShoppingBasket, Sparkles, Sprout, Truck } from "lucide-react";
 import Link from "next/link";
 import styles from "./shop-cart-hero.module.css";
+import { shopCartImageSrc } from "./cart-image";
 
 type Variant = { id:string; pack_size:string; price:number; sale_price:number|null; sale_starts_at:string|null; sale_ends_at:string|null; stock_quantity:number };
 type Product = { id:string; name:string; slug:string; category:string; short_description?:string|null; description:string|null; ingredients?:string|null; highlights?:string[]|null; image_url:string|null; is_featured?:boolean; created_at?:string; product_variants?:Variant[] };
@@ -57,88 +59,19 @@ export default async function ShopPage({searchParams}:{searchParams:Promise<{cat
             <span className={`${styles.sparkle} ${styles.sparkleTwo}`} aria-hidden="true">✧</span>
             <span className={`${styles.sparkle} ${styles.sparkleThree}`} aria-hidden="true">✦</span>
             <span className={styles.cartGround} aria-hidden="true"/>
-            <svg className={styles.cartArtwork} viewBox="0 0 520 390" role="img" aria-labelledby="shop-cart-title shop-cart-desc" xmlns="http://www.w3.org/2000/svg">
-              <title id="shop-cart-title">eCuisine shopping cart</title>
-              <desc id="shop-cart-desc">A floating three-dimensional green shopping cart carrying colourful grocery bags, a cereal pack, vegetables and pantry items.</desc>
-              <defs>
-                <linearGradient id="cartBasket" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#37a875"/><stop offset="1" stopColor="#07543f"/></linearGradient>
-                <linearGradient id="cartRim" x1="0" y1="0" x2="1" y2="0"><stop stopColor="#8bd1a1"/><stop offset="1" stopColor="#16734d"/></linearGradient>
-                <linearGradient id="bagGold" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#ffe58b"/><stop offset="1" stopColor="#e5aa25"/></linearGradient>
-                <linearGradient id="bagOrange" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#ffbd78"/><stop offset="1" stopColor="#ed7541"/></linearGradient>
-                <linearGradient id="packGreen" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#8ed49a"/><stop offset="1" stopColor="#2b8b59"/></linearGradient>
-                <linearGradient id="cartMetal" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#dce9df"/><stop offset="1" stopColor="#8ba99a"/></linearGradient>
-              </defs>
-              <ellipse cx="270" cy="343" rx="160" ry="18" fill="#214b32" opacity=".08"/>
-              <path d="M83 63h39l35 178c3 15 15 25 30 25h207" fill="none" stroke="url(#cartMetal)" strokeWidth="13" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M73 57h22" stroke="#245b42" strokeWidth="14" strokeLinecap="round"/>
-              <path d="M145 104l299 1-40 157H183z" fill="url(#cartBasket)" stroke="#07543f" strokeWidth="5" strokeLinejoin="round"/>
-              <path d="M145 104l299 1-9 30H151z" fill="url(#cartRim)"/>
-              <path d="M179 143l22 108M239 139l11 112M300 138l1 112M361 138l-10 112M421 137l-25 112" stroke="#b8e2c3" strokeWidth="4" opacity=".42"/>
-              <path d="M184 251l216 0" stroke="#b8e2c3" strokeWidth="4" opacity=".3"/>
-              <path d="M191 99l20-56q5-12 17-7l55 18q10 4 6 15l-13 34z" fill="url(#bagGold)" stroke="#d99b21" strokeWidth="3"/>
-              <path d="M212 47q25-24 50 7" fill="none" stroke="#b98218" strokeWidth="5" strokeLinecap="round"/>
-              <path d="M278 102l15-63q3-12 15-9l58 13q12 3 9 15l-10 44z" fill="url(#bagOrange)" stroke="#d86d3e" strokeWidth="3"/>
-              <path d="M301 41q25-23 50 6" fill="none" stroke="#c85e32" strokeWidth="5" strokeLinecap="round"/>
-              <path d="M345 101l13-48q3-10 13-8l42 8q10 2 8 13l-8 37z" fill="url(#packGreen)" stroke="#267c4e" strokeWidth="3"/>
-              <path d="M374 64q13-13 26 4" fill="none" stroke="#e7f5d9" strokeWidth="4" strokeLinecap="round"/>
-              <rect x="226" y="65" width="48" height="75" rx="8" fill="#fff7df" stroke="#e3c879" strokeWidth="3" transform="rotate(-7 226 65)"/>
-              <path d="M236 84l27-4" stroke="#b68b30" strokeWidth="4" strokeLinecap="round"/>
-              <path d="M237 96l23-3" stroke="#d2b35d" strokeWidth="3" strokeLinecap="round"/>
-              <text x="248" y="119" fill="#236342" fontSize="10" fontWeight="900" textAnchor="middle" transform="rotate(-7 248 119)">FOOD</text>
-              <path d="M164 91q-18-25-4-43 18 12 14 39" fill="#4d9d56"/>
-              <path d="M173 94q-4-31 19-42 7 23-13 47" fill="#77b75e"/>
-              <path d="M163 92q-26-8-29-28 24-4 36 20" fill="#2e8c4b"/>
-              <circle cx="157" cy="84" r="13" fill="#e66d48"/><circle cx="157" cy="84" r="5" fill="#f8b06b"/>
-              <path d="M410 99q10-24 30-22 0 21-24 29" fill="#6bbf65"/>
-              <path d="M426 101q15-20 33-11-8 19-30 20" fill="#398f52"/>
-              <path d="M435 96q-3-23 16-31 9 19-8 35" fill="#88c96d"/>
-              <circle cx="435" cy="96" r="12" fill="#e6a92e"/>
-              <path d="M184 267h220" stroke="#6e927e" strokeWidth="9" strokeLinecap="round"/>
-              <path d="M202 270l-12 30M387 270l12 30" stroke="#8ba99a" strokeWidth="9" strokeLinecap="round"/>
-              <circle cx="187" cy="314" r="25" fill="#284b39"/><circle cx="187" cy="314" r="12" fill="#dce8d9"/><circle cx="187" cy="314" r="5" fill="#789282"/>
-              <circle cx="406" cy="314" r="25" fill="#284b39"/><circle cx="406" cy="314" r="12" fill="#dce8d9"/><circle cx="406" cy="314" r="5" fill="#789282"/>
-              <path d="M180 290q-8 6-7 17" fill="none" stroke="#fff" strokeWidth="3" opacity=".45" strokeLinecap="round"/>
-              <path d="M399 290q-8 6-7 17" fill="none" stroke="#fff" strokeWidth="3" opacity=".45" strokeLinecap="round"/>
-              <path d="M312 174q18-17 36 0" fill="none" stroke="#f8e7a8" strokeWidth="5" strokeLinecap="round" opacity=".9"/>
-              <path d="M326 188h15" stroke="#f8e7a8" strokeWidth="4" strokeLinecap="round" opacity=".9"/>
-            </svg>
+            <Image
+              className={styles.cartArtwork}
+              src={shopCartImageSrc}
+              alt="A glossy three-dimensional eCuisine shopping cart filled with everyday groceries"
+              width={320}
+              height={292}
+              sizes="(max-width: 767px) 88vw, 510px"
+              priority
+              unoptimized
+            />
             <div className={styles.cartNote}><span className={styles.cartNoteDot}/><span>GOOD FOOD, BETTER LIVING</span></div>
 
-            <svg className={styles.shopMascot} viewBox="0 0 230 300" role="img" aria-labelledby="shop-mascot-title shop-mascot-desc" xmlns="http://www.w3.org/2000/svg">
-              <title id="shop-mascot-title">eCuisine welcome mascot</title>
-              <desc id="shop-mascot-desc">A cheerful three-dimensional green food mascot holding a Welcome to Shop sign.</desc>
-              <defs>
-                <linearGradient id="mascotBody" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#b9e98b"/><stop offset=".48" stopColor="#69bd70"/><stop offset="1" stopColor="#218453"/></linearGradient>
-                <linearGradient id="mascotSide" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#8bd77c"/><stop offset="1" stopColor="#287b4d"/></linearGradient>
-                <linearGradient id="mascotBoard" x1="0" y1="0" x2="0" y2="1"><stop stopColor="#fffdf2"/><stop offset="1" stopColor="#f3e6bd"/></linearGradient>
-                <linearGradient id="mascotHat" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#fff"/><stop offset="1" stopColor="#dfe9dd"/></linearGradient>
-                <filter id="mascotShadow" x="-30%" y="-30%" width="160%" height="170%"><feGaussianBlur stdDeviation="5"/></filter>
-              </defs>
-              <ellipse cx="113" cy="281" rx="69" ry="10" fill="#234b32" opacity=".15" filter="url(#mascotShadow)"/>
-              <g className={styles.mascotFloat}>
-                <path d="M80 208q-27 13-31 39-2 12 9 15 12 3 17-10l17-27M151 208q27 13 31 39 2 12-9 15-12 3-17-10l-17-27" fill="none" stroke="#2d8d57" strokeWidth="17" strokeLinecap="round"/>
-                <path d="M86 242l-8 28q-3 11 8 13l18 2q12 1 13-11l1-27M132 245l5 27q2 12 14 10l17-4q11-3 7-14l-10-26" fill="#246f49"/>
-                <path d="M60 135q0-59 54-70 57 11 58 70l-5 76q-3 42-52 45-49-3-52-45z" fill="url(#mascotBody)" stroke="#287d4c" strokeWidth="3"/>
-                <path d="M119 69q34 8 43 43l-2 90q-4 43-43 52 20-32 17-94 2-57-15-91" fill="#287e4e" opacity=".25"/>
-                <ellipse cx="91" cy="150" rx="7" ry="10" fill="#173d2b"/><ellipse cx="137" cy="150" rx="7" ry="10" fill="#173d2b"/>
-                <circle cx="93" cy="146" r="2.5" fill="#fff"/><circle cx="139" cy="146" r="2.5" fill="#fff"/>
-                <path d="M102 170q12 14 25 0" fill="none" stroke="#174b31" strokeWidth="4" strokeLinecap="round"/>
-                <ellipse cx="78" cy="169" rx="10" ry="6" fill="#f58b78" opacity=".65"/><ellipse cx="151" cy="169" rx="10" ry="6" fill="#f58b78" opacity=".65"/>
-                <path d="M113 73q-7-18 4-31 16 9 13 27" fill="#318b4d"/><path d="M117 48q-1-17 15-22 6 17-10 27" fill="#77bd51"/>
-                <path d="M87 82q-3-24 22-30 18 3 22 21-21-7-44 9" fill="url(#mascotHat)" stroke="#d4dfd2" strokeWidth="2"/>
-                <path d="M81 78q30-11 62 1l-2 12q-31-9-59 1z" fill="#fff" stroke="#d4dfd2" strokeWidth="2"/>
-                <g className={styles.mascotSign}>
-                  <path d="M44 178q-10-12-19-4-8 8 3 18l18 17M185 178q10-12 19-4 8 8-3 18l-18 17" fill="none" stroke="#2d8d57" strokeWidth="13" strokeLinecap="round"/>
-                  <rect x="24" y="177" width="183" height="73" rx="14" fill="#9a6b2e" opacity=".25" transform="translate(0 5)"/>
-                  <rect x="21" y="171" width="183" height="73" rx="14" fill="url(#mascotBoard)" stroke="#d6b65f" strokeWidth="4"/>
-                  <path d="M34 182h157" stroke="#fff" strokeWidth="3" opacity=".9" strokeLinecap="round"/>
-                  <text x="112" y="201" fill="#d18d19" fontSize="10" fontWeight="900" letterSpacing="1.3" textAnchor="middle">HEY THERE!</text>
-                  <text x="112" y="222" fill="#07543f" fontSize="17" fontWeight="1000" textAnchor="middle">WELCOME TO</text>
-                  <text x="112" y="238" fill="#e28b2e" fontSize="17" fontWeight="1000" textAnchor="middle">SHOP!</text>
-                </g>
-                <path d="M69 115q7-18 22-21" fill="none" stroke="#fff" strokeWidth="6" opacity=".3" strokeLinecap="round"/>
-              </g>
-            </svg>
+            
           </div>
         </div>
       </div>
