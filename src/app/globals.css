@@ -311,7 +311,7 @@ body{font-feature-settings:"ss01" on;-webkit-font-smoothing:antialiased}
 .ec-pickup-section{background:#07543f;color:#fff}
 .ec-location-chip{border-color:rgba(255,255,255,.25);background:rgba(255,255,255,.1);color:#fff}
 .ec-pickup-card{border-color:#e4ecdf;background:#fff;color:#23432e;box-shadow:0 20px 42px rgba(0,0,0,.12)}
-.ec-store-footer{background:#102f22}
+.ec-store-footer{background:#071b14}
 @media(max-width:767px){
  .ec-home-hero{min-height:unset}
  .ec-home-hero--video{min-height:720px}
@@ -1611,7 +1611,7 @@ html[data-theme="dark"] .ec-category-word--coming{background:linear-gradient(135
 /* Traditional deep-green footer with clear contrast and warm gold accents */
 .ec-store-footer{
   color:#eef4ea!important;
-  background:#10271e!important;
+  background:#071b14!important;
   border-top:1px solid rgba(222,190,105,.3)!important;
   box-shadow:none!important;
 }
@@ -1627,7 +1627,7 @@ html[data-theme="dark"] .ec-category-word--coming{background:linear-gradient(135
 }
 .ec-store-footer__bottom span:last-child{color:#e5ca78!important}
 /* Preserve the original eCuisine logo colours on the dark footer. */
-.ec-store-footer .ec-footer-brand__logo{filter:none!important;mix-blend-mode:normal!important;opacity:1!important}
+.ec-store-footer .ec-footer-brand__logo{display:block;max-height:76px;max-width:300px;filter:none!important;mix-blend-mode:normal!important;opacity:1!important}
 .ec-store-footer .ec-footer-social{width:44px;height:44px;border-radius:14px;color:#fff!important;border:1px solid rgba(255,255,255,.12)!important;background:#263e31!important;box-shadow:0 7px 18px rgba(0,0,0,.24)!important}
 .ec-store-footer .ec-footer-social svg{width:21px;height:21px;stroke-width:2.4}
 .ec-store-footer .ec-footer-social--facebook{background:#1877f2!important;color:#fff!important}
