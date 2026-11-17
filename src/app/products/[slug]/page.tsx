@@ -36,7 +36,7 @@ export default async function ProductPage({params}:{params:Promise<{slug:string}
   return <main className="ec-product-page min-h-screen overflow-hidden bg-[#fffdf7] text-[#203329]">
     <div className="ec-product-announcement px-4 py-2 text-center text-[10px] font-extrabold tracking-[.08em]">GOOD FOOD · BETTER LIVING</div>
     <SiteHeader/>
-    <section className="mx-auto max-w-7xl px-5 py-7 sm:py-10">
+    <section className="mx-auto max-w-[1680px] px-4 py-7 sm:px-6 sm:py-10 xl:px-8">
       <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-2 text-[11px] font-semibold text-[#829083]">
         <Link href="/" className="hover:text-[#087f5b]">Home</Link><ChevronRight size={12}/>
         <Link href="/shop" className="hover:text-[#087f5b]">Shop</Link><ChevronRight size={12}/>
@@ -45,12 +45,12 @@ export default async function ProductPage({params}:{params:Promise<{slug:string}
 
       <Link href="/shop" className="mt-5 inline-flex items-center gap-2 text-xs font-extrabold text-[#245b42]"><ArrowLeft size={14}/> Back to the shop</Link>
 
-      <div className="ec-product-detail-grid mt-6 grid gap-6 lg:grid-cols-[1.02fr_.98fr] lg:items-start">
-        <div className="ec-product-gallery rounded-[1.8rem] border p-3 shadow-sm sm:p-5">
-          <div className="ec-product-image-stage relative flex min-h-[320px] items-center justify-center overflow-hidden rounded-[1.35rem] p-6 sm:min-h-[500px] sm:p-10">
+      <div className="ec-product-detail-grid mt-6 grid gap-6 lg:grid-cols-[minmax(0,1.08fr)_minmax(0,.92fr)] lg:items-start xl:gap-8">
+        <div className="ec-product-gallery rounded-[1.8rem] border p-2 shadow-sm sm:p-3 xl:p-4">
+          <div className="ec-product-image-stage relative flex aspect-[1.08/1] min-h-[340px] items-center justify-center overflow-hidden rounded-[1.35rem] p-3 sm:min-h-[520px] sm:p-5 xl:min-h-[680px] xl:p-7">
             <div className="ec-product-image-orb"/>
             {product.image_url
-              ?<img src={product.image_url} alt={product.name} className="relative z-10 max-h-[440px] w-auto max-w-full object-contain drop-shadow-[0_24px_24px_rgba(34,36,22,.18)]"/>
+              ?<img src={product.image_url} alt={product.name} className="relative z-10 max-h-[640px] w-full max-w-full object-contain drop-shadow-[0_24px_24px_rgba(34,36,22,.18)]"/>
               :<div className="relative z-10 max-w-sm text-center"><span className="mx-auto grid h-20 w-20 place-items-center rounded-full bg-white text-[#087f5b] shadow-lg"><PackageCheck size={34}/></span><p className="mt-5 text-[10px] font-black uppercase tracking-[.22em] text-[#9a792e]">eCuisinefoods product</p><p className="mt-2 text-2xl font-black text-[#315b43]">{product.name}</p><p className="mt-2 text-xs font-semibold text-[#8a9689]">Product photography coming soon</p></div>}
             <span className="absolute left-4 top-4 inline-flex items-center gap-2 rounded-full border border-white/80 bg-white/90 px-3 py-2 text-[9px] font-black uppercase tracking-wider text-[#48624d]"><Leaf size={12}/> {product.category}</span>
             {product.is_featured&&<span className="absolute bottom-4 left-4 inline-flex items-center gap-1 rounded-full bg-[#fff1bf] px-3 py-2 text-[9px] font-black text-[#7c5a0b]"><Sparkles size={11}/> Featured product</span>}
@@ -61,7 +61,7 @@ export default async function ProductPage({params}:{params:Promise<{slug:string}
           </div>
         </div>
 
-        <div className="ec-product-information rounded-[1.8rem] border bg-white p-5 shadow-sm sm:p-7 lg:sticky lg:top-36">
+        <div className="ec-product-information rounded-[1.8rem] border bg-white p-5 shadow-sm sm:p-7 lg:sticky lg:top-28">
           <div className="flex flex-wrap items-center gap-2">
             <span className="rounded-full bg-[#eef6e9] px-3 py-1.5 text-[9px] font-black uppercase tracking-wider text-[#42724b]">{product.category}</span>
             <span className={"inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-[9px] font-black uppercase tracking-wider "+(available.length>0?"bg-[#e8f5e6] text-[#47764a]":"bg-[#faece5] text-[#a34b42]")}>
