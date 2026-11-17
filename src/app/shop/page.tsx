@@ -40,12 +40,12 @@ export default async function ShopPage({searchParams}:{searchParams:Promise<{cat
       <div className="ec-shop-hero-orb ec-shop-hero-orb-one"/>
       <div className="ec-shop-hero-orb ec-shop-hero-orb-two"/>
       <div className="relative mx-auto max-w-7xl px-5 py-12 sm:py-16 md:py-20">
-        <div className="max-w-3xl">
-          <Link href="/" className="inline-flex items-center gap-2 text-xs font-bold text-[#68806d] hover:text-[#087f5b]">← Back to home</Link>
+        <div className="mx-auto max-w-3xl text-center">
+          <Link href="/" className="mx-auto inline-flex items-center gap-2 text-xs font-bold text-[#68806d] hover:text-[#087f5b]">← Back to home</Link>
           <p className="ec-shop-kicker mt-7 inline-flex items-center gap-2 rounded-full border px-4 py-2 text-[10px] font-black uppercase tracking-[.18em]"><ShoppingBasket size={14}/> The eCuisine shop</p>
           <h1 className="mt-5 text-[2.8rem] font-black leading-[1.02] tracking-[-.06em] text-[#07543f] sm:text-6xl lg:text-[4.5rem]">Find your everyday <span className="block text-[#e2a900]">favourites.</span></h1>
-          <p className="mt-5 max-w-xl text-sm leading-7 text-[#68766b] sm:text-base">Browse the products currently available, compare pack sizes and prices, and add what you need to your cart. New categories will join the collection as they launch.</p>
-          <div className="mt-7 flex flex-wrap gap-3">
+          <p className="mx-auto mt-5 max-w-xl text-sm leading-7 text-[#68766b] sm:text-base">Browse the products currently available, compare pack sizes and prices, and add what you need to your cart. New categories will join the collection as they launch.</p>
+          <div className="mt-7 flex flex-wrap justify-center gap-3">
             <Link href="#products" className="inline-flex items-center gap-2 rounded-xl bg-[#087f5b] px-6 py-3.5 text-xs font-extrabold text-white shadow-lg transition hover:-translate-y-1 hover:bg-[#07543f]">Browse products <ArrowRight size={15}/></Link>
             <Link href="/contact" className="inline-flex items-center gap-2 rounded-xl border border-[#cddacb] bg-white/75 px-5 py-3.5 text-xs font-bold text-[#315b43] transition hover:-translate-y-1">Need help? Contact us</Link>
           </div>
