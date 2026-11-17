@@ -28,8 +28,6 @@ export default async function ShopPage({searchParams}:{searchParams:Promise<{cat
     products=(data||[]) as Product[];
   }
   const categories=Array.from(new Set(products.map(product=>product.category).filter(Boolean)));
-  const featured=products.filter(product=>product.is_featured).length;
-  const inStock=products.filter(product=>(product.product_variants||[]).some(variant=>variant.stock_quantity>0)).length;
   const catalog=products as unknown as Parameters<typeof ProductCatalog>[0]["products"];
 
   return <main className="ec-shop-page min-h-screen overflow-hidden bg-[#fffdf7] text-[#203329]">
@@ -41,8 +39,8 @@ export default async function ShopPage({searchParams}:{searchParams:Promise<{cat
     <section className="ec-shop-hero relative overflow-hidden">
       <div className="ec-shop-hero-orb ec-shop-hero-orb-one"/>
       <div className="ec-shop-hero-orb ec-shop-hero-orb-two"/>
-      <div className="relative mx-auto grid max-w-7xl gap-9 px-5 py-12 sm:py-16 md:grid-cols-[1.08fr_.92fr] md:items-center md:py-20">
-        <div className="max-w-2xl">
+      <div className="relative mx-auto max-w-7xl px-5 py-12 sm:py-16 md:py-20">
+        <div className="max-w-3xl">
           <Link href="/" className="inline-flex items-center gap-2 text-xs font-bold text-[#68806d] hover:text-[#087f5b]">← Back to home</Link>
           <p className="ec-shop-kicker mt-7 inline-flex items-center gap-2 rounded-full border px-4 py-2 text-[10px] font-black uppercase tracking-[.18em]"><ShoppingBasket size={14}/> The eCuisine shop</p>
           <h1 className="mt-5 text-[2.8rem] font-black leading-[1.02] tracking-[-.06em] text-[#07543f] sm:text-6xl lg:text-[4.5rem]">Find your everyday <span className="block text-[#e2a900]">favourites.</span></h1>
@@ -51,18 +49,6 @@ export default async function ShopPage({searchParams}:{searchParams:Promise<{cat
             <Link href="#products" className="inline-flex items-center gap-2 rounded-xl bg-[#087f5b] px-6 py-3.5 text-xs font-extrabold text-white shadow-lg transition hover:-translate-y-1 hover:bg-[#07543f]">Browse products <ArrowRight size={15}/></Link>
             <Link href="/contact" className="inline-flex items-center gap-2 rounded-xl border border-[#cddacb] bg-white/75 px-5 py-3.5 text-xs font-bold text-[#315b43] transition hover:-translate-y-1">Need help? Contact us</Link>
           </div>
-        </div>
-
-        <div className="ec-shop-stat-panel rounded-[1.8rem] border bg-white p-5 shadow-xl sm:p-7">
-          <div className="flex items-center gap-3">
-            <span className="grid h-12 w-12 place-items-center rounded-2xl bg-[#fff2bf] text-[#90690f]"><PackageCheck size={22}/></span>
-            <div><p className="text-[10px] font-black uppercase tracking-[.17em] text-[#9a792e]">Your shopping starts here</p><p className="mt-1 text-lg font-black text-[#244b34]">A growing food collection</p></div>
-          </div>
-          <div className="mt-6 grid grid-cols-2 gap-3">
-            <div className="ec-shop-stat rounded-2xl p-4"><p className="text-3xl font-black text-[#087f5b] tabular-nums">{products.length}</p><p className="mt-1 text-[10px] font-bold text-[#788477]">Active products</p></div>
-            <div className="ec-shop-stat rounded-2xl p-4"><p className="text-3xl font-black text-[#d69b13] tabular-nums">{inStock}</p><p className="mt-1 text-[10px] font-bold text-[#788477]">With stock available</p></div>
-          </div>
-          <div className="mt-4 flex items-start gap-3 rounded-2xl bg-[#edf6e9] p-4"><Truck size={18} className="mt-0.5 shrink-0 text-[#087f5b]"/><div><p className="text-xs font-extrabold text-[#315b43]">Delivery & collection options</p><p className="mt-1 text-[11px] leading-5 text-[#6d816d]">See the available fulfilment choices when you place your order.</p></div></div>
         </div>
       </div>
     </section>
