@@ -2,7 +2,7 @@
 
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, ExternalLink, Eye, EyeOff, LoaderCircle, Package, Pencil, Plus, Save, Search, Sparkles, Trash2 } from "lucide-react";
+import { ArrowLeft, ExternalLink, Eye, EyeOff, LoaderCircle, Package, Pencil, Plus, Save, Search, Trash2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { BrandLogoUploader } from "@/components/brand-logo-uploader";
 
