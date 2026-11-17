@@ -63,8 +63,15 @@ export default function PartnerDashboardPage(){
   setProducts((productResult.data||[]) as Product[]);
   setReferralStats({clicks:Number(referralResult.data?.clicks||0),orders:Number(referralResult.data?.orders||0)});
   if(orderResult.error)setError(orderResult.error.message);else setReferralOrders((orderResult.data||[]) as ReferralOrder[]);
-  const commissionRows=(commissionResult.data||[]) as {commission_amount:number;status:string}[];
-  setCommissionStats({earned:commissionRows.filter(x=>x.status==="earned"||x.status==="approved").reduce((n,x)=>n+Number(x.commission_amount),0),approved:commissionRows.filter(x=>x.status==="approved").reduce((n,x)=>n+Number(x.commission_amount),0),paid:commissionRows.filter(x=>x.status==="paid").reduce((n,x)=>n+Number(x.commission_amount),0)});
+  const commissionRows=(commissionResult.data||[]) as {commission_amount:number;status:string;earned_at:string}[];
+  const lagosNow=new Date(new Date().toLocaleString("en-US",{timeZone:"Africa/Lagos"}));
+  const lagosDay=new Date(Date.UTC(lagosNow.getFullYear(),lagosNow.getMonth(),lagosNow.getDate()));
+  lagosDay.setUTCDate(lagosDay.getUTCDate()-((lagosDay.getUTCDay()+2)%7));
+  const weekStart=lagosDay.toISOString().slice(0,10)+"T00:00:00+01:00";
+  const outstanding=commissionRows.filter(x=>x.status==="earned"||x.status==="approved");
+  setCommissionStats({earned:outstanding.reduce((n,x)=>n+Number(x.commission_amount),0),approved:commissionRows.filter(x=>x.status==="approved").reduce((n,x)=>n+Number(x.commission_amount),0),paid:commissionRows.filter(x=>x.status==="paid").reduce((n,x)=>n+Number(x.commission_amount),0),week:commissionRows.filter(x=>x.earned_at>=weekStart&&x.status!=="reversed").reduce((n,x)=>n+Number(x.commission_amount),0)});
+  const bank=(bankResult.data?.[0]||{bank_name:"",bank_account_name:"",bank_account_number:""}) as BankDetails;
+  setBankDetails(bank);setBankForm({bank_name:bank.bank_name||"",bank_account_name:bank.bank_account_name||"",bank_account_number:bank.bank_account_number||""});
   setPartner(profile as Partner);
   setLoading(false);
  },[]);
