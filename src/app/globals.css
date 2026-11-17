@@ -1764,3 +1764,21 @@ html[data-theme="dark"] .ec-category-word--coming{background:linear-gradient(135
   .ec-product-image-stage { aspect-ratio: 1 / 1; min-height: 330px; }
   .ec-purchase-actions { grid-template-columns: 1fr 1fr; }
 }
+
+
+/* Darker footer with a high-contrast frame for the exact uploaded brand logo. */
+.ec-store-footer{background:linear-gradient(145deg,#061b14 0%,#09291d 48%,#0d3424 100%);color:#f4f7ef}
+.ec-store-footer__main{border-top:1px solid rgba(255,255,255,.08)}
+.ec-store-footer__bottom{border-top:1px solid rgba(255,255,255,.14);color:#d0ddd2}
+.ec-store-footer__bottom .font-semibold{color:#f0d98b!important}
+.ec-footer-group h3{color:#f2cf67}
+.ec-footer-links a{color:#e1eae1}
+.ec-footer-links a:hover{color:#ffe69a}
+.ec-footer-group p{color:#c1d0c4!important}
+.ec-footer-brand>p{color:#d5e1d7!important}
+.ec-footer-brand__lockup{min-height:88px;background:#fffdf4;border-color:rgba(255,255,255,.8);box-shadow:0 14px 34px rgba(0,0,0,.28),inset 0 1px 0 #fff}
+.ec-storefront .ec-footer-brand__logo{max-height:68px;max-width:260px;object-fit:contain;object-position:left center;filter:none}
+.ec-footer-contact{border-color:rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:#fff5cf;box-shadow:inset 0 1px 0 rgba(255,255,255,.12)}
+.ec-footer-contact:hover{background:rgba(255,255,255,.17)}
+.ec-footer-social{border-color:rgba(255,255,255,.16);background:rgba(255,255,255,.1);color:#f4f7ef;box-shadow:inset 0 1px 0 rgba(255,255,255,.12)}
+.ec-footer-social:hover{background:rgba(255,255,255,.2)}
