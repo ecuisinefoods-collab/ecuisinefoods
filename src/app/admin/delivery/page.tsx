@@ -43,10 +43,19 @@ export default function DeliveryAdminPage() {
     else {
       const loaded = (data ?? []) as DeliveryZone[];
       setZones(loaded);
-      setForm(current => ({
-        ...current,
-        delivery_fee: current.delivery_fee || String(loaded.find(zone => zone.state === current.state && zone.city === DESTINATIONS.find(item => item.state === current.state)?.city)?.delivery_fee ?? ""),
-      }));
+      setForm(current => {
+        if (current.delivery_fee) return current;
+        const currentCity = DESTINATIONS.find(item => item.state === current.state)?.city;
+        const existing = loaded.find(zone => zone.state === current.state && zone.city === currentCity);
+        return existing ? {
+          ...current,
+          delivery_fee: String(existing.delivery_fee),
+          minimum_order_amount: String(existing.minimum_order_amount),
+          estimated_days: existing.estimated_days || "",
+          instructions: existing.instructions || "",
+          is_active: existing.is_active,
+        } : current;
+      });
     }
     setLoading(false);
   }, []);
