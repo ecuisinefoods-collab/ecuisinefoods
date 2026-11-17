@@ -8,14 +8,6 @@ type Variant = { id:string; pack_size:string; price:number; sale_price:number|nu
 type Product = { id:string; name:string; slug:string; category:string; short_description?:string|null; description:string|null; ingredients?:string|null; highlights?:string[]|null; image_url:string|null; is_featured?:boolean; created_at?:string; product_variants?:Variant[] };
 export const dynamic="force-dynamic";
 
-const comingSoon = [
-  { name:"Grains & staples", detail:"Everyday pantry essentials", icon:Sprout },
-  { name:"Spices & seasonings", detail:"More flavour for your kitchen", icon:Sparkles },
-  { name:"Beverages", detail:"Drinks and blends", icon:Coffee },
-  { name:"Snacks", detail:"Little bites for any time", icon:Cookie },
-  { name:"Pantry essentials", detail:"More useful kitchen favourites", icon:ShoppingBasket }
-];
-
 export default async function ShopPage({searchParams}:{searchParams:Promise<{category?:string|string[];search?:string|string[]}>}) {
   const params=await searchParams;
   const initialCategory=Array.isArray(params.category)?params.category[0]||"All products":params.category||"All products";
@@ -44,7 +36,7 @@ export default async function ShopPage({searchParams}:{searchParams:Promise<{cat
           <Link href="/" className="mx-auto inline-flex items-center gap-2 text-xs font-bold text-[#68806d] hover:text-[#087f5b]">← Back to home</Link>
           <p className="ec-shop-kicker mt-7 inline-flex items-center gap-2 rounded-full border px-4 py-2 text-[10px] font-black uppercase tracking-[.18em]"><ShoppingBasket size={14}/> The eCuisine shop</p>
           <h1 className="mt-5 text-[2.8rem] font-black leading-[1.02] tracking-[-.06em] text-[#07543f] sm:text-6xl lg:text-[4.5rem]">Find your everyday <span className="block text-[#e2a900]">favourites.</span></h1>
-          <p className="mx-auto mt-5 max-w-xl text-sm leading-7 text-[#68766b] sm:text-base">Browse the products currently available, compare pack sizes and prices, and add what you need to your cart. New categories will join the collection as they launch.</p>
+          <p className="mx-auto mt-5 max-w-xl text-sm leading-7 text-[#68766b] sm:text-base">Browse available products, compare pack sizes and prices, and choose exactly what you need.</p>
           <div className="mt-7 flex flex-wrap justify-center gap-3">
             <Link href="#products" className="inline-flex items-center gap-2 rounded-xl bg-[#087f5b] px-6 py-3.5 text-xs font-extrabold text-white shadow-lg transition hover:-translate-y-1 hover:bg-[#07543f]">Browse products <ArrowRight size={15}/></Link>
             <Link href="/contact" className="inline-flex items-center gap-2 rounded-xl border border-[#cddacb] bg-white/75 px-5 py-3.5 text-xs font-bold text-[#315b43] transition hover:-translate-y-1">Need help? Contact us</Link>
@@ -66,7 +58,7 @@ export default async function ShopPage({searchParams}:{searchParams:Promise<{cat
 
     <section className="mx-auto max-w-7xl px-5 py-10 sm:py-14">
       <div className="flex flex-wrap items-end justify-between gap-4">
-        <div><p className="ec-shop-section-kicker">Explore the pantry</p><h2 className="mt-2 text-2xl font-black tracking-tight text-[#183d2b] sm:text-3xl">Shop by category</h2><p className="mt-2 text-sm text-[#7b887c]">Choose a current collection or see what's coming next.</p></div>
+        <div><p className="ec-shop-section-kicker">Explore the pantry</p><h2 className="mt-2 text-2xl font-black tracking-tight text-[#183d2b] sm:text-3xl">Shop by category</h2><p className="mt-2 text-sm text-[#7b887c]">Browse the categories currently available.</p></div>
         <span className="rounded-full bg-[#fff2bf] px-4 py-2 text-[10px] font-black text-[#7d5b0d]">{categories.length} active {categories.length===1?"category":"categories"}</span>
       </div>
       <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
@@ -78,16 +70,13 @@ export default async function ShopPage({searchParams}:{searchParams:Promise<{cat
             <span><span className="block text-xs font-extrabold leading-5 text-[#304936]">{category}</span><span className="mt-1 flex items-center justify-between text-[10px] font-semibold text-[#879184]"><span>{count} {count===1?"product":"products"}</span><ArrowRight size={13} className="transition group-hover:translate-x-1"/></span></span>
           </Link>;
         })}
-        {comingSoon.slice(0,Math.max(0,6-categories.length)).map(item=><div key={item.name} className="ec-shop-category ec-shop-category-coming flex min-h-[142px] flex-col justify-between rounded-2xl border p-4">
-          <span className="ec-shop-category-icon ec-shop-category-icon--3d grid h-12 w-12 place-items-center rounded-2xl"><item.icon size={19}/></span>
-          <span><span className="block text-xs font-extrabold leading-5 text-[#304936]">{item.name}</span><span className="mt-1 block text-[10px] font-semibold text-[#9a8e72]">{item.detail}</span><span className="mt-2 inline-flex rounded-full bg-[#fff0bd] px-2.5 py-1 text-[9px] font-black uppercase tracking-wider text-[#8b6714]">Coming soon</span></span>
-        </div>)}
+        
       </div>
     </section>
 
     <section className="ec-shop-reassurance py-10 sm:py-14">
-      <div className="mx-auto grid max-w-7xl gap-4 px-5 sm:grid-cols-3">
-        {[{icon:PackageCheck,title:"Clear product information",detail:"Pack sizes, prices and stock availability are displayed before checkout."},{icon:Truck,title:"Delivery & collection",detail:"See the available fulfilment choices when you place your order."},{icon:Leaf,title:"A growing collection",detail:"New food categories and products will be introduced as they become available."}].map(item=><article key={item.title} className="ec-shop-reassurance-card flex gap-3 rounded-2xl border bg-white p-5"><span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[#edf5e7] text-[#087f5b]"><item.icon size={19}/></span><span><strong className="block text-xs font-extrabold text-[#304936]">{item.title}</strong><span className="mt-2 block text-[11px] leading-5 text-[#7e897f]">{item.detail}</span></span></article>)}
+      <div className="mx-auto grid max-w-7xl gap-4 px-5 sm:grid-cols-2">
+        {[{icon:PackageCheck,title:"Clear product information",detail:"Pack sizes, prices and stock availability are displayed before checkout."},{icon:Truck,title:"Delivery & collection",detail:"See the available fulfilment choices when you place your order."},{icon:Leaf,title:"Thoughtful product details",detail:"Review product descriptions, pack sizes, prices and current stock before adding to your basket."}].map(item=><article key={item.title} className="ec-shop-reassurance-card flex gap-3 rounded-2xl border bg-white p-5"><span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[#edf5e7] text-[#087f5b]"><item.icon size={19}/></span><span><strong className="block text-xs font-extrabold text-[#304936]">{item.title}</strong><span className="mt-2 block text-[11px] leading-5 text-[#7e897f]">{item.detail}</span></span></article>)}
       </div>
     </section>
   </main>;
