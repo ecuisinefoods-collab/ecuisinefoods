@@ -5,7 +5,7 @@ import Link from "next/link";
 import { ArrowRight, CalendarClock, CheckCircle2, ClipboardCheck, ExternalLink, LoaderCircle, LogOut, Package, Send, ShieldCheck, Sparkles, Users } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
-type Partner = { id:string; partner_code:string; status:string };
+type Partner = { id:string; partner_code:string; status:string; restriction_reason?:string|null; restricted_at?:string|null };
 type Task = { id:string; title:string; description:string; task_type:string; priority:string; status:string; due_at:string|null; reference_url:string|null; product_id:string|null };
 type Submission = { id:string; task_id:string; status:string; submission_text:string; proof_url:string|null; submitted_at:string };
 type Product = { id:string; name:string; slug:string; image_url:string|null };
@@ -47,7 +47,7 @@ export default function PartnerDashboardPage(){
   if(claimError){setError(claimError.message.includes("No approved")?"Your affiliate application has not yet been approved for Affiliate Hub access.":claimError.message);setLoading(false);return;}
   const {data:profile,error:profileError}=await supabase.from("partner_profiles").select("id,partner_code,status").eq("id",claim).maybeSingle();
   if(profileError||!profile){setError(profileError?.message||"Affiliate profile could not be loaded.");setLoading(false);return;}
-  if(profile.status!=="active"){setError("Your affiliate access is currently paused. Please contact eCuisine.");setLoading(false);return;}
+  if(profile.status!=="active"){setPartner(profile as Partner);setLoading(false);return;}
   const [taskResult,submissionResult,productResult,referralResult,commissionResult,orderResult,bankResult]=await Promise.all([
    supabase.from("partner_tasks").select("id,title,description,task_type,priority,status,due_at,reference_url,product_id").eq("assigned_partner_id",profile.id).neq("status","cancelled").order("due_at",{ascending:true}),
    supabase.from("partner_task_submissions").select("id,task_id,status,submission_text,proof_url,submitted_at").eq("partner_id",profile.id).order("submitted_at",{ascending:false}),
@@ -113,6 +113,8 @@ export default function PartnerDashboardPage(){
  async function signOut(){await supabase?.auth.signOut();setPartner(null);setTasks([]);setSubmissions([]);setUserEmail("");setNotice("You have signed out.");}
 
  if(loading)return <main className="grid min-h-screen place-items-center bg-[#f5f8f2] text-sm font-semibold text-[#315b43]"><LoaderCircle className="mr-2 animate-spin"/>Loading your Affiliate Hub…</main>;
+
+ if(partner && partner.status !== "active") return <main className="min-h-screen bg-[#f5f7f2] px-4 py-10 text-[#203b2b]"><div className="mx-auto max-w-2xl rounded-[2rem] border border-white bg-white p-7 text-center shadow-xl sm:p-10">{partner.status==="suspended"&&<img src="/affiliate-sad-mascot.svg" alt="A sad eCuisine mascot" className="mx-auto mb-5 h-48 w-48"/>}<span className="inline-flex rounded-full bg-[#f4f6f1] px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-[#657765]">{label(partner.status)} account</span><h1 className="mt-4 text-3xl font-black">{partner.status==="suspended"?"Your affiliate account is suspended":partner.status==="banned"?"Affiliate access has been restricted":partner.status==="paused"?"Your affiliate access is paused":"Your affiliate profile is no longer active"}</h1><p className="mx-auto mt-3 max-w-lg text-sm leading-7 text-[#788579]">{partner.restriction_reason||"Your Affiliate Hub access is currently restricted. You can review the account activity and contact eCuisine if you need help."}</p>{partner.restricted_at&&<p className="mt-2 text-[10px] text-[#9aa398]">Action date: {new Date(partner.restricted_at).toLocaleString("en-NG")}</p>}<div className="mt-6 flex flex-wrap justify-center gap-3"><Link href="/affiliate/appeal" className="rounded-xl bg-[#1d5a3c] px-5 py-3 text-xs font-bold text-white">{["suspended","banned"].includes(partner.status)?"Review decision / submit appeal":"View account activity"}</Link><Link href="/account" className="rounded-xl border border-[#dce5da] px-5 py-3 text-xs font-bold text-[#315b43]">Customer account</Link></div><p className="mt-6 text-[10px] text-[#9aa398]">You can still sign in to review your account history. An appeal does not automatically restore affiliate access.</p></div></main>;
 
  if(!partner)return <main className="relative min-h-screen overflow-hidden bg-[#f4f7f1] px-4 py-8 text-[#203b2b] sm:py-12">
   <div className="pointer-events-none absolute -left-24 top-10 h-72 w-72 rounded-full bg-[#dcebdc] blur-3xl"/>
