@@ -1774,7 +1774,7 @@ html[data-theme="dark"] .ec-category-word--coming{background:linear-gradient(135
 
 /* Unified eCuisine admin design system — matches the live storefront palette and finish. */
 .admin-workspace{background:radial-gradient(ellipse at 4% 0%,rgba(222,237,218,.72),transparent 34%),radial-gradient(ellipse at 96% 8%,rgba(244,224,175,.42),transparent 28%),linear-gradient(135deg,#f7faf5 0%,#f6f3e9 56%,#f7faf5 100%);background-attachment:fixed;color:#26352b}
-.admin-workspace .admin-glass-shell{background:transparent!important}
+.admin-workspace > main{background:transparent!important}.admin-workspace .admin-glass-shell{background:transparent!important}
 .admin-dashboard-root .admin-sidebar-premium{background:rgba(255,255,255,.78);border-color:rgba(216,226,211,.8);backdrop-filter:blur(22px) saturate(160%);box-shadow:12px 0 38px rgba(39,66,43,.045)}
 .admin-dashboard-root .admin-sidebar-brand>span:first-child{background:#f3d36c!important;box-shadow:0 5px 14px rgba(177,135,43,.2)}
 .admin-dashboard-root .admin-topbar-premium{background:rgba(255,255,255,.78);border-color:rgba(220,229,216,.8);backdrop-filter:blur(22px) saturate(160%)}
@@ -1794,6 +1794,8 @@ html[data-theme="dark"] .ec-category-word--coming{background:linear-gradient(135
 .admin-products-page button:not(:disabled):active{transform:translateY(1px)}
 .admin-products-page form>label{line-height:1.45}
 .admin-products-page article{background:rgba(255,255,255,.86);border-color:rgba(255,255,255,.96);box-shadow:0 12px 32px rgba(39,66,43,.065)}
-.admin-products-page article .bg-\\[\\#f8faf6\\]{background:#f5f8f2}
-@media(max-width:640px){.admin-products-page{padding-top:1.25rem}.admin-products-page .grid.lg\\:grid-cols-\\[\\.9fr_1\\.1fr\\]{grid-template-columns:minmax(0,1fr)}.admin-dashboard-root .admin-topbar-premium{padding-left:1rem;padding-right:1rem}}
+@media(max-width:640px){.admin-products-page{padding-top:1.25rem}.admin-dashboard-root .admin-topbar-premium{padding-left:1rem;padding-right:1rem}}
 @media(prefers-reduced-motion:reduce){.admin-products-page button{transition:none}}
+
+.admin-workspace main input:not([type=checkbox]):not([type=file]),.admin-workspace main select,.admin-workspace main textarea{accent-color:#245b42}
+.admin-workspace main button:focus-visible,.admin-workspace main a:focus-visible{outline:3px solid #c6a34b;outline-offset:3px}
