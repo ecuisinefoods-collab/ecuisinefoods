@@ -11,6 +11,7 @@ type Props = {
   latitude: number | null;
   longitude: number | null;
   onChange: (latitude: number, longitude: number) => void;
+  zones?: { id:string; state:string; city:string; area_name:string; coverage_geojson:{type:"Polygon";coordinates:number[][][]}|null }[];
 };
 
 const CENTERS: Record<string, [number, number]> = {
@@ -22,10 +23,11 @@ const CENTERS: Record<string, [number, number]> = {
   default: [9.082, 8.6753],
 };
 
-export function DeliveryLocationPicker({ state, city, latitude, longitude, onChange }: Props) {
+export function DeliveryLocationPicker({ state, city, latitude, longitude, onChange, zones = [] }: Props) {
   const mapElement = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<any>(null);
   const marker = useRef<any>(null);
+  const zoneLayers = useRef<any[]>([]);
   const onChangeRef = useRef(onChange);
   const [mapError, setMapError] = useState("");
   const [ready, setReady] = useState(false);
@@ -89,6 +91,7 @@ export function DeliveryLocationPicker({ state, city, latitude, longitude, onCha
         mapInstance.current?.remove();
         mapInstance.current = null;
         marker.current = null;
+        zoneLayers.current = [];
       };
     }
     return () => {
@@ -96,8 +99,24 @@ export function DeliveryLocationPicker({ state, city, latitude, longitude, onCha
       mapInstance.current?.remove();
       mapInstance.current = null;
       marker.current = null;
+      zoneLayers.current = [];
     };
   }, []);
+
+  useEffect(() => {
+    if (!mapInstance.current || !window.L) return;
+    zoneLayers.current.forEach(layer => layer.remove());
+    zoneLayers.current = [];
+    for (const zone of zones) {
+      const ring = zone.coverage_geojson?.coordinates?.[0];
+      if (!ring || ring.length < 4) continue;
+      const layer = window.L.polygon(ring.map(([lng, lat]: number[]) => [lat, lng]), {
+        color: "#2b8a5b", weight: 2, fillColor: "#48a76c", fillOpacity: 0.08,
+      }).addTo(mapInstance.current);
+      layer.bindTooltip(zone.city + " · " + zone.area_name + " delivery area");
+      zoneLayers.current.push(layer);
+    }
+  }, [zones, ready]);
 
   useEffect(() => {
     if (!mapInstance.current) return;
