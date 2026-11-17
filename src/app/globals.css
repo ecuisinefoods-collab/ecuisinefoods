@@ -1733,3 +1733,34 @@ html[data-theme="dark"] .ec-category-word--coming{background:linear-gradient(135
     filter:none!important;
   }
 }
+
+
+/* Wider product detail gallery and purchase controls styled after the supplied reference. */
+@media (min-width: 1024px) {
+  .ec-product-detail-grid { grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr); }
+  .ec-product-gallery { min-width: 0; }
+  .ec-product-image-stage { min-height: min(68vw, 680px); }
+  .ec-product-image-stage > img { max-height: 640px; }
+}
+.ec-buy-now {
+  background: linear-gradient(135deg, #168446, #087f5b);
+  border: 1px solid rgba(7, 101, 58, .2);
+  box-shadow: 0 9px 22px rgba(8, 92, 61, .18), inset 0 1px 0 rgba(255,255,255,.18);
+}
+.ec-buy-now:hover:not(:disabled) {
+  background: linear-gradient(135deg, #0d713a, #07543f);
+  box-shadow: 0 14px 27px rgba(8, 92, 61, .24);
+}
+.ec-purchase-add {
+  background: linear-gradient(135deg, #edf8e9, #dff1dd) !important;
+  color: #167344 !important;
+  border: 1px solid #a8cfaa !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.95), 0 6px 15px rgba(22,116,68,.07) !important;
+}
+.ec-purchase-add:hover:not(:disabled) {
+  background: linear-gradient(135deg, #e1f2dc, #d1ebcf) !important;
+}
+@media (max-width: 639px) {
+  .ec-product-image-stage { aspect-ratio: 1 / 1; min-height: 330px; }
+  .ec-purchase-actions { grid-template-columns: 1fr 1fr; }
+}
