@@ -1809,3 +1809,91 @@ button:focus-visible,input[type="button"]:focus-visible,input[type="submit"]:foc
 @keyframes ec-buy-overlay-in{from{opacity:0}to{opacity:1}}
 @keyframes ec-buy-panel-in{from{opacity:0;transform:translateY(18px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
 @media(prefers-reduced-motion:reduce){.ec-buy-options-backdrop,.ec-buy-options-panel{animation:none!important}}
+
+/* Premium eCuisine buttons — dimensional colour and soft shadows, never reflective. */
+.ec-primary-cta,
+.ec-catalogue-cart,
+.ec-add-pack,
+.ec-purchase-add,
+.ec-shop-buy-button,
+.ec-shop-buy-confirm,
+.site-header a[href="/cart"],
+.site-header button[type="submit"],
+button[type="submit"],
+input[type="submit"] {
+  border: 1px solid rgba(5, 79, 54, .22);
+  background-color: #087f5b;
+  background-image: linear-gradient(135deg, #0b9369 0%, #087f5b 54%, #07543f 100%);
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(7, 84, 63, .18);
+  overflow: visible;
+  text-shadow: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform .18s cubic-bezier(.2,.75,.25,1), box-shadow .18s ease, background-color .18s ease, border-color .18s ease;
+}
+
+.ec-primary-cta:hover,
+.ec-catalogue-cart:hover,
+.ec-add-pack:hover,
+.ec-purchase-add:hover,
+.ec-shop-buy-button:hover:not(:disabled),
+.ec-shop-buy-confirm:hover:not(:disabled),
+.site-header a[href="/cart"]:hover,
+.site-header button[type="submit"]:hover,
+button[type="submit"]:hover:not(:disabled),
+input[type="submit"]:hover:not(:disabled) {
+  transform: translateY(-2px);
+  background-color: #07543f;
+  background-image: linear-gradient(135deg, #087f5b 0%, #07543f 100%);
+  box-shadow: 0 11px 24px rgba(7, 84, 63, .24);
+}
+
+.ec-primary-cta:active,
+.ec-catalogue-cart:active,
+.ec-add-pack:active,
+.ec-purchase-add:active,
+.ec-shop-buy-button:active:not(:disabled),
+.ec-shop-buy-confirm:active:not(:disabled),
+.site-header a[href="/cart"]:active,
+.site-header button[type="submit"]:active,
+button[type="submit"]:active:not(:disabled),
+input[type="submit"]:active:not(:disabled) {
+  transform: translateY(0) scale(.985);
+  box-shadow: 0 3px 8px rgba(7, 84, 63, .16);
+}
+
+.ec-secondary-cta,
+.site-header a[href="/account"] {
+  box-shadow: 0 4px 12px rgba(31, 73, 43, .07);
+  transition: transform .18s cubic-bezier(.2,.75,.25,1), box-shadow .18s ease, border-color .18s ease, background-color .18s ease;
+}
+
+.ec-secondary-cta:hover,
+.site-header a[href="/account"]:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 9px 18px rgba(31, 73, 43, .11);
+}
+
+.ec-secondary-cta:active,
+.site-header a[href="/account"]:active {
+  transform: translateY(0) scale(.99);
+  box-shadow: 0 2px 6px rgba(31, 73, 43, .07);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ec-primary-cta,
+  .ec-catalogue-cart,
+  .ec-add-pack,
+  .ec-purchase-add,
+  .ec-shop-buy-button,
+  .ec-shop-buy-confirm,
+  .ec-secondary-cta,
+  .site-header a[href="/cart"],
+  .site-header a[href="/account"],
+  .site-header button[type="submit"],
+  button[type="submit"],
+  input[type="submit"] {
+    transition: none !important;
+  }
+}
+
