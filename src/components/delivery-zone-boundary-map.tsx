@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { LocateFixed, Minus, Search, Trash2 } from "lucide-react";
 import type { FormEvent } from "react";
 
@@ -41,9 +41,7 @@ export function DeliveryZoneBoundaryMap({ state, city, value, onChange, zones = 
   const [mapError, setMapError] = useState("");
 
   useEffect(() => { onChangeRef.current = onChange; }, [onChange]);
-  useEffect(() => { pointsRef.current = value; redrawDraft(); }, [value]);
-
-  function redrawDraft() {
+  const redrawDraft = useCallback(() => {
     const map = mapRef.current;
     const L = window.L;
     if (!map || !L) return;
@@ -58,7 +56,9 @@ export function DeliveryZoneBoundaryMap({ state, city, value, onChange, zones = 
         color: "#087f5b", weight: 3, dashArray: "7 7",
       }).addTo(map);
     }
-  }
+  }, []);
+
+  useEffect(() => { pointsRef.current = value; redrawDraft(); }, [value, redrawDraft]);
 
   useEffect(() => {
     let cancelled = false;
@@ -114,7 +114,7 @@ export function DeliveryZoneBoundaryMap({ state, city, value, onChange, zones = 
       mapRef.current?.remove();
       mapRef.current = null;
     };
-  }, []);
+  }, [redrawDraft]);
 
   useEffect(() => {
     const map = mapRef.current;
