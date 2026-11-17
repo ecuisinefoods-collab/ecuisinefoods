@@ -54,7 +54,8 @@ export default function PartnerDashboardPage(){
    supabase.from("products").select("id,name,slug,image_url").eq("is_active",true).order("name").limit(60),
    supabase.rpc("get_my_partner_referral_stats"),
    supabase.from("affiliate_commissions").select("commission_amount,status,earned_at").eq("partner_id",profile.id),
-   supabase.rpc("get_my_partner_referral_orders")
+   supabase.rpc("get_my_partner_referral_orders"),
+   supabase.rpc("get_my_affiliate_bank_details")
   ]);
   if(taskResult.error)setError(taskResult.error.message);
   else setTasks((taskResult.data||[]) as Task[]);
