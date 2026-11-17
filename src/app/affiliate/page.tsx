@@ -94,7 +94,7 @@ export default function PartnerDashboardPage(){
 
  async function saveBankDetails(event:FormEvent<HTMLFormElement>){
   event.preventDefault();if(!supabase)return;
-  if(!bankForm.bank_name.trim()||!bankForm.bank_account_name.trim()||!/^\\d{10}$/.test(bankForm.bank_account_number)){setError("Enter your bank name, account holder name and valid 10-digit account number.");return;}
+  if(!bankForm.bank_name.trim()||!bankForm.bank_account_name.trim()||!/^\d{10}$/.test(bankForm.bank_account_number)){setError("Enter your bank name, account holder name and valid 10-digit account number.");return;}
   setSavingBank(true);setError("");setNotice("");
   const {error:saveError}=await supabase.rpc("update_my_affiliate_bank_details",{p_bank_name:bankForm.bank_name.trim(),p_bank_account_name:bankForm.bank_account_name.trim(),p_bank_account_number:bankForm.bank_account_number});
   if(saveError)setError(saveError.message);else{setBankDetails({...bankForm});setNotice("Your bank details have been saved securely for manual Friday payouts.");}
