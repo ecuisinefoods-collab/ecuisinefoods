@@ -1831,3 +1831,26 @@ button:focus-visible,input[type="button"]:focus-visible,input[type="submit"]:foc
 @keyframes ec-buy-overlay-in{from{opacity:0}to{opacity:1}}
 @keyframes ec-buy-panel-in{from{opacity:0;transform:translateY(18px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
 @media(prefers-reduced-motion:reduce){button:not(:disabled),input[type="button"],input[type="submit"],a[class*="rounded-"],.ec-primary-cta,.ec-secondary-cta,.ec-footer-contact,.ec-footer-social,[role="button"]{transition:none!important}.ec-buy-options-backdrop,.ec-buy-options-panel{animation:none!important}}
+
+
+/* Consistent liquid-glass finish for every actionable button across eCuisine. */
+button:not(:disabled),input[type="button"]:not(:disabled),input[type="submit"]:not(:disabled),a[role="button"],.ec-primary-cta,.ec-secondary-cta,.ec-shop-buy-button,.ec-shop-buy-confirm{
+  position:relative;isolation:isolate;border-color:rgba(255,255,255,.34);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.68),inset 0 -1px 0 rgba(12,55,32,.10),0 6px 16px rgba(26,68,39,.10);
+  transition:transform .22s cubic-bezier(.2,.75,.25,1),box-shadow .22s ease,filter .22s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+button:not(:disabled)::before,input[type="button"]:not(:disabled)::before,input[type="submit"]:not(:disabled)::before,a[role="button"]::before,.ec-primary-cta::before,.ec-secondary-cta::before,.ec-shop-buy-button::before,.ec-shop-buy-confirm::before{
+  content:"";position:absolute;inset:1px;border-radius:inherit;pointer-events:none;z-index:0;
+  background:linear-gradient(180deg,rgba(255,255,255,.32),rgba(255,255,255,.08) 38%,transparent 68%,rgba(8,36,22,.07));
+}
+button:not(:disabled)::after,input[type="button"]:not(:disabled)::after,input[type="submit"]:not(:disabled)::after,a[role="button"]::after,.ec-primary-cta::after,.ec-secondary-cta::after,.ec-shop-buy-button::after,.ec-shop-buy-confirm::after{
+  content:"";position:absolute;inset:1px;border-radius:inherit;pointer-events:none;z-index:0;opacity:0;transform:translateX(-22%);
+  background:linear-gradient(110deg,transparent 18%,rgba(255,255,255,.06) 36%,rgba(255,255,255,.42) 49%,rgba(255,255,255,.08) 61%,transparent 82%);
+  transition:opacity .25s ease,transform .55s cubic-bezier(.2,.75,.25,1);
+}
+button:not(:disabled)>*,input[type="button"]:not(:disabled)>*,input[type="submit"]:not(:disabled)>*,a[role="button"]>*,.ec-primary-cta>*,.ec-secondary-cta>*,.ec-shop-buy-button>*,.ec-shop-buy-confirm>*{position:relative;z-index:1}
+button:not(:disabled):hover,input[type="button"]:not(:disabled):hover,input[type="submit"]:not(:disabled):hover,a[role="button"]:hover,.ec-primary-cta:hover,.ec-secondary-cta:hover,.ec-shop-buy-button:hover,.ec-shop-buy-confirm:hover{transform:translateY(-1px);filter:saturate(1.08) brightness(1.035);box-shadow:inset 0 1px 0 rgba(255,255,255,.82),inset 0 -1px 0 rgba(12,55,32,.08),0 11px 24px rgba(26,68,39,.16)}
+button:not(:disabled):hover::after,input[type="button"]:not(:disabled):hover::after,input[type="submit"]:not(:disabled):hover::after,a[role="button"]:hover::after,.ec-primary-cta:hover::after,.ec-secondary-cta:hover::after,.ec-shop-buy-button:hover::after,.ec-shop-buy-confirm:hover::after{opacity:1;transform:translateX(22%)}
+button:not(:disabled):active,input[type="button"]:not(:disabled):active,input[type="submit"]:not(:disabled):active,a[role="button"]:active,.ec-primary-cta:active,.ec-secondary-cta:active,.ec-shop-buy-button:active,.ec-shop-buy-confirm:active{transform:translateY(0) scale(.985);box-shadow:inset 0 2px 5px rgba(12,55,32,.14),inset 0 1px 0 rgba(255,255,255,.5)}
+@media(prefers-reduced-motion:reduce){button:not(:disabled),input[type="button"]:not(:disabled),input[type="submit"]:not(:disabled),a[role="button"],.ec-primary-cta,.ec-secondary-cta,.ec-shop-buy-button,.ec-shop-buy-confirm{transition:none!important}}
