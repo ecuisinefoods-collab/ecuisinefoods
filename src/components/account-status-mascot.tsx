@@ -17,28 +17,41 @@ const visuals: Record<string, { title: string; subtitle: string; symbol: typeof 
 export default function AccountStatusMascot({ status, compact = false }: { status: AccountStatus; compact?: boolean }) {
   const item = visuals[status] || visuals.active;
   const Symbol = item.symbol;
+
   return (
-    <div className={`flex ${compact ? "items-center gap-3" : "flex-col items-center"}`}>
-      <div className={`relative ${compact ? "h-20 w-20" : "h-56 w-56"}`}>
-        <div className={`absolute inset-[12%] rounded-full bg-gradient-to-br from-[#dff3c9] via-[#eff8e7] to-white blur-[1px] ring-1 ${item.ring}`} />
+    <div className={`flex ${compact ? "items-center gap-3" : "flex-col items-center"}`} aria-label={`eCuisine account status: ${item.title}`}>
+      <div className={`mascot-stage relative isolate shrink-0 ${compact ? "h-20 w-20" : "h-56 w-56"}`}>
+        <div className={`mascot-glow absolute inset-[11%] rounded-full bg-gradient-to-br from-[#e3f8d3] via-[#f4fae9] to-white ring-1 ${item.ring}`} />
+        <div className="mascot-shadow absolute bottom-[7%] left-[24%] h-[7%] w-[52%] rounded-[50%] bg-[#275b31]/20 blur-md" />
         <img
-          src="/affiliate-sad-mascot.svg"
-          alt={`eCuisine ${item.title.toLowerCase()} account mascot`}
-          className={`account-mascot-float relative z-10 h-full w-full object-contain drop-shadow-[0_12px_12px_rgba(24,75,42,.18)] ${status === "active" || status === "restored" ? "account-mascot-happy" : ""}`}
+          src="/eCuisine-3d-mascot.webp"
+          alt={`eCuisine 3D mascot representing an ${item.title.toLowerCase()} account`}
+          draggable={false}
+          className="mascot-character relative z-10 h-full w-full select-none object-contain"
         />
-        <span className={`absolute z-20 grid place-items-center rounded-full shadow-lg ring-4 ring-white ${item.tone} ${compact ? "right-0 top-1 h-8 w-8" : "right-[8%] top-[10%] h-12 w-12"}`}>
+        <span className={`mascot-status absolute z-20 grid place-items-center rounded-full shadow-[0_5px_14px_rgba(20,50,25,.24)] ring-[3px] ring-white ${item.tone} ${compact ? "right-0 top-1 h-8 w-8" : "right-[8%] top-[10%] h-12 w-12"}`}>
           <Symbol size={compact ? 16 : 23} strokeWidth={2.7} />
         </span>
       </div>
-      <div className={compact ? "min-w-0" : "mt-2 text-center"}>
-        <p className={`font-black text-[#274532] ${compact ? "text-xs" : "text-lg"}`}>{item.title}</p>
+      <div className={compact ? "min-w-0" : "mt-1 text-center"}>
+        <p className={`font-black tracking-tight text-[#274532] ${compact ? "text-xs" : "text-lg"}`}>{item.title}</p>
         {!compact && <p className="mt-1 text-xs text-[#7c8b7d]">{item.subtitle}</p>}
       </div>
       <style jsx>{`
-        .account-mascot-float { animation: mascotFloat 3.4s ease-in-out infinite; transform-origin: 50% 65%; }
-        .account-mascot-happy { filter: drop-shadow(0 12px 12px rgba(24,75,42,.18)) saturate(1.12); }
-        @keyframes mascotFloat { 0%,100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(-7px) rotate(1deg); } }
-        @media (prefers-reduced-motion: reduce) { .account-mascot-float { animation: none; } }
+        .mascot-character {
+          transform-origin: 50% 72%;
+          filter: drop-shadow(0 10px 10px rgba(24,75,42,.15)) saturate(1.04);
+          animation: mascot-float 4s ease-in-out infinite;
+        }
+        .mascot-glow { box-shadow: inset 0 0 22px rgba(255,255,255,.8), 0 10px 34px rgba(79,133,54,.08); }
+        .mascot-status { backdrop-filter: blur(8px); }
+        @keyframes mascot-float {
+          0%, 100% { transform: translate3d(0, 0, 0) rotate(-1deg); }
+          50% { transform: translate3d(0, -7px, 0) rotate(1deg); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .mascot-character { animation: none; }
+        }
       `}</style>
     </div>
   );
