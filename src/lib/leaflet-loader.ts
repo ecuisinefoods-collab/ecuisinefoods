@@ -53,3 +53,34 @@ export function loadLeaflet(): Promise<any> {
 
   return leafletPromise;
 }
+
+
+/** Adds OpenStreetMap tiles with a Carto fallback if the primary tile server fails. */
+export function addMapBaseLayer(L: any, map: any, onFailure?: (message: string) => void) {
+  const attribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+  const primary = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19,
+    attribution,
+    crossOrigin: true,
+  });
+
+  let failedTiles = 0;
+  let fallbackActive = false;
+  primary.on("tileerror", () => {
+    failedTiles += 1;
+    if (failedTiles < 2 || fallbackActive) return;
+    fallbackActive = true;
+    primary.remove();
+    const fallback = L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+      maxZoom: 19,
+      subdomains: "abcd",
+      attribution: attribution + ' &copy; <a href="https://carto.com/attributions">CARTO</a>',
+      crossOrigin: true,
+    });
+    fallback.on("tileerror", () => onFailure?.("Map tiles are not responding from either map provider. Check your internet connection and try again."));
+    fallback.addTo(map);
+  });
+
+  primary.addTo(map);
+  return primary;
+}
