@@ -17,7 +17,7 @@ export function ProductPurchasePanel({productId,productName,productImage,variant
   const [selected,setSelected]=useState(available[0]?.id??"");
   const [qty,setQty]=useState(1);
   const [showOptions,setShowOptions]=useState(false);
-  const [notice,setNotice]=useState(false);
+  const [askCheckout,setAskCheckout]=useState(false);
   const [storageError,setStorageError]=useState("");
   const current=variants.find(variant=>variant.id===selected);
   const discount=current?getDiscountPercent(current):0;
@@ -53,9 +53,8 @@ export function ProductPurchasePanel({productId,productName,productImage,variant
         :[...cart,{variant_id:current.id,product_id:productId,name:productName,pack_size:current.pack_size,price:getEffectivePrice(current),original_price:Number(current.price),qty:safeQty,stock_quantity:current.stock_quantity,image_url:productImage}];
       localStorage.setItem(KEY,JSON.stringify(next));
       setStorageError("");
-      setNotice(true);
+      setAskCheckout(true);
       setShowOptions(false);
-      router.push("/cart");
     } catch {
       setStorageError("We could not save your selection. Please enable browser storage and try again.");
     }
@@ -72,7 +71,7 @@ export function ProductPurchasePanel({productId,productName,productImage,variant
       <button type="button" onClick={openOptions} disabled={!available.length} className="ec-buy-now mt-5 inline-flex min-h-[56px] w-full items-center justify-center gap-2 rounded-xl px-5 py-4 text-sm font-black uppercase tracking-[.09em] text-white transition disabled:cursor-not-allowed disabled:opacity-50">
         <ShoppingBag size={19} strokeWidth={2.5}/> Buy now <ArrowRight size={17}/>
       </button>
-      {notice&&<div role="status" className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[#dcebd8] bg-[#f1f8ed] px-3.5 py-3"><span className="inline-flex items-center gap-2 text-xs font-bold text-[#357044]"><Check size={14}/> Added to your cart</span><Link href="/cart" className="inline-flex items-center gap-1 text-xs font-black text-[#245b42]">View cart <ChevronRight size={13}/></Link></div>}
+      
     </section>
 
     {showOptions&&<div className="ec-buy-options-backdrop fixed inset-0 z-[110] flex items-end justify-center bg-[#10251a]/60 p-0 backdrop-blur-sm sm:items-center sm:p-5" onMouseDown={event=>{if(event.target===event.currentTarget)setShowOptions(false);}}>
@@ -82,10 +81,12 @@ export function ProductPurchasePanel({productId,productName,productImage,variant
           <button type="button" onClick={()=>setShowOptions(false)} aria-label="Close product options" className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-[#dfe8dc] bg-white text-[#4c6651]"><X size={17}/></button>
         </div>
         {current&&current.stock_quantity>0?<div className="mt-5">
-          <button type="button" onClick={()=>saveSelection()} disabled={qty>remaining||remaining<1} className="ec-buy-now inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-black uppercase tracking-wide text-white disabled:cursor-not-allowed disabled:opacity-50"><ShoppingBag size={17}/> Add to cart &amp; view cart <ArrowRight size={16}/></button>
+          <div className="mb-4 flex items-center gap-4 rounded-2xl border border-[#e7ecdf] bg-white p-3">{productImage?<img src={productImage} alt={productName} className="h-24 w-24 rounded-xl bg-[#f4f7ef] object-contain p-2"/>:<div className="grid h-24 w-24 place-items-center rounded-xl bg-[#f4f7ef] text-[#8a9b86]"><ShoppingBag size={26}/></div>}<div className="min-w-0 flex-1"><p className="font-extrabold text-[#203b2a]">{productName}</p><p className="mt-1 text-xs text-[#71816f]">{current.pack_size} · {qty} × {money(getEffectivePrice(current))}</p><p className="mt-1 text-lg font-black tabular-nums text-[#087f5b]">{money(lineTotal)}</p></div></div>
+          <button type="button" onClick={()=>saveSelection()} disabled={qty>remaining||remaining<1} className="ec-buy-now inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-black uppercase tracking-wide text-white disabled:cursor-not-allowed disabled:opacity-50"><ShoppingBag size={17}/> Add to Cart <ArrowRight size={16}/></button>
         </div>:<p className="mt-4 rounded-xl bg-[#fff7e7] p-4 text-sm text-[#856c36]">This product is currently unavailable in all pack sizes.</p>}
         <button type="button" onClick={()=>setShowOptions(false)} className="mt-3 w-full rounded-xl px-4 py-3 text-xs font-bold text-[#6e7c70] hover:bg-[#f3f6f1]">Continue browsing</button>
       </section>
     </div>}
+    {askCheckout&&<div className="fixed inset-0 z-[120] flex items-center justify-center bg-[#10251a]/65 p-4 backdrop-blur-sm"><section role="dialog" aria-modal="true" aria-labelledby="ec-added-title" className="w-full max-w-sm rounded-[1.6rem] bg-[#fffefa] p-6 text-center shadow-2xl"><span className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-[#eaf5e7] text-[#287548]"><Check size={23}/></span><h2 id="ec-added-title" className="mt-4 text-xl font-black text-[#173e2d]">Added to your cart!</h2><p className="mt-2 text-sm leading-6 text-[#71816f]">Would you like to check out now?</p><div className="mt-5 grid grid-cols-2 gap-3"><button type="button" onClick={()=>setAskCheckout(false)} className="rounded-xl border border-[#dce5d8] px-4 py-3 text-sm font-bold text-[#45634d]">No, keep shopping</button><button type="button" onClick={()=>{setAskCheckout(false);router.push("/checkout");}} className="rounded-xl bg-[#087f5b] px-4 py-3 text-sm font-black text-white">Yes, check out</button></div></section></div>}
   </>;
 }
