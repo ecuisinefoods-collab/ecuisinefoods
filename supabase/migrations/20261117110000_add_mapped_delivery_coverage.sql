@@ -35,14 +35,14 @@ declare
 begin
   if p_geojson is null or p_lat is null or p_lng is null
      or p_lat < -90 or p_lat > 90 or p_lng < -180 or p_lng > 180
-     or p_geojson->>'type' <> 'Polygon'
-     or jsonb_typeof(p_geojson->'coordinates') <> 'array'
-     or jsonb_array_length(p_geojson->'coordinates') < 1 then
+     or p_geojson->>'type' is distinct from 'Polygon' then
     return false;
   end if;
+  if jsonb_typeof(p_geojson->'coordinates') is distinct from 'array' then return false; end if;
+  if jsonb_array_length(p_geojson->'coordinates') < 1 then return false; end if;
 
   v_ring := p_geojson->'coordinates'->0;
-  if jsonb_typeof(v_ring) <> 'array' then return false; end if;
+  if jsonb_typeof(v_ring) is distinct from 'array' then return false; end if;
   v_count := jsonb_array_length(v_ring);
   if v_count < 4 then return false; end if;
 
@@ -53,10 +53,11 @@ begin
 
   for v_i in 0..(v_count - 2) loop
     v_j := v_i + 1;
-    if jsonb_typeof(v_ring->v_i) <> 'array'
-       or jsonb_typeof(v_ring->v_j) <> 'array'
-       or jsonb_array_length(v_ring->v_i) < 2
-       or jsonb_array_length(v_ring->v_j) < 2 then
+    if jsonb_typeof(v_ring->v_i) is distinct from 'array'
+       or jsonb_typeof(v_ring->v_j) is distinct from 'array' then
+      return false;
+    end if;
+    if jsonb_array_length(v_ring->v_i) < 2 or jsonb_array_length(v_ring->v_j) < 2 then
       return false;
     end if;
 
