@@ -1770,3 +1770,30 @@ html[data-theme="dark"] .ec-category-word--coming{background:linear-gradient(135
 .ec-store-footer .ec-footer-brand__lockup{background:transparent!important;border:0!important;border-radius:0!important;padding:0!important;box-shadow:none!important;outline:0!important;}
 .ec-store-footer .ec-footer-brand__logo{display:block;max-height:76px;max-width:300px;object-fit:contain;object-position:left center;filter:none!important;mix-blend-mode:normal!important;opacity:1!important;transform:none!important;}
 .ec-store-footer .ec-footer-brand__lockup:hover .ec-footer-brand__logo{filter:none!important;transform:none!important;}
+
+
+/* Unified eCuisine admin design system — matches the live storefront palette and finish. */
+.admin-workspace{background:radial-gradient(ellipse at 4% 0%,rgba(222,237,218,.72),transparent 34%),radial-gradient(ellipse at 96% 8%,rgba(244,224,175,.42),transparent 28%),linear-gradient(135deg,#f7faf5 0%,#f6f3e9 56%,#f7faf5 100%);background-attachment:fixed;color:#26352b}
+.admin-workspace .admin-glass-shell{background:transparent!important}
+.admin-dashboard-root .admin-sidebar-premium{background:rgba(255,255,255,.78);border-color:rgba(216,226,211,.8);backdrop-filter:blur(22px) saturate(160%);box-shadow:12px 0 38px rgba(39,66,43,.045)}
+.admin-dashboard-root .admin-sidebar-brand>span:first-child{background:#f3d36c!important;box-shadow:0 5px 14px rgba(177,135,43,.2)}
+.admin-dashboard-root .admin-topbar-premium{background:rgba(255,255,255,.78);border-color:rgba(220,229,216,.8);backdrop-filter:blur(22px) saturate(160%)}
+.admin-dashboard-root .admin-stat-card,.admin-dashboard-root .admin-module-panel{background:rgba(255,255,255,.82);border-color:rgba(255,255,255,.92);box-shadow:0 14px 38px rgba(39,66,43,.07),inset 0 1px 0 rgba(255,255,255,.96);backdrop-filter:blur(18px) saturate(150%)}
+.admin-dashboard-root .admin-nav-link--active{background:linear-gradient(110deg,#e7f1e4,#f6f8f1);color:#245b42;box-shadow:inset 3px 0 #d1a943}
+.admin-dashboard-root .admin-nav-link:not(.admin-nav-link--active):hover,.admin-dashboard-root .admin-module-link:hover{background:rgba(232,242,228,.75);color:#245b42}
+.admin-dashboard-root .admin-nav-group{border-color:rgba(220,229,216,.72);background:rgba(255,255,255,.38)}
+.admin-dashboard-root .admin-role-card{background:linear-gradient(145deg,#edf5e9,#faf4e4);border:1px solid rgba(213,225,205,.8)}
+.admin-dashboard-root .admin-role-pill,.admin-dashboard-root .admin-connection-pill{background:#edf5e9;border-color:#dce9d7;color:#386344}
+.admin-dashboard-root .admin-signout{background:rgba(255,255,255,.72);border-color:#dce6d8;color:#526b55}
+.admin-products-page{background:transparent!important}
+.admin-products-page .rounded-2xl.border{border-color:rgba(255,255,255,.9);box-shadow:0 16px 42px rgba(39,66,43,.075),inset 0 1px 0 rgba(255,255,255,.95);backdrop-filter:blur(18px) saturate(155%)}
+.admin-products-page section.rounded-2xl{border-radius:1.35rem}
+.admin-products-page input:not([type=checkbox]):not([type=file]),.admin-products-page textarea{border-color:#dfe8dc;background:rgba(255,255,255,.82);border-radius:.8rem;transition:border-color .2s,box-shadow .2s}
+.admin-products-page input:focus,.admin-products-page textarea:focus{border-color:#6d9b70;box-shadow:0 0 0 3px rgba(91,139,92,.12);outline:none}
+.admin-products-page button{transition:transform .18s ease,box-shadow .18s ease,background-color .18s ease}
+.admin-products-page button:not(:disabled):active{transform:translateY(1px)}
+.admin-products-page form>label{line-height:1.45}
+.admin-products-page article{background:rgba(255,255,255,.86);border-color:rgba(255,255,255,.96);box-shadow:0 12px 32px rgba(39,66,43,.065)}
+.admin-products-page article .bg-\\[\\#f8faf6\\]{background:#f5f8f2}
+@media(max-width:640px){.admin-products-page{padding-top:1.25rem}.admin-products-page .grid.lg\\:grid-cols-\\[\\.9fr_1\\.1fr\\]{grid-template-columns:minmax(0,1fr)}.admin-dashboard-root .admin-topbar-premium{padding-left:1rem;padding-right:1rem}}
+@media(prefers-reduced-motion:reduce){.admin-products-page button{transition:none}}
