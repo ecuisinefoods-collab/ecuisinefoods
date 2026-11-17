@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { LocateFixed, Minus, Search, Trash2 } from "lucide-react";
 import type { FormEvent } from "react";
+import { addMapBaseLayer, loadLeaflet } from "@/lib/leaflet-loader";
 
 declare global { interface Window { L?: any } }
 export type BoundaryPoint = [number, number]; // [longitude, latitude]
@@ -39,6 +40,7 @@ export function DeliveryZoneBoundaryMap({ state, city, value, onChange, zones = 
   const [query, setQuery] = useState("");
   const [searching, setSearching] = useState(false);
   const [mapError, setMapError] = useState("");
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => { onChangeRef.current = onChange; }, [onChange]);
   const redrawDraft = useCallback(() => {
@@ -62,59 +64,52 @@ export function DeliveryZoneBoundaryMap({ state, city, value, onChange, zones = 
 
   useEffect(() => {
     let cancelled = false;
-    const initialize = () => {
-      if (cancelled || !element.current || !window.L || mapRef.current) return;
-      const L = window.L;
-      const map = L.map(element.current, { scrollWheelZoom: false }).setView(CENTERS[state] || DEFAULT_CENTER, 12);
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        maxZoom: 19,
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      }).addTo(map);
-      map.on("click", (event: any) => {
-        const next: BoundaryPoint[] = [...pointsRef.current, [Number(event.latlng.lng.toFixed(6)), Number(event.latlng.lat.toFixed(6))]];
-        pointsRef.current = next;
-        onChangeRef.current(next);
-      });
-      mapRef.current = map;
-      setReady(true);
-      window.setTimeout(() => { map.invalidateSize(); redrawDraft(); }, 120);
-    };
+    let resizeObserver: ResizeObserver | null = null;
+    const handleResize = () => mapRef.current?.invalidateSize();
 
-    if (!document.querySelector('link[data-ecuisine-leaflet="true"]')) {
-      const link = document.createElement("link");
-      link.rel = "stylesheet";
-      link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
-      link.dataset.ecuisineLeaflet = "true";
-      document.head.appendChild(link);
-    }
-    if (window.L) initialize();
-    else {
-      let script = document.querySelector<HTMLScriptElement>('script[data-ecuisine-leaflet="true"]');
-      if (!script) {
-        script = document.createElement("script");
-        script.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
-        script.async = true;
-        script.dataset.ecuisineLeaflet = "true";
-        document.body.appendChild(script);
+    async function initialize() {
+      setReady(false);
+      setMapError("");
+      try {
+        const L = await loadLeaflet();
+        if (cancelled || !element.current || mapRef.current) return;
+        const map = L.map(element.current, { scrollWheelZoom: false, zoomControl: true }).setView(CENTERS[state] || DEFAULT_CENTER, 12);
+        mapRef.current = map;
+        addMapBaseLayer(L, map, message => setMapError(message));
+        map.on("click", (event: any) => {
+          const next: BoundaryPoint[] = [...pointsRef.current, [Number(event.latlng.lng.toFixed(6)), Number(event.latlng.lat.toFixed(6))]];
+          pointsRef.current = next;
+          onChangeRef.current(next);
+        });
+        map.whenReady(() => {
+          if (cancelled) return;
+          setReady(true);
+          window.requestAnimationFrame(() => map.invalidateSize(true));
+          redrawDraft();
+        });
+        if ("ResizeObserver" in window) {
+          resizeObserver = new ResizeObserver(() => {
+            if (mapRef.current === map) map.invalidateSize();
+          });
+          resizeObserver.observe(element.current);
+        }
+        window.addEventListener("resize", handleResize);
+      } catch (error) {
+        if (!cancelled) setMapError(error instanceof Error ? error.message : "The map could not be loaded. Please try again.");
       }
-      const handleLoad = () => initialize();
-      const handleError = () => setMapError("The map could not load. Check your connection and reload this page.");
-      script.addEventListener("load", handleLoad);
-      script.addEventListener("error", handleError);
-      return () => {
-        cancelled = true;
-        script?.removeEventListener("load", handleLoad);
-        script?.removeEventListener("error", handleError);
-        mapRef.current?.remove();
-        mapRef.current = null;
-      };
     }
+
+    void initialize();
     return () => {
       cancelled = true;
+      resizeObserver?.disconnect();
+      window.removeEventListener("resize", handleResize);
       mapRef.current?.remove();
       mapRef.current = null;
+      draftLayer.current = null;
+      zoneLayers.current = [];
     };
-  }, [redrawDraft]);
+  }, [redrawDraft, retryCount]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -182,8 +177,8 @@ export function DeliveryZoneBoundaryMap({ state, city, value, onChange, zones = 
       <button type="button" onClick={() => updatePoints([])} disabled={!value.length} className="inline-flex items-center gap-2 rounded-lg border border-[#ead9d4] bg-white px-3 py-2 text-xs font-bold text-[#9b5144] disabled:opacity-40"><Trash2 size={13}/> Clear boundary</button>
       <span className="text-[11px] text-[#7c897b]">Tip: click in a loop around the delivery area. The polygon closes automatically when saved.</span>
     </div>
-    {mapError && <p role="alert" className="mt-2 rounded-lg bg-red-50 p-2 text-xs text-red-700">{mapError}</p>}
+    {mapError && <div role="alert" className="mt-2 flex flex-wrap items-center justify-between gap-2 rounded-lg bg-red-50 p-3 text-xs text-red-700"><span>{mapError}</span><button type="button" onClick={() => { setMapError(""); setRetryCount(count => count + 1); }} className="rounded-lg border border-red-200 bg-white px-3 py-2 font-bold text-red-700">Try loading again</button></div>}
     {!ready && !mapError && <p className="mt-2 text-xs text-[#899487]">Loading map…</p>}
-    <p className="mt-2 text-[11px] text-[#899487]">Map data © OpenStreetMap contributors.</p>
+    <p className="mt-2 text-[11px] text-[#899487]">Map data © OpenStreetMap contributors · Carto fallback tiles when needed.</p>
   </section>;
 }
