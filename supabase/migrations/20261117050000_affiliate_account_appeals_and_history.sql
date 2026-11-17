@@ -104,3 +104,6 @@ end;
 $$;
 revoke all on function private.claim_ecuisine_partner_account() from public;
 grant execute on function private.claim_ecuisine_partner_account() to authenticated;
+
+revoke all on function public.log_affiliate_account_status_change() from public, anon, authenticated;
+revoke all on function public.log_affiliate_appeal_review() from public, anon, authenticated;
