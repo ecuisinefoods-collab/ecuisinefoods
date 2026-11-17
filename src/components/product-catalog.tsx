@@ -20,23 +20,41 @@ export function ProductCatalog({ products, initialCategory = "All products", ini
   const [search,setSearch]=useState(initialSearch);
   const [sort,setSort]=useState("featured");
   const [notice,setNotice]=useState("");
+  const [buyingProduct,setBuyingProduct]=useState<Product|null>(null);
+  const [selectedVariantId,setSelectedVariantId]=useState("");
+  const [buyQuantity,setBuyQuantity]=useState(1);
   useEffect(()=>{setCart(readCart());},[]);
+  useEffect(()=>{
+    if(!buyingProduct)return;
+    const closeOnEscape=(event:KeyboardEvent)=>{if(event.key==="Escape")setBuyingProduct(null);};
+    window.addEventListener("keydown",closeOnEscape);
+    return ()=>window.removeEventListener("keydown",closeOnEscape);
+  },[buyingProduct]);
 
   function save(next:CartItem[]) {
     setCart(next);
     try { localStorage.setItem(KEY,JSON.stringify(next)); } catch {}
   }
-  function add(product:Product,variant:Variant) {
-    if(variant.stock_quantity<=0)return;
+  function add(product:Product,variant:Variant,quantity:number) {
     const found=cart.find(item=>item.variant_id===variant.id);
+    const alreadyInCart=found?.qty??0;
+    const quantityToAdd=Math.min(Math.max(0,Math.floor(quantity)),Math.max(0,variant.stock_quantity-alreadyInCart));
+    if(quantityToAdd<=0){setNotice("You already have all available "+variant.pack_size+" units in your cart.");return;}
     save(found
       ? cart.map(item=>item.variant_id===variant.id
-        ? {...item,qty:Math.min(item.qty+1,variant.stock_quantity),price:getEffectivePrice(variant),original_price:Number(variant.price),stock_quantity:variant.stock_quantity}
+        ? {...item,qty:item.qty+quantityToAdd,price:getEffectivePrice(variant),original_price:Number(variant.price),stock_quantity:variant.stock_quantity}
         : item)
-      : [...cart,{variant_id:variant.id,product_id:product.id,name:product.name,pack_size:variant.pack_size,price:getEffectivePrice(variant),original_price:Number(variant.price),qty:1,stock_quantity:variant.stock_quantity,image_url:product.image_url}]
+      : [...cart,{variant_id:variant.id,product_id:product.id,name:product.name,pack_size:variant.pack_size,price:getEffectivePrice(variant),original_price:Number(variant.price),qty:quantityToAdd,stock_quantity:variant.stock_quantity,image_url:product.image_url}]
     );
-    setNotice(product.name+" · "+variant.pack_size+" added to your cart");
-    window.setTimeout(()=>setNotice(""),2600);
+    setNotice(product.name+" · "+variant.pack_size+" × "+quantityToAdd+" added to your cart");
+    window.setTimeout(()=>setNotice(""),3200);
+  }
+  function openBuyOptions(product:Product) {
+    const variants=product.product_variants??[];
+    const firstAvailable=variants.find(variant=>variant.stock_quantity>0)??variants[0];
+    setBuyingProduct(product);
+    setSelectedVariantId(firstAvailable?.id??"");
+    setBuyQuantity(1);
   }
 
   const categories=["All products",...Array.from(new Set(products.map(product=>product.category).filter(Boolean)))];
@@ -61,6 +79,9 @@ export function ProductCatalog({ products, initialCategory = "All products", ini
   const totalQty=cart.reduce((sum,item)=>sum+item.qty,0);
   const stockCount=shown.reduce((sum,product)=>sum+(product.product_variants||[]).filter(variant=>variant.stock_quantity>0).length,0);
   const saleLabel=(product:Product)=>Math.max(0,...(product.product_variants??[]).map(getDiscountPercent));
+  const selectedVariant=buyingProduct?.product_variants?.find(variant=>variant.id===selectedVariantId)??null;
+  const selectedAlreadyInCart=selectedVariant?cart.find(item=>item.variant_id===selectedVariant.id)?.qty??0:0;
+  const remainingSelectedStock=selectedVariant?Math.max(0,selectedVariant.stock_quantity-selectedAlreadyInCart):0;
 
   return <div className="ec-catalogue">
     <div className="ec-catalogue-toolbar rounded-3xl border bg-white p-3 shadow-sm sm:p-4">
@@ -136,12 +157,13 @@ export function ProductCatalog({ products, initialCategory = "All products", ini
                 </div>
                 <Link href={"/products/"+product.slug} className="inline-flex shrink-0 items-center gap-1 text-[11px] font-extrabold text-[#245b42]">Product details <ArrowRight size={13}/></Link>
               </div>
-              {variants.length ? <div className="mt-4 space-y-2">
-                {variants.map(variant=><div key={variant.id} className="ec-pack-row flex items-center justify-between gap-3 rounded-xl px-3 py-2.5">
-                  <div className="min-w-0"><p className="text-xs font-bold text-[#405044]">{variant.pack_size}</p><p className="mt-1 text-sm font-black text-[#245b42]">{money(getEffectivePrice(variant))}{getDiscountPercent(variant)>0&&<span className="ml-2 text-[9px] font-black text-[#b45a3c]">{getDiscountPercent(variant)}% OFF</span>}</p>{getDiscountPercent(variant)>0&&<p className="text-[10px] text-[#899288] line-through">{money(Number(variant.price))}</p>}<p className={"mt-0.5 text-[9px] font-semibold "+(variant.stock_quantity>0?"text-[#648064]":"text-[#a34b42]")}>{variant.stock_quantity>0?variant.stock_quantity+" available":"Out of stock"}</p></div>
-                  <button type="button" disabled={variant.stock_quantity<=0} onClick={()=>add(product,variant)} aria-label={"Add "+product.name+" "+variant.pack_size+" to cart"} className="ec-add-pack grid h-10 w-10 shrink-0 place-items-center rounded-full text-white transition hover:scale-105 disabled:cursor-not-allowed disabled:bg-[#d8ddd7]"><Plus size={16}/></button>
-                </div>)}
-              </div> : <p className="mt-4 rounded-xl bg-[#fff9e8] px-3 py-3 text-[11px] font-semibold text-[#8b7441]">Pack sizes and prices will be announced soon.</p>}
+              <div className="mt-5 border-t border-[#eef1e9] pt-4">
+                <button type="button" onClick={()=>openBuyOptions(product)} className="ec-shop-buy-button flex w-full items-center justify-center gap-2 rounded-xl bg-[#087f5b] px-5 py-3.5 text-sm font-extrabold text-white shadow-lg transition hover:-translate-y-0.5">
+                  <ShoppingBag size={17}/> Buy
+                  <span className="ml-1 text-[10px] font-semibold text-white/80">{available?"Choose size & quantity":"View availability"}</span>
+                </button>
+                {!variants.length&&<p className="mt-2 text-center text-[10px] font-medium text-[#899288]">Pack sizes and prices will be announced soon.</p>}
+              </div>
             </div>
           </article>;
         })}
@@ -155,6 +177,32 @@ export function ProductCatalog({ products, initialCategory = "All products", ini
       </div>
     )}
   </div>;
+    {buyingProduct&&<div className="ec-buy-options-backdrop fixed inset-0 z-[100] flex items-end justify-center bg-[#10251a]/55 p-0 backdrop-blur-sm sm:items-center sm:p-5" onMouseDown={event=>{if(event.target===event.currentTarget)setBuyingProduct(null);}}>
+      <section role="dialog" aria-modal="true" aria-labelledby="ec-buy-options-title" className="ec-buy-options-panel w-full max-w-md rounded-t-[1.8rem] border border-white/80 bg-[#fffefa] p-5 shadow-2xl sm:rounded-[1.8rem] sm:p-6">
+        <div className="flex items-start justify-between gap-4">
+          <div><p className="text-[9px] font-black uppercase tracking-[.18em] text-[#a17c20]">eCuisine · Your selection</p><h2 id="ec-buy-options-title" className="mt-1 text-xl font-black text-[#173e2d]">{buyingProduct.name}</h2><p className="mt-1 text-xs text-[#778477]">Choose the pack size and quantity you need.</p></div>
+          <button type="button" onClick={()=>setBuyingProduct(null)} aria-label="Close product options" className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-[#dfe8dc] bg-white text-[#4c6651]"><span aria-hidden="true" className="text-xl leading-none">×</span></button>
+        </div>
+        {buyingProduct.product_variants?.length?<>
+          <label className="mt-6 block text-xs font-bold text-[#405443]">Pack size
+            <select value={selectedVariantId} onChange={event=>{setSelectedVariantId(event.target.value);setBuyQuantity(1);}} className="mt-2 w-full rounded-xl border border-[#dfe7dc] bg-white px-4 py-3 text-sm font-semibold text-[#25392b] outline-none focus:border-[#4c805b]">
+              {buyingProduct.product_variants.map(variant=><option key={variant.id} value={variant.id} disabled={variant.stock_quantity<=0}>{variant.pack_size} · {money(getEffectivePrice(variant))}{variant.stock_quantity>0?" · "+variant.stock_quantity+" available":" · Out of stock"}</option>)}
+            </select>
+          </label>
+          {selectedVariant&&<div className="mt-4 flex items-center justify-between gap-4 rounded-2xl bg-[#f1f7ed] p-4">
+            <div><p className="text-[10px] font-bold uppercase tracking-wider text-[#71816f]">Price per pack</p><p className="mt-1 text-xl font-black tabular-nums text-[#087f5b]">{money(getEffectivePrice(selectedVariant))}</p>{getDiscountPercent(selectedVariant)>0&&<p className="mt-1 text-[10px] font-semibold text-[#ad5a3e]">{getDiscountPercent(selectedVariant)}% off · <span className="line-through">{money(Number(selectedVariant.price))}</span></p>}<p className="mt-1 text-[10px] text-[#71816f]">{remainingSelectedStock>0?remainingSelectedStock+" more available to add":selectedVariant.stock_quantity>0?"All available units are already in your cart":"Currently out of stock"}</p></div>
+            <div className="shrink-0 text-right"><p className="text-[10px] font-bold uppercase tracking-wider text-[#71816f]">Quantity</p><div className="mt-2 flex items-center gap-3">
+              <button type="button" onClick={()=>setBuyQuantity(value=>Math.max(1,value-1))} disabled={buyQuantity<=1} aria-label="Decrease quantity" className="grid h-9 w-9 place-items-center rounded-full border border-[#d4e2d0] bg-white text-[#315b43] disabled:opacity-35"><Minus size={14}/></button>
+              <span aria-live="polite" className="min-w-5 text-center text-base font-black tabular-nums text-[#203b2a]">{buyQuantity}</span>
+              <button type="button" onClick={()=>setBuyQuantity(value=>Math.min(remainingSelectedStock,value+1))} disabled={buyQuantity>=remainingSelectedStock} aria-label="Increase quantity" className="grid h-9 w-9 place-items-center rounded-full border border-[#d4e2d0] bg-white text-[#315b43] disabled:opacity-35"><Plus size={14}/></button>
+            </div></div>
+          </div>}
+          <div className="mt-5 flex items-center justify-between gap-3 border-t border-[#edf0e9] pt-4"><span className="text-xs font-semibold text-[#667568]">Total for this selection</span><strong className="text-lg font-black tabular-nums text-[#173e2d]">{selectedVariant?money(getEffectivePrice(selectedVariant)*buyQuantity):"—"}</strong></div>
+          <button type="button" disabled={!selectedVariant||remainingSelectedStock<1} onClick={()=>{if(selectedVariant){add(buyingProduct,selectedVariant,buyQuantity);setBuyingProduct(null);}}} className="ec-shop-buy-confirm mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-[#087f5b] px-5 py-3.5 text-sm font-extrabold text-white disabled:cursor-not-allowed disabled:opacity-45"><ShoppingBag size={16}/> Add to cart</button>
+        </>:<div className="mt-6 rounded-2xl bg-[#fff7e7] p-4 text-sm leading-6 text-[#856c36]">Pack sizes and prices are not available for this product yet. Please check back soon.</div>}
+        <button type="button" onClick={()=>setBuyingProduct(null)} className="mt-3 w-full rounded-xl px-4 py-3 text-xs font-bold text-[#6e7c70] hover:bg-[#f3f6f1]">Continue shopping</button>
+      </section>
+    </div>}
 }
 
 export function CartPage(){
