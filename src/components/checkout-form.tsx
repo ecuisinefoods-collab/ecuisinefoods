@@ -3,11 +3,8 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, CheckCircle2, MapPin, MessageCircle, PackageCheck, ShoppingBag } from "lucide-react";
-import { NIGERIAN_STATES } from "@/lib/nigerian-states";
 import { supabase } from "@/lib/supabase";
 import { getEffectivePrice } from "@/lib/product-pricing";
-import { DeliveryLocationPicker } from "@/components/delivery-location-picker";
-import { isPointInsideDeliveryCoverage, type DeliveryCoverageGeoJSON } from "@/lib/delivery-coverage";
 
 type Location = {
   id:string; city:string; location_name:string; instructions:string|null;
@@ -15,12 +12,17 @@ type Location = {
 };
 type DeliveryZone = {
   id:string; state:string; city:string; area_name:string; delivery_fee:number;
-  minimum_order_amount:number; estimated_days:string|null; instructions:string|null; coverage_geojson:DeliveryCoverageGeoJSON|null; sort_order?:number;
+  minimum_order_amount:number; estimated_days:string|null; instructions:string|null; sort_order?:number;
 };
 type Item = { variant_id:string; product_id:string; name:string; pack_size:string; price:number; original_price?:number; qty:number; stock_quantity?:number; image_url?:string|null };
 type OrderCreated = { order_number:number; tracking_code:string; subtotal:number; delivery_fee:number; discount_amount:number; coupon_code:string|null; total:number; payment_method:string; payment_status:string; payment_reference:string|null };
 type PaymentSettings = { bank_name:string; account_name:string; account_number:string; transfer_instructions:string; bank_transfer_enabled:boolean; cash_pickup_enabled:boolean; cash_delivery_enabled:boolean };
 const defaultPaymentSettings:PaymentSettings = { bank_name:"", account_name:"", account_number:"", transfer_instructions:"", bank_transfer_enabled:false, cash_pickup_enabled:true, cash_delivery_enabled:true };
+
+const DELIVERY_DESTINATIONS = [
+  { state: "Plateau", label: "Jos, Plateau" },
+  { state: "Federal Capital Territory", label: "Abuja (FCT)" },
+] as const;
 
 const CART_KEY="ecuisinefoods-cart-v1";
 const money=(n:number)=>"₦"+Number(n||0).toLocaleString("en-NG");
@@ -39,8 +41,6 @@ export function CheckoutForm({ locations, deliveryZones }: { locations: Location
   const [phone,setPhone]=useState("");
   const [email,setEmail]=useState("");
   const [state,setState]=useState("");
-  const [deliveryLatitude,setDeliveryLatitude]=useState<number|null>(null);
-  const [deliveryLongitude,setDeliveryLongitude]=useState<number|null>(null);
   const [street,setStreet]=useState("");
   const [landmark,setLandmark]=useState("");
   const [notes,setNotes]=useState("");
@@ -129,10 +129,8 @@ export function CheckoutForm({ locations, deliveryZones }: { locations: Location
 
   const subtotal=useMemo(()=>cart.reduce((sum,item)=>sum+Number(item.price)*item.qty,0),[cart]);
   const cityLocations=locations.filter(x=>x.city===city&&x.id);
-  const availableZones=deliveryZones.filter(z=>z.state===state);
-  const selectedZone=method==="delivery"&&deliveryLatitude!==null&&deliveryLongitude!==null
-    ? availableZones.find(z=>isPointInsideDeliveryCoverage(deliveryLongitude,deliveryLatitude,z.coverage_geojson))
-    : undefined;
+  const availableZones=deliveryZones.filter(z=>z.state===state&&DELIVERY_DESTINATIONS.some(destination=>destination.state===z.state));
+  const selectedZone=method==="delivery"?availableZones[0]:undefined;
   const deliveryZoneId=selectedZone?.id??"";
   const deliveryFee=selectedZone?Number(selectedZone.delivery_fee):0;
   const minOrder=Number(selectedZone?.minimum_order_amount||0);
@@ -142,7 +140,7 @@ export function CheckoutForm({ locations, deliveryZones }: { locations: Location
   const selectedPaymentReady=paymentMethod==="bank_transfer"?bankTransferReady:cashPaymentReady;
   const missingMinimum=Math.max(0,minOrder-subtotal);
   const stockUnavailable=cart.some(item=>!Number(item.stock_quantity)||Number(item.stock_quantity)<item.qty);
-  const canContinue=Boolean(stockChecked&&!stockIssue&&!stockUnavailable&&cart.length>0&&name.trim().length>=2&&phone.trim()&&(method==="pickup"?!!pickup:!!state&&!!deliveryZoneId&&!!street.trim()&&deliveryLatitude!==null&&deliveryLongitude!==null&&minimumMet)&&selectedPaymentReady);
+  const canContinue=Boolean(stockChecked&&!stockIssue&&!stockUnavailable&&cart.length>0&&name.trim().length>=2&&phone.trim()&&(method==="pickup"?!!pickup:!!state&&!!deliveryZoneId&&!!street.trim()&&minimumMet)&&selectedPaymentReady);
 
   async function submitOrder(e:FormEvent<HTMLFormElement>){
     e.preventDefault();
@@ -156,8 +154,8 @@ export function CheckoutForm({ locations, deliveryZones }: { locations: Location
       fulfillment_method:method,payment_method:paymentMethod,pickup_location_id:method==="pickup"?pickup:null,
       delivery_zone_id:method==="delivery"?deliveryZoneId:null,
       street_address:method==="delivery"?street.trim():null,
-      delivery_latitude:method==="delivery"?deliveryLatitude:null,
-      delivery_longitude:method==="delivery"?deliveryLongitude:null,
+      delivery_state:method==="delivery"?selectedZone?.state:null,
+      delivery_city:method==="delivery"?selectedZone?.city:null,
       house_number_landmark:method==="delivery"?landmark.trim():null,
       order_notes:notes.trim()||null,
       coupon_code:couponCode.trim()||null,
@@ -186,7 +184,7 @@ export function CheckoutForm({ locations, deliveryZones }: { locations: Location
       "Customer: "+name.trim(),
       "Phone: "+phone.trim(),
       email.trim()?"Email: "+email.trim():"",
-      method==="pickup"?"Pickup: "+(selected?.city||city)+" — "+(selected?.location_name||"Selected pickup point"):"Delivery: "+street.trim()+", "+selectedZone?.city+", "+selectedZone?.state+" — "+selectedZone?.area_name+(landmark.trim()?" (Landmark: "+landmark.trim()+")":"")+(deliveryLatitude!==null&&deliveryLongitude!==null?" (Map pin: "+deliveryLatitude+", "+deliveryLongitude+")":""),
+      method==="pickup"?"Pickup: "+(selected?.city||city)+" — "+(selected?.location_name||"Selected pickup point"):"Delivery: "+street.trim()+", "+selectedZone?.city+", "+selectedZone?.state+" — "+selectedZone?.area_name+(landmark.trim()?" (Landmark: "+landmark.trim()+")":""),
       notes.trim()?"Notes: "+notes.trim():"",
       "",
       "Track this order: "+trackingUrl,
@@ -228,7 +226,26 @@ export function CheckoutForm({ locations, deliveryZones }: { locations: Location
             <label className="text-xs font-semibold text-[#68766b] sm:col-span-2">Email (optional)<input type="email" value={email} onChange={e=>setEmail(e.target.value)} className="mt-1.5 w-full rounded-xl border border-[#dfe4da] bg-white/85 px-3 py-3 text-sm text-[#203329] outline-none focus:border-[#245b42]" placeholder="you@example.com"/></label>
           </div></section>
           <section className="border-t border-[#edf0e9] pt-5"><h2 className="font-bold text-[#203329]">How would you like to receive your order?</h2><div className="mt-3 grid grid-cols-2 gap-2"><button type="button" onClick={()=>{setMethod("pickup");if(paymentMethod!=="bank_transfer")setPaymentMethod("cash");}} className={`rounded-xl border px-4 py-3 text-sm font-bold ${method==="pickup"?"border-[#245b42] bg-[#edf3e9] text-[#245b42]":"border-[#dfe4da] bg-white/70 text-[#68766b]"}`}>Pickup</button><button type="button" disabled={!deliveryZones.length} onClick={()=>{setMethod("delivery");if(paymentMethod!=="bank_transfer")setPaymentMethod("cash_on_delivery");}} className={`rounded-xl border px-4 py-3 text-sm font-bold ${method==="delivery"?"border-[#245b42] bg-[#edf3e9] text-[#245b42]":"border-[#dfe4da] bg-white/70 text-[#68766b]"} disabled:cursor-not-allowed disabled:opacity-50`}>Home delivery{!deliveryZones.length?" · Not set up":""}</button></div>
-            {!deliveryZones.length&&<p className="mt-3 rounded-xl bg-[#fff7e8] p-4 text-xs leading-5 text-[#795b21]">Home delivery cannot be selected yet because no delivery areas or fees have been configured. Please choose one of the active pickup points for this order.</p>}{method==="pickup"?<div className="mt-4 rounded-xl bg-[#fbfaf7]/80 p-4"><label className="text-xs font-semibold text-[#68766b]">Pickup city<select value={city} onChange={e=>{setCity(e.target.value);setPickup("");}} className="mt-1.5 w-full rounded-xl border border-[#dfe4da] bg-white px-3 py-3 text-sm text-[#203329]">{Array.from(new Set(locations.map(l=>l.city))).map(value=><option key={value}>{value}</option>)}</select></label><label className="mt-3 block text-xs font-semibold text-[#68766b]">Pickup location<select required value={pickup} onChange={e=>setPickup(e.target.value)} className="mt-1.5 w-full rounded-xl border border-[#dfe4da] bg-white px-3 py-3 text-sm text-[#203329]"><option value="">Select a location</option>{cityLocations.map(l=><option key={l.id} value={l.id}>{l.location_name}</option>)}</select></label>{pickup&&(()=>{const selected=cityLocations.find(l=>l.id===pickup);return selected?<div className="mt-3 rounded-xl bg-white/75 p-3 text-xs leading-5 text-[#68766b]"><p className="flex gap-2"><MapPin size={14} className="mt-0.5 shrink-0"/>{selected.address||selected.instructions||"Please wait for our order confirmation before visiting."}</p>{selected.opening_hours&&<p className="mt-2">Hours: {selected.opening_hours}</p>}{selected.contact_phone&&<p className="mt-1">Location contact: {selected.contact_phone}</p>}</div>:null;})()}</div>:<div className="mt-4 grid gap-3 rounded-xl bg-[#fbfaf7]/80 p-4 sm:grid-cols-2"><label className="text-xs font-semibold text-[#68766b]">State<select required value={state} onChange={e=>{setState(e.target.value);setDeliveryLatitude(null);setDeliveryLongitude(null);}} className="mt-1.5 w-full rounded-xl border border-[#dfe4da] bg-white px-3 py-3 text-sm"><option value="">Select state</option>{NIGERIAN_STATES.map(s=><option key={s} value={s}>{s}</option>)}</select></label><div className="rounded-xl border border-[#dfe8da] bg-white p-3 text-xs leading-5 text-[#68766b]"><b className="block text-[#315b43]">Your delivery fee is matched automatically</b><span>Choose your state, then pin your exact address on the map. We will identify the coverage area and show its delivery charge.</span>{state&&!availableZones.length&&<span className="mt-2 block font-bold text-[#9b5144]">No mapped delivery zones are active in this state yet.</span>}</div><label className="text-xs font-semibold text-[#68766b] sm:col-span-2">Street address<input required value={street} onChange={e=>setStreet(e.target.value)} className="mt-1.5 w-full rounded-xl border border-[#dfe4da] bg-white px-3 py-3 text-sm" placeholder="Street / area"/></label><label className="text-xs font-semibold text-[#68766b] sm:col-span-2">House number / landmark<input value={landmark} onChange={e=>setLandmark(e.target.value)} className="mt-1.5 w-full rounded-xl border border-[#dfe4da] bg-white px-3 py-3 text-sm" placeholder="House number or nearby landmark"/></label><DeliveryLocationPicker state={state} city={selectedZone?.city||""} latitude={deliveryLatitude} longitude={deliveryLongitude} zones={availableZones} onChange={(lat,lng)=>{setDeliveryLatitude(lat);setDeliveryLongitude(lng);}}/>{selectedZone&&<div className="rounded-xl bg-white/75 p-3 text-xs leading-5 text-[#68766b] sm:col-span-2"><p>Delivery fee: <b>{money(deliveryFee)}</b>{selectedZone.estimated_days?" · Estimated: "+selectedZone.estimated_days:""}</p>{selectedZone.instructions&&<p className="mt-1">{selectedZone.instructions}</p>}{minOrder>0&&<p className={minimumMet?"mt-1 text-green-700":"mt-1 font-bold text-red-700"}>Minimum order: {money(minOrder)}{minimumMet?" — minimum met":" — add "+money(missingMinimum)+" more to continue"}</p>}</div>}{deliveryLatitude!==null&&!selectedZone&&<p role="alert" className="rounded-xl bg-[#fff2eb] p-3 text-xs font-semibold leading-5 text-[#9b5144] sm:col-span-2">This pin is outside our mapped delivery areas. Please choose another location or contact eCuisine before ordering.</p>}{deliveryLatitude===null&&<p className="rounded-xl bg-[#f4f7ef] p-3 text-xs text-[#68766b] sm:col-span-2">Select a map pin to see the delivery area and exact delivery fee.</p>}</div>}
+            {!deliveryZones.length&&<p className="mt-3 rounded-xl bg-[#fff7e8] p-4 text-xs leading-5 text-[#795b21]">Home delivery cannot be selected yet because no delivery areas or fees have been configured. Please choose one of the active pickup points for this order.</p>}{method==="pickup"?<div className="mt-4 rounded-xl bg-[#fbfaf7]/80 p-4"><label className="text-xs font-semibold text-[#68766b]">Pickup city<select value={city} onChange={e=>{setCity(e.target.value);setPickup("");}} className="mt-1.5 w-full rounded-xl border border-[#dfe4da] bg-white px-3 py-3 text-sm text-[#203329]">{Array.from(new Set(locations.map(l=>l.city))).map(value=><option key={value}>{value}</option>)}</select></label><label className="mt-3 block text-xs font-semibold text-[#68766b]">Pickup location<select required value={pickup} onChange={e=>setPickup(e.target.value)} className="mt-1.5 w-full rounded-xl border border-[#dfe4da] bg-white px-3 py-3 text-sm text-[#203329]"><option value="">Select a location</option>{cityLocations.map(l=><option key={l.id} value={l.id}>{l.location_name}</option>)}</select></label>{pickup&&(()=>{const selected=cityLocations.find(l=>l.id===pickup);return selected?<div className="mt-3 rounded-xl bg-white/75 p-3 text-xs leading-5 text-[#68766b]"><p className="flex gap-2"><MapPin size={14} className="mt-0.5 shrink-0"/>{selected.address||selected.instructions||"Please wait for our order confirmation before visiting."}</p>{selected.opening_hours&&<p className="mt-2">Hours: {selected.opening_hours}</p>}{selected.contact_phone&&<p className="mt-1">Location contact: {selected.contact_phone}</p>}</div>:null;})()}</div>:<div className="mt-4 grid gap-3 rounded-xl bg-[#fbfaf7]/80 p-4 sm:grid-cols-2">
+              <label className="text-xs font-semibold text-[#68766b] sm:col-span-2">Delivery destination
+                <select required value={state} onChange={event=>setState(event.target.value)} className="mt-1.5 w-full rounded-xl border border-[#dfe4da] bg-white px-3 py-3 text-sm">
+                  <option value="">Select destination</option>
+                  {DELIVERY_DESTINATIONS.filter(destination=>deliveryZones.some(zone=>zone.state===destination.state)).map(destination=><option key={destination.state} value={destination.state}>{destination.label}</option>)}
+                </select>
+              </label>
+              {selectedZone ? <div className="rounded-xl border border-[#dfe8da] bg-white p-3 text-xs leading-5 text-[#68766b] sm:col-span-2">
+                <b className="block text-[#315b43]">Flat-rate home delivery in {selectedZone.city}</b>
+                <span>Delivery fee: <strong>{money(deliveryFee)}</strong>{selectedZone.estimated_days ? " · Estimated delivery: "+selectedZone.estimated_days : ""}</span>
+                {selectedZone.instructions&&<span className="mt-1 block">{selectedZone.instructions}</span>}
+                {minOrder>0&&<span className={minimumMet?"mt-1 block text-green-700":"mt-1 block font-bold text-red-700"}>Minimum order: {money(minOrder)}{minimumMet?" — minimum met":" — add "+money(missingMinimum)+" more to continue"}</span>}
+              </div> : <p className="rounded-xl bg-[#fff7e8] p-3 text-xs leading-5 text-[#795b21] sm:col-span-2">Choose Jos or Abuja. Home delivery is not offered in other locations at this time.</p>}
+              <label className="text-xs font-semibold text-[#68766b] sm:col-span-2">Street address
+                <input required value={street} onChange={event=>setStreet(event.target.value)} className="mt-1.5 w-full rounded-xl border border-[#dfe4da] bg-white px-3 py-3 text-sm" placeholder="Street / area"/>
+              </label>
+              <label className="text-xs font-semibold text-[#68766b] sm:col-span-2">House number / landmark
+                <input value={landmark} onChange={event=>setLandmark(event.target.value)} className="mt-1.5 w-full rounded-xl border border-[#dfe4da] bg-white px-3 py-3 text-sm" placeholder="House number or nearby landmark"/>
+              </label>
+            </div>}
           </section>
           <section className="border-t border-[#edf0e9] pt-5"><h2 className="font-bold text-[#203329]">How would you like to pay?</h2><div className="mt-3 grid gap-3 sm:grid-cols-2">
             {method==="pickup"&&<button type="button" disabled={!paymentSettings.cash_pickup_enabled} onClick={()=>setPaymentMethod("cash")} className={`rounded-xl border p-4 text-left ${paymentMethod==="cash"?"border-[#245b42] bg-[#edf5ea]":"border-[#dfe4da] bg-white/80"} disabled:cursor-not-allowed disabled:opacity-40`}><b className="block text-sm text-[#315b43]">Cash on pickup</b><span className="mt-1 block text-xs text-[#788678]">Pay when you collect your order.</span></button>}
