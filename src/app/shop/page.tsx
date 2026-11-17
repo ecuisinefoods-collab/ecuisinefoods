@@ -51,7 +51,7 @@ export default async function ShopPage({searchParams}:{searchParams:Promise<{cat
             <p className="mt-5 max-w-xl text-sm leading-7 text-[#68766b] sm:text-base">Good food, thoughtful choices and little everyday joys. Explore the eCuisine collection and fill your basket with something lovely.</p>
             <div className="mt-7 flex flex-wrap gap-3 max-md:justify-center">
               <Link href="#products" className="inline-flex items-center gap-2 rounded-xl bg-[#087f5b] px-6 py-3.5 text-xs font-extrabold text-white shadow-lg transition hover:-translate-y-1 hover:bg-[#07543f]">Browse products <ArrowRight size={15}/></Link>
-              <Link href="/contact" className="inline-flex items-center gap-2 rounded-xl border border-[#cddacb] bg-white/75 px-5 py-3.5 text-xs font-bold text-[#315b43] transition hover:-translate-y-1">Need help? Contact us</Link>
+              <Link href="/contact" className="ec-secondary-cta inline-flex items-center gap-2 rounded-xl border border-[#cddacb] bg-white/75 px-5 py-3.5 text-xs font-bold text-[#315b43] transition">Need help? Contact us</Link>
             </div>
           </div>
           <div className={styles.cartScene} aria-label="A colourful three-dimensional shopping cart filled with groceries">

@@ -1817,6 +1817,7 @@ button:focus-visible,input[type="button"]:focus-visible,input[type="submit"]:foc
 .ec-purchase-add,
 .ec-shop-buy-button,
 .ec-shop-buy-confirm,
+.ec-buy-now,
 .site-header a[href="/cart"],
 .site-header button[type="submit"],
 button[type="submit"],
@@ -1887,13 +1888,58 @@ input[type="submit"]:active:not(:disabled) {
   .ec-purchase-add,
   .ec-shop-buy-button,
   .ec-shop-buy-confirm,
+  .ec-buy-now,
   .ec-secondary-cta,
   .site-header a[href="/cart"],
   .site-header a[href="/account"],
-  .site-header button[type="submit"],
-  button[type="submit"],
-  input[type="submit"] {
+  .site-header button[type="submit"] {
     transition: none !important;
   }
 }
 
+
+
+/* Consistent, bold liquid-glass CTAs: static highlights only, no reflection layers or shimmer. */
+.ec-primary-cta,
+.ec-catalogue-cart,
+.ec-shop-buy-button,
+.ec-shop-buy-confirm,
+.ec-buy-now,
+.site-header a[href="/cart"],
+.site-header button[type="submit"] {
+  position: relative;
+  border: 1px solid rgba(255,255,255,.28);
+  background: linear-gradient(145deg,#13a878 0%,#087f5b 48%,#07543f 100%) !important;
+  color: #fff !important;
+  box-shadow: 0 9px 20px rgba(7,84,63,.2), inset 0 1px 0 rgba(255,255,255,.24), inset 0 -1px 0 rgba(0,45,30,.18);
+  text-shadow: 0 1px 1px rgba(0,45,30,.16);
+  transition: transform .2s cubic-bezier(.2,.75,.25,1), box-shadow .2s ease, filter .2s ease;
+}
+.ec-shop-buy-button { min-height: 54px; font-size: 14px; letter-spacing: .09em; }
+.ec-primary-cta:hover,
+.ec-catalogue-cart:hover,
+.ec-buy-now:hover:not(:disabled),
+.ec-shop-buy-button:hover:not(:disabled),
+.ec-shop-buy-confirm:hover:not(:disabled),
+.site-header a[href="/cart"]:hover,
+.site-header button[type="submit"]:hover {
+  transform: translateY(-2px);
+  filter: saturate(1.08) brightness(1.03);
+  box-shadow: 0 13px 26px rgba(7,84,63,.26), inset 0 1px 0 rgba(255,255,255,.28);
+}
+.ec-primary-cta:active,
+.ec-catalogue-cart:active,
+.ec-buy-now:active:not(:disabled),
+.ec-shop-buy-button:active:not(:disabled),
+.ec-shop-buy-confirm:active:not(:disabled),
+.site-header a[href="/cart"]:active,
+.site-header button[type="submit"]:active {
+  transform: translateY(0) scale(.985);
+  box-shadow: 0 4px 10px rgba(7,84,63,.18), inset 0 1px 2px rgba(0,45,30,.12);
+}
+.ec-shop-buy-button:focus-visible,
+.ec-shop-buy-confirm:focus-visible { outline: 3px solid rgba(198,163,75,.85); outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) {
+  .ec-primary-cta,.ec-catalogue-cart,.ec-shop-buy-button,.ec-shop-buy-confirm,
+  .site-header a[href="/cart"],.site-header button[type="submit"] { transition: none !important; }
+}
