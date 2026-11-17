@@ -70,18 +70,10 @@ $migration$;
 do $migration$
 declare
   v_definition text;
-  v_old_pin_logic text := $old$
-v_lat:=nullif(p_order->>'delivery_latitude','')::numeric; v_lng:=nullif(p_order->>'delivery_longitude','')::numeric; if v_lat is null or v_lng is null or v_lat not between -90 and 90 or v_lng not between -180 and 180 then raise exception 'Choose your delivery location on the map.'; end if; v_street:=
-$old$;
-  v_new_delivery_logic text := $new$
-v_zone_id:=nullif(p_order->>'delivery_zone_id','')::uuid; v_street:=
-$new$;
-  v_old_zone_lookup text := $old$
-select z.id,z.state,z.city,z.area_name,z.delivery_fee,z.minimum_order_amount into v_zone_id,v_state,v_city,v_area,v_fee,v_minimum from public.delivery_zones z where z.is_active=true and z.coverage_geojson is not null and private.delivery_zone_covers_point(z.coverage_geojson,v_lat,v_lng) order by z.sort_order,z.created_at,z.id limit 1; if not found then raise exception 'We do not currently deliver to the map pin you selected. Please choose another location or contact eCuisine.'; end if;
-$old$;
-  v_new_zone_lookup text := $new$
-select z.id,z.state,z.city,z.area_name,z.delivery_fee,z.minimum_order_amount into v_zone_id,v_state,v_city,v_area,v_fee,v_minimum from public.delivery_zones z where z.id=v_zone_id and z.is_active=true and ((z.state='Plateau' and z.city='Jos') or (z.state='Federal Capital Territory' and z.city='Abuja')) limit 1; if not found then raise exception 'Home delivery is currently available only in Jos and Abuja. Please select an available delivery destination.'; end if;
-$new$;
+  v_old_pin_logic text := $old$v_lat:=nullif(p_order->>'delivery_latitude','')::numeric; v_lng:=nullif(p_order->>'delivery_longitude','')::numeric; if v_lat is null or v_lng is null or v_lat not between -90 and 90 or v_lng not between -180 and 180 then raise exception 'Choose your delivery location on the map.'; end if; v_street:=$old$;
+  v_new_delivery_logic text := $new$v_zone_id:=nullif(p_order->>'delivery_zone_id','')::uuid; v_street:=$new$;
+  v_old_zone_lookup text := $old$select z.id,z.state,z.city,z.area_name,z.delivery_fee,z.minimum_order_amount into v_zone_id,v_state,v_city,v_area,v_fee,v_minimum from public.delivery_zones z where z.is_active=true and z.coverage_geojson is not null and private.delivery_zone_covers_point(z.coverage_geojson,v_lat,v_lng) order by z.sort_order,z.created_at,z.id limit 1; if not found then raise exception 'We do not currently deliver to the map pin you selected. Please choose another location or contact eCuisine.'; end if;$old$;
+  v_new_zone_lookup text := $new$select z.id,z.state,z.city,z.area_name,z.delivery_fee,z.minimum_order_amount into v_zone_id,v_state,v_city,v_area,v_fee,v_minimum from public.delivery_zones z where z.id=v_zone_id and z.is_active=true and ((z.state='Plateau' and z.city='Jos') or (z.state='Federal Capital Territory' and z.city='Abuja')) limit 1; if not found then raise exception 'Home delivery is currently available only in Jos and Abuja. Please select an available delivery destination.'; end if;$new$;
 begin
   v_definition := pg_get_functiondef('public.create_order_request(jsonb)'::regprocedure);
 
