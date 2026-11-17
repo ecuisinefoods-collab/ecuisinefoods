@@ -120,7 +120,7 @@ export function AffiliateApplicationForm() {
         <div className="mt-3 grid gap-3 sm:grid-cols-3">
           <label className="block text-xs font-bold text-[#405648]">Bank name<input maxLength={100} value={bankName} onChange={e=>setBankName(e.target.value)} placeholder="e.g. Access Bank" className="mt-2 w-full rounded-xl border border-[#dce5db] bg-white px-3 py-3 text-sm font-normal"/></label>
           <label className="block text-xs font-bold text-[#405648]">Account holder name<input maxLength={120} value={bankAccountName} onChange={e=>setBankAccountName(e.target.value)} placeholder="Name on bank account" className="mt-2 w-full rounded-xl border border-[#dce5db] bg-white px-3 py-3 text-sm font-normal"/></label>
-          <label className="block text-xs font-bold text-[#405648]">10-digit account number<input inputMode="numeric" pattern="[0-9]{10}" maxLength={10} value={bankAccountNumber} onChange={e=>setBankAccountNumber(e.target.value.replace(/\\D/g,"").slice(0,10))} placeholder="0123456789" className="mt-2 w-full rounded-xl border border-[#dce5db] bg-white px-3 py-3 text-sm font-normal"/></label>
+          <label className="block text-xs font-bold text-[#405648]">10-digit account number<input inputMode="numeric" pattern="[0-9]{10}" maxLength={10} value={bankAccountNumber} onChange={e=>setBankAccountNumber(e.target.value.replace(/\D/g,"").slice(0,10))} placeholder="0123456789" className="mt-2 w-full rounded-xl border border-[#dce5db] bg-white px-3 py-3 text-sm font-normal"/></label>
         </div>
         <p className="mt-2 text-[10px] leading-5 text-[#879487]">These details are used by eCuisine administrators to make your manual bank transfer. They are not displayed publicly.</p>
       </div>
