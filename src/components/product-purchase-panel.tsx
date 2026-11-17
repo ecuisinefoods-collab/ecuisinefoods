@@ -7,11 +7,11 @@ import { ArrowRight, Check, ChevronRight, Minus, Plus, ShoppingBag, Tag, X } fro
 import { getEffectivePrice, getDiscountPercent } from "@/lib/product-pricing";
 
 type Variant = { id:string; pack_size:string; price:number; sale_price:number|null; sale_starts_at:string|null; sale_ends_at:string|null; stock_quantity:number };
-type CartItem = { variant_id:string; product_id:string; name:string; pack_size:string; price:number; original_price?:number; qty:number; stock_quantity?:number };
+type CartItem = { variant_id:string; product_id:string; name:string; pack_size:string; price:number; original_price?:number; qty:number; stock_quantity?:number; image_url?:string|null };
 const KEY="ecuisinefoods-cart-v1";
 const money=(value:number)=>"₦"+Number(value||0).toLocaleString("en-NG");
 
-export function ProductPurchasePanel({productId,productName,variants}:{productId:string;productName:string;variants:Variant[]}) {
+export function ProductPurchasePanel({productId,productName,productImage,variants}:{productId:string;productName:string;productImage:string|null;variants:Variant[]}) {
   const router=useRouter();
   const available=useMemo(()=>variants.filter(variant=>variant.stock_quantity>0),[variants]);
   const [selected,setSelected]=useState(available[0]?.id??"");
@@ -40,7 +40,7 @@ export function ProductPurchasePanel({productId,productName,variants}:{productId
     setShowOptions(true);
   }
 
-  function saveSelection(goToCheckout:boolean) {
+  function saveSelection() {
     if(!current||current.stock_quantity<1)return;
     try {
       let cart:CartItem[]=[];
@@ -53,9 +53,9 @@ export function ProductPurchasePanel({productId,productName,variants}:{productId
         :[...cart,{variant_id:current.id,product_id:productId,name:productName,pack_size:current.pack_size,price:getEffectivePrice(current),original_price:Number(current.price),qty:safeQty,stock_quantity:current.stock_quantity}];
       localStorage.setItem(KEY,JSON.stringify(next));
       setStorageError("");
-      if(goToCheckout){router.push("/checkout");return;}
       setNotice(true);
       setShowOptions(false);
+      router.push("/cart");
     } catch {
       setStorageError("We could not save your selection. Please enable browser storage and try again.");
     }
