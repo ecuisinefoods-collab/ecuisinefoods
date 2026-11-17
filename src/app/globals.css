@@ -1817,6 +1817,7 @@ button:focus-visible,input[type="button"]:focus-visible,input[type="submit"]:foc
 .ec-purchase-add,
 .ec-shop-buy-button,
 .ec-shop-buy-confirm,
+.ec-buy-now,
 .site-header a[href="/cart"],
 .site-header button[type="submit"],
 button[type="submit"],
@@ -1887,6 +1888,7 @@ input[type="submit"]:active:not(:disabled) {
   .ec-purchase-add,
   .ec-shop-buy-button,
   .ec-shop-buy-confirm,
+  .ec-buy-now,
   .ec-secondary-cta,
   .site-header a[href="/cart"],
   .site-header a[href="/account"],
@@ -1917,6 +1919,7 @@ input[type="submit"]:active:not(:disabled) {
 .ec-shop-buy-button { min-height: 54px; font-size: 14px; letter-spacing: .09em; }
 .ec-primary-cta:hover,
 .ec-catalogue-cart:hover,
+.ec-buy-now:hover:not(:disabled),
 .ec-shop-buy-button:hover:not(:disabled),
 .ec-shop-buy-confirm:hover:not(:disabled),
 .site-header a[href="/cart"]:hover,
@@ -1927,6 +1930,7 @@ input[type="submit"]:active:not(:disabled) {
 }
 .ec-primary-cta:active,
 .ec-catalogue-cart:active,
+.ec-buy-now:active:not(:disabled),
 .ec-shop-buy-button:active:not(:disabled),
 .ec-shop-buy-confirm:active:not(:disabled),
 .site-header a[href="/cart"]:active,
