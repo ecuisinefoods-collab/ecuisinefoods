@@ -24,8 +24,22 @@ const lagosDate = (value: string | Date) =>
 const timeLabel = (value: string) =>
   new Date(value).toLocaleString("en-NG", { timeZone: "Africa/Lagos", dateStyle: "medium", timeStyle: "short" });
 
+type Period = "today" | 7 | 30 | 90;
+
+const startOfTodayInLagos = () => {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Africa/Lagos",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date());
+  const part = (type: string) => parts.find((item) => item.type === type)?.value || "";
+  // Nigeria uses UTC+01:00 year-round; query from midnight local time.
+  return new Date(`${part("year")}-${part("month")}-${part("day")}T00:00:00+01:00`).toISOString();
+};
+
 export function SiteTrafficAnalytics() {
-  const [days, setDays] = useState<7 | 30 | 90>(30);
+  const [period, setPeriod] = useState<Period>(7);
   const [visits, setVisits] = useState<Visit[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -38,7 +52,9 @@ export function SiteTrafficAnalytics() {
     }
     setLoading(true);
     setError("");
-    const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
+    const since = period === "today"
+      ? startOfTodayInLagos()
+      : new Date(Date.now() - period * 24 * 60 * 60 * 1000).toISOString();
     const { data, error: queryError } = await supabase
       .from("site_visit_events")
       .select("id,visitor_id,page_path,referrer_host,campaign_source,created_at")
@@ -52,7 +68,7 @@ export function SiteTrafficAnalytics() {
       setVisits((data || []) as Visit[]);
     }
     setLoading(false);
-  }, [days]);
+  }, [period]);
 
   useEffect(() => { void load(); }, [load]);
 
@@ -71,12 +87,25 @@ export function SiteTrafficAnalytics() {
       const date = lagosDate(visit.created_at);
       dailyCounts.set(date, (dailyCounts.get(date) || 0) + 1);
     }
-    const daysToShow = Array.from({ length: 14 }, (_, index) => {
+    const daysToShow = Array.from({ length: period === 7 ? 7 : 14 }, (_, index) => {
       const date = new Date();
-      date.setDate(date.getDate() - (13 - index));
+      date.setDate(date.getDate() - ( (period === 7 ? 6 : 13) - index));
       const key = lagosDate(date);
       return { key, label: new Intl.DateTimeFormat("en-NG", { timeZone: "Africa/Lagos", day: "numeric", month: "short" }).format(date), count: dailyCounts.get(key) || 0 };
     });
+    const hourlyCounts = Array.from({ length: 24 }, (_, hour) => ({
+      key: String(hour),
+      label: `${hour === 0 || hour === 12 ? 12 : hour % 12}${hour < 12 ? "a" : "p"}`,
+      count: 0,
+    }));
+    for (const visit of todayVisits) {
+      const hour = Number(new Intl.DateTimeFormat("en-GB", {
+        timeZone: "Africa/Lagos",
+        hour: "2-digit",
+        hourCycle: "h23",
+      }).format(new Date(visit.created_at)));
+      if (Number.isInteger(hour) && hour >= 0 && hour < 24) hourlyCounts[hour].count += 1;
+    }
     return {
       total: visits.length,
       unique: unique.size,
@@ -85,10 +114,12 @@ export function SiteTrafficAnalytics() {
       pages: Array.from(pageCounts, ([label, count]) => ({ label, count })).sort((a, b) => b.count - a.count).slice(0, 7),
       sources: Array.from(sourceCounts, ([label, count]) => ({ label, count })).sort((a, b) => b.count - a.count).slice(0, 7),
       daily: daysToShow,
+      hourly: hourlyCounts,
     };
-  }, [visits]);
+  }, [visits, period]);
 
-  const maxDaily = Math.max(1, ...metrics.daily.map((day) => day.count));
+  const chartData = period === "today" ? metrics.hourly : metrics.daily;
+  const maxChart = Math.max(1, ...chartData.map((item) => item.count));
 
   return (
     <section className="mt-7 rounded-3xl border border-[#dfe8dd] bg-white p-5 shadow-sm sm:p-6">
@@ -100,9 +131,9 @@ export function SiteTrafficAnalytics() {
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <div className="flex rounded-xl bg-[#f1f5ef] p-1">
-            {([7, 30, 90] as const).map((option) => (
-              <button key={option} onClick={() => setDays(option)} className={`rounded-lg px-3 py-2 text-[11px] font-bold ${days === option ? "bg-[#245b42] text-white shadow-sm" : "text-[#657664]"}`}>
-                {option} days
+            {(["today", 7, 30, 90] as const).map((option) => (
+              <button key={option} onClick={() => setPeriod(option)} className={`rounded-lg px-3 py-2 text-[11px] font-bold ${period === option ? "bg-[#245b42] text-white shadow-sm" : "text-[#657664]"}`}>
+                {option === "today" ? "Today" : `${option} days`}
               </button>
             ))}
           </div>
@@ -116,9 +147,9 @@ export function SiteTrafficAnalytics() {
         <>
           <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             {[
-              { label: "Page views", value: metrics.total.toLocaleString("en-NG"), note: `Last ${days} days`, icon: Eye },
-              { label: "Unique visitors", value: metrics.unique.toLocaleString("en-NG"), note: "Distinct anonymous browsers", icon: Users },
-              { label: "Today's visits", value: metrics.today.toLocaleString("en-NG"), note: `${metrics.todayUnique} unique today`, icon: Globe2 },
+              { label: "Page views", value: metrics.total.toLocaleString("en-NG"), note: period === "today" ? "Today · Lagos time" : `Last ${period} days`, icon: Eye },
+              { label: "Unique visitors", value: metrics.unique.toLocaleString("en-NG"), note: period === "today" ? "Distinct browsers today" : "Distinct anonymous browsers", icon: Users },
+              { label: "Today's unique visitors", value: metrics.todayUnique.toLocaleString("en-NG"), note: `${metrics.today} page views today`, icon: Globe2 },
               { label: "Pages visited", value: metrics.pages.length ? String(new Set(visits.map((visit) => visit.page_path)).size) : "0", note: "Different storefront pages", icon: FileText },
             ].map((item) => (
               <article key={item.label} className="rounded-2xl border border-[#e8eee6] bg-[#fbfcfa] p-4">
@@ -138,16 +169,18 @@ export function SiteTrafficAnalytics() {
           ) : (
             <div className="mt-6 grid gap-5 xl:grid-cols-[1.5fr_1fr]">
               <section className="rounded-2xl border border-[#e8eee6] p-4 sm:p-5">
-                <h3 className="text-sm font-bold text-[#294332]">Daily visits</h3>
-                <p className="mt-1 text-[10px] text-[#879286]">Last 14 days · Lagos time</p>
-                <div className="mt-5 flex h-40 items-end gap-1.5 border-b border-l border-[#e8eee5] px-2 pb-2 sm:gap-2">
-                  {metrics.daily.map((day) => (
-                    <div key={day.key} className="group relative flex h-full min-w-0 flex-1 items-end justify-center">
-                      <div title={`${day.label}: ${day.count} visits`} className="w-full max-w-5 rounded-t-md bg-[#39734f] transition-opacity group-hover:opacity-75" style={{ height: `${day.count ? Math.max(4, day.count / maxDaily * 100) : 0}%` }}/>
+                <h3 className="text-sm font-bold text-[#294332]">{period === "today" ? "Hourly visits today" : "Daily visits"}</h3>
+                <p className="mt-1 text-[10px] text-[#879286]">{period === "today" ? "Today · Lagos time" : `Last ${period === 7 ? 7 : 14} days shown · Lagos time`}</p>
+                <div className="mt-5 flex h-40 items-end gap-1 border-b border-l border-[#e8eee5] px-2 pb-2 sm:gap-2">
+                  {chartData.map((item) => (
+                    <div key={item.key} className="group relative flex h-full min-w-0 flex-1 items-end justify-center">
+                      <div title={`${item.label}: ${item.count} visits`} className="w-full rounded-t-md bg-[#39734f] transition-opacity group-hover:opacity-75" style={{ height: `${item.count ? Math.max(4, item.count / maxChart * 100) : 0}%` }}/>
                     </div>
                   ))}
                 </div>
-                <div className="mt-2 flex justify-between text-[9px] text-[#8b9788]"><span>{metrics.daily[0]?.label}</span><span>{metrics.daily[6]?.label}</span><span>{metrics.daily[13]?.label}</span></div>
+                <div className="mt-2 flex justify-between text-[9px] text-[#8b9788]">
+                  {period === "today" ? <><span>12a</span><span>6a</span><span>12p</span><span>6p</span><span>11p</span></> : <><span>{metrics.daily[0]?.label}</span><span>{metrics.daily[Math.floor(metrics.daily.length / 2)]?.label}</span><span>{metrics.daily[metrics.daily.length - 1]?.label}</span></>}
+                </div>
               </section>
               <section className="rounded-2xl border border-[#e8eee6] p-4 sm:p-5">
                 <h3 className="text-sm font-bold text-[#294332]">Top pages</h3>
