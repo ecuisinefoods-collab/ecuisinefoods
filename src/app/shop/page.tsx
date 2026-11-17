@@ -3,6 +3,7 @@ import { ProductCatalog } from "@/components/product-catalog";
 import { supabase } from "@/lib/supabase";
 import { ArrowRight, BadgePercent, Coffee, Cookie, Leaf, PackageCheck, ShoppingBasket, Sparkles, Sprout, Truck } from "lucide-react";
 import Link from "next/link";
+import styles from "./shop-cart-hero.module.css";
 
 type Variant = { id:string; pack_size:string; price:number; sale_price:number|null; sale_starts_at:string|null; sale_ends_at:string|null; stock_quantity:number };
 type Product = { id:string; name:string; slug:string; category:string; short_description?:string|null; description:string|null; ingredients?:string|null; highlights?:string[]|null; image_url:string|null; is_featured?:boolean; created_at?:string; product_variants?:Variant[] };
@@ -39,15 +40,69 @@ export default async function ShopPage({searchParams}:{searchParams:Promise<{cat
     <section className="ec-shop-hero relative overflow-hidden">
       <div className="ec-shop-hero-orb ec-shop-hero-orb-one"/>
       <div className="ec-shop-hero-orb ec-shop-hero-orb-two"/>
-      <div className="relative mx-auto max-w-7xl px-5 py-12 sm:py-16 md:py-20">
-        <div className="mx-auto max-w-3xl text-center">
-          <Link href="/" className="mx-auto inline-flex items-center gap-2 text-xs font-bold text-[#68806d] hover:text-[#087f5b]">← Back to home</Link>
-          <p className="ec-shop-kicker mt-7 inline-flex items-center gap-2 rounded-full border px-4 py-2 text-[10px] font-black uppercase tracking-[.18em]"><ShoppingBasket size={14}/> The eCuisine shop</p>
-          <h1 className="mt-5 text-[2.8rem] font-black leading-[1.02] tracking-[-.06em] text-[#07543f] sm:text-6xl lg:text-[4.5rem]">Find your everyday <span className="block text-[#e2a900]">favourites.</span></h1>
-          <p className="mx-auto mt-5 max-w-xl text-sm leading-7 text-[#68766b] sm:text-base">Browse the products currently available, compare pack sizes and prices, and add what you need to your cart. New categories will join the collection as they launch.</p>
-          <div className="mt-7 flex flex-wrap justify-center gap-3">
-            <Link href="#products" className="inline-flex items-center gap-2 rounded-xl bg-[#087f5b] px-6 py-3.5 text-xs font-extrabold text-white shadow-lg transition hover:-translate-y-1 hover:bg-[#07543f]">Browse products <ArrowRight size={15}/></Link>
-            <Link href="/contact" className="inline-flex items-center gap-2 rounded-xl border border-[#cddacb] bg-white/75 px-5 py-3.5 text-xs font-bold text-[#315b43] transition hover:-translate-y-1">Need help? Contact us</Link>
+      <div className="relative mx-auto max-w-7xl px-5 py-10 sm:py-14 md:py-16">
+        <div className={styles.heroGrid}>
+          <div className={styles.heroCopy}>
+            <Link href="/" className="inline-flex items-center gap-2 text-xs font-bold text-[#68806d] hover:text-[#087f5b]">← Back to home</Link>
+            <p className="ec-shop-kicker mt-7 inline-flex items-center gap-2 rounded-full border px-4 py-2 text-[10px] font-black uppercase tracking-[.18em]"><ShoppingBasket size={14}/> The eCuisine shop</p>
+            <h1 className="mt-5 text-[2.8rem] font-black leading-[1.02] tracking-[-.06em] text-[#07543f] sm:text-6xl lg:text-[4.5rem]">Find your everyday <span className="block text-[#e2a900]">favourites.</span></h1>
+            <p className="mt-5 max-w-xl text-sm leading-7 text-[#68766b] sm:text-base">Good food, thoughtful choices and little everyday joys. Explore the eCuisine collection and fill your basket with something lovely.</p>
+            <div className="mt-7 flex flex-wrap gap-3 max-md:justify-center">
+              <Link href="#products" className="inline-flex items-center gap-2 rounded-xl bg-[#087f5b] px-6 py-3.5 text-xs font-extrabold text-white shadow-lg transition hover:-translate-y-1 hover:bg-[#07543f]">Browse products <ArrowRight size={15}/></Link>
+              <Link href="/contact" className="inline-flex items-center gap-2 rounded-xl border border-[#cddacb] bg-white/75 px-5 py-3.5 text-xs font-bold text-[#315b43] transition hover:-translate-y-1">Need help? Contact us</Link>
+            </div>
+          </div>
+          <div className={styles.cartScene} aria-label="A colourful three-dimensional shopping cart filled with groceries">
+            <span className={`${styles.sparkle} ${styles.sparkleOne}`} aria-hidden="true">✦</span>
+            <span className={`${styles.sparkle} ${styles.sparkleTwo}`} aria-hidden="true">✧</span>
+            <span className={`${styles.sparkle} ${styles.sparkleThree}`} aria-hidden="true">✦</span>
+            <span className={styles.cartGround} aria-hidden="true"/>
+            <svg className={styles.cartArtwork} viewBox="0 0 520 390" role="img" aria-labelledby="shop-cart-title shop-cart-desc" xmlns="http://www.w3.org/2000/svg">
+              <title id="shop-cart-title">eCuisine shopping cart</title>
+              <desc id="shop-cart-desc">A floating three-dimensional green shopping cart carrying colourful grocery bags, a cereal pack, vegetables and pantry items.</desc>
+              <defs>
+                <linearGradient id="cartBasket" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#37a875"/><stop offset="1" stopColor="#07543f"/></linearGradient>
+                <linearGradient id="cartRim" x1="0" y1="0" x2="1" y2="0"><stop stopColor="#8bd1a1"/><stop offset="1" stopColor="#16734d"/></linearGradient>
+                <linearGradient id="bagGold" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#ffe58b"/><stop offset="1" stopColor="#e5aa25"/></linearGradient>
+                <linearGradient id="bagOrange" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#ffbd78"/><stop offset="1" stopColor="#ed7541"/></linearGradient>
+                <linearGradient id="packGreen" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#8ed49a"/><stop offset="1" stopColor="#2b8b59"/></linearGradient>
+                <linearGradient id="cartMetal" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#dce9df"/><stop offset="1" stopColor="#8ba99a"/></linearGradient>
+              </defs>
+              <ellipse cx="270" cy="343" rx="160" ry="18" fill="#214b32" opacity=".08"/>
+              <path d="M83 63h39l35 178c3 15 15 25 30 25h207" fill="none" stroke="url(#cartMetal)" strokeWidth="13" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M73 57h22" stroke="#245b42" strokeWidth="14" strokeLinecap="round"/>
+              <path d="M145 104l299 1-40 157H183z" fill="url(#cartBasket)" stroke="#07543f" strokeWidth="5" strokeLinejoin="round"/>
+              <path d="M145 104l299 1-9 30H151z" fill="url(#cartRim)"/>
+              <path d="M179 143l22 108M239 139l11 112M300 138l1 112M361 138l-10 112M421 137l-25 112" stroke="#b8e2c3" strokeWidth="4" opacity=".42"/>
+              <path d="M184 251l216 0" stroke="#b8e2c3" strokeWidth="4" opacity=".3"/>
+              <path d="M191 99l20-56q5-12 17-7l55 18q10 4 6 15l-13 34z" fill="url(#bagGold)" stroke="#d99b21" strokeWidth="3"/>
+              <path d="M212 47q25-24 50 7" fill="none" stroke="#b98218" strokeWidth="5" strokeLinecap="round"/>
+              <path d="M278 102l15-63q3-12 15-9l58 13q12 3 9 15l-10 44z" fill="url(#bagOrange)" stroke="#d86d3e" strokeWidth="3"/>
+              <path d="M301 41q25-23 50 6" fill="none" stroke="#c85e32" strokeWidth="5" strokeLinecap="round"/>
+              <path d="M345 101l13-48q3-10 13-8l42 8q10 2 8 13l-8 37z" fill="url(#packGreen)" stroke="#267c4e" strokeWidth="3"/>
+              <path d="M374 64q13-13 26 4" fill="none" stroke="#e7f5d9" strokeWidth="4" strokeLinecap="round"/>
+              <rect x="226" y="65" width="48" height="75" rx="8" fill="#fff7df" stroke="#e3c879" strokeWidth="3" transform="rotate(-7 226 65)"/>
+              <path d="M236 84l27-4" stroke="#b68b30" strokeWidth="4" strokeLinecap="round"/>
+              <path d="M237 96l23-3" stroke="#d2b35d" strokeWidth="3" strokeLinecap="round"/>
+              <text x="248" y="119" fill="#236342" fontSize="10" fontWeight="900" textAnchor="middle" transform="rotate(-7 248 119)">FOOD</text>
+              <path d="M164 91q-18-25-4-43 18 12 14 39" fill="#4d9d56"/>
+              <path d="M173 94q-4-31 19-42 7 23-13 47" fill="#77b75e"/>
+              <path d="M163 92q-26-8-29-28 24-4 36 20" fill="#2e8c4b"/>
+              <circle cx="157" cy="84" r="13" fill="#e66d48"/><circle cx="157" cy="84" r="5" fill="#f8b06b"/>
+              <path d="M410 99q10-24 30-22 0 21-24 29" fill="#6bbf65"/>
+              <path d="M426 101q15-20 33-11-8 19-30 20" fill="#398f52"/>
+              <path d="M435 96q-3-23 16-31 9 19-8 35" fill="#88c96d"/>
+              <circle cx="435" cy="96" r="12" fill="#e6a92e"/>
+              <path d="M184 267h220" stroke="#6e927e" strokeWidth="9" strokeLinecap="round"/>
+              <path d="M202 270l-12 30M387 270l12 30" stroke="#8ba99a" strokeWidth="9" strokeLinecap="round"/>
+              <circle cx="187" cy="314" r="25" fill="#284b39"/><circle cx="187" cy="314" r="12" fill="#dce8d9"/><circle cx="187" cy="314" r="5" fill="#789282"/>
+              <circle cx="406" cy="314" r="25" fill="#284b39"/><circle cx="406" cy="314" r="12" fill="#dce8d9"/><circle cx="406" cy="314" r="5" fill="#789282"/>
+              <path d="M180 290q-8 6-7 17" fill="none" stroke="#fff" strokeWidth="3" opacity=".45" strokeLinecap="round"/>
+              <path d="M399 290q-8 6-7 17" fill="none" stroke="#fff" strokeWidth="3" opacity=".45" strokeLinecap="round"/>
+              <path d="M312 174q18-17 36 0" fill="none" stroke="#f8e7a8" strokeWidth="5" strokeLinecap="round" opacity=".9"/>
+              <path d="M326 188h15" stroke="#f8e7a8" strokeWidth="4" strokeLinecap="round" opacity=".9"/>
+            </svg>
+            <div className={styles.cartNote}><span className={styles.cartNoteDot}/><span>GOOD FOOD, BETTER LIVING</span></div>
           </div>
         </div>
       </div>
