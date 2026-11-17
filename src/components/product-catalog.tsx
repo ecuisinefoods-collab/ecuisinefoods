@@ -176,7 +176,7 @@ export function ProductCatalog({ products, initialCategory = "All products", ini
         <button type="button" onClick={()=>{setSearch("");setFilter("All products");setAvailability("all");}} className="mt-5 rounded-xl bg-[#087f5b] px-5 py-3 text-xs font-extrabold text-white">Show all products</button>
       </div>
     )}
-  </div>;
+  </div>
     {buyingProduct&&<div className="ec-buy-options-backdrop fixed inset-0 z-[100] flex items-end justify-center bg-[#10251a]/55 p-0 backdrop-blur-sm sm:items-center sm:p-5" onMouseDown={event=>{if(event.target===event.currentTarget)setBuyingProduct(null);}}>
       <section role="dialog" aria-modal="true" aria-labelledby="ec-buy-options-title" className="ec-buy-options-panel w-full max-w-md rounded-t-[1.8rem] border border-white/80 bg-[#fffefa] p-5 shadow-2xl sm:rounded-[1.8rem] sm:p-6">
         <div className="flex items-start justify-between gap-4">
