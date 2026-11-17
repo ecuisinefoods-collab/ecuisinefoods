@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { LocateFixed, Minus, RotateCcw, Search, Trash2 } from "lucide-react";
+import { LocateFixed, Minus, Search, Trash2 } from "lucide-react";
+import type { FormEvent } from "react";
 
 declare global { interface Window { L?: any } }
 export type BoundaryPoint = [number, number]; // [longitude, latitude]
@@ -15,10 +16,10 @@ type Props = {
 };
 
 const CENTERS: Record<string, [number, number]> = {
-  Abia: [5.4527, 7.5248], Adamawa: [9.3265, 12.3984], Akwa: [4.9057, 8.305], Anambra: [6.2104, 7.0699],
+  Abia: [5.4527, 7.5248], Adamawa: [9.3265, 12.3984], "Akwa Ibom": [5.0377, 7.9128], Anambra: [6.2104, 7.0699],
   Bauchi: [10.3103, 9.8439], Bayelsa: [4.9267, 6.2676], Benue: [7.3369, 8.7404], Borno: [11.8311, 13.151],
-  Delta: [5.5325, 5.8987], Ebonyi: [6.2649, 8.0137], Edo: [6.335], Ekiti: [7.719, 5.311],
-  Enugu: [6.5244, 7.5105], Gombe: [10.2897, 11.1673], Imo: [5.572], Jigawa: [12.228], Kaduna: [10.5105, 7.4165],
+  "Cross River": [5.9631, 8.3300], Delta: [5.5325, 5.8987], Ebonyi: [6.2649, 8.0137], Edo: [6.335, 5.6037], Ekiti: [7.719, 5.311],
+  Enugu: [6.5244, 7.5105], Gombe: [10.2897, 11.1673], Imo: [5.572, 7.0588], Jigawa: [12.228, 9.5616], Kaduna: [10.5105, 7.4165],
   Kano: [12.0022, 8.5919], Katsina: [12.9908, 7.6018], Kebbi: [12.4539, 4.1975], Kogi: [7.8, 6.74],
   Kwara: [8.4799, 4.5418], Lagos: [6.5244, 3.3792], Nasarawa: [8.5378, 8.3078], Niger: [9.6139, 6.5569],
   Ogun: [7.1475, 3.3619], Ondo: [7.25, 5.2], Osun: [7.5629, 4.5200], Oyo: [7.3775, 3.947],
@@ -76,7 +77,7 @@ export function DeliveryZoneBoundaryMap({ state, city, value, onChange, zones = 
       });
       mapRef.current = map;
       setReady(true);
-      window.setTimeout(() => map.invalidateSize(), 120);
+      window.setTimeout(() => { map.invalidateSize(); redrawDraft(); }, 120);
     };
 
     if (!document.querySelector('link[data-ecuisine-leaflet="true"]')) {
@@ -137,7 +138,7 @@ export function DeliveryZoneBoundaryMap({ state, city, value, onChange, zones = 
     mapRef.current.setView(CENTERS[state] || DEFAULT_CENTER, 12);
   }, [state]);
 
-  async function findPlace(event: React.FormEvent) {
+  async function findPlace(event: FormEvent) {
     event.preventDefault();
     const term = query.trim() || [city, state, "Nigeria"].filter(Boolean).join(", ");
     if (!term || !mapRef.current) return;
