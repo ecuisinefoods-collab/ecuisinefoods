@@ -331,13 +331,15 @@ export default async function HomePage() {
             </div>
           </nav>
 
-          <nav className="ec-footer-group" aria-label="Affiliate programme">
-            <h3>Affiliate programme</h3>
+          <nav className="ec-footer-group" aria-label="Affiliate">
+            <h3>Affiliate only</h3>
             <div className="ec-footer-links">
               <Link href="/affiliates">Become an affiliate</Link>
-              <Link href="/affiliates">Affiliate programme</Link>
               <Link href="/affiliate">Affiliate Hub login</Link>
             </div>
+            <Link href="/partnerships" className="ec-footer-partnership-cta mt-5 inline-flex items-center gap-2 rounded-full px-4 py-3 text-[11px] font-extrabold transition hover:-translate-y-0.5">
+              Partnership opportunities <ArrowRight size={13} />
+            </Link>
           </nav>
 
           <div className="ec-footer-group">
