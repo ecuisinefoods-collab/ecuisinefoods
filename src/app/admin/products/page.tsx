@@ -6,6 +6,7 @@ import { ArrowLeft, ExternalLink, Eye, EyeOff, LoaderCircle, Package, Pencil, Pl
 import { supabase } from "@/lib/supabase";
 import { BrandLogoUploader } from "@/components/brand-logo-uploader";
 
+type Category = { id: string; name: string; slug: string };
 type Variant = { id: string; product_id: string; pack_size: string; price: number; sale_price: number | null; sale_starts_at: string | null; sale_ends_at: string | null; stock_quantity: number };
 type Product = { id: string; name: string; slug: string; category: string; short_description: string | null; description: string | null; ingredients: string | null; highlights: string[] | null; usage_instructions: string | null; storage_instructions: string | null; allergy_info: string | null; nutrition_info: unknown; image_url: string | null; is_featured: boolean; is_active: boolean; product_variants: Variant[] };
 type ProductDraft = { name: string; slug: string; category: string; short_description: string; description: string; ingredients: string; highlights: string; usage_instructions: string; storage_instructions: string; allergy_info: string; nutrition_info: string; image_url: string; is_featured: boolean; is_active: boolean };
@@ -19,6 +20,10 @@ const money = (value: number) => "₦" + Number(value || 0).toLocaleString("en-N
 
 export default function ProductsAdminPage() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [showCategoryForm, setShowCategoryForm] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState("");
+  const [savingCategory, setSavingCategory] = useState(false);
   const [draft, setDraft] = useState<ProductDraft>(blankProduct);
   const [variantDrafts, setVariantDrafts] = useState<Record<string, VariantDraft>>({});
   const [editing, setEditing] = useState<string | null>(null);
@@ -47,9 +52,14 @@ export default function ProductsAdminPage() {
       setError("Only the owner or an authorised store manager can manage products."); setLoading(false); return;
     }
     setAuthorized(true);
-    const { data, error: queryError } = await supabase.from("products").select("id,name,slug,category,short_description,description,ingredients,highlights,usage_instructions,storage_instructions,allergy_info,nutrition_info,image_url,is_featured,is_active,product_variants(id,product_id,pack_size,price,sale_price,sale_starts_at,sale_ends_at,stock_quantity)").order("created_at", { ascending: false });
+    const [{ data, error: queryError }, { data: categoryRows, error: categoryError }] = await Promise.all([
+      supabase.from("products").select("id,name,slug,category,short_description,description,ingredients,highlights,usage_instructions,storage_instructions,allergy_info,nutrition_info,image_url,is_featured,is_active,product_variants(id,product_id,pack_size,price,sale_price,sale_starts_at,sale_ends_at,stock_quantity)").order("created_at", { ascending: false }),
+      supabase.from("product_categories").select("id,name,slug").order("name")
+    ]);
     if (queryError) setError(queryError.message);
     else setProducts((data ?? []) as Product[]);
+    if (categoryError) setError(categoryError.message);
+    else setCategories((categoryRows ?? []) as Category[]);
     setLoading(false);
   }, []);
 
@@ -70,6 +80,29 @@ export default function ProductsAdminPage() {
     if (uploadError) setError(uploadError.message);
     else { const { data } = supabase.storage.from("product-images").getPublicUrl(path); setDraft(current => ({ ...current, image_url: data.publicUrl })); setMessage("Image uploaded. Save the product to publish it."); }
     setUploadingImage(false);
+  };
+
+  const saveCategory = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!supabase || !authorized) return;
+    const name = newCategoryName.trim().replace(/\\s+/g, " ");
+    if (!name) return;
+    if (categories.some(category => category.name.toLowerCase() === name.toLowerCase())) {
+      setError("That category already exists. Choose it from the category list.");
+      return;
+    }
+    setSavingCategory(true); setError(""); setMessage("");
+    const { data, error: insertError } = await supabase.from("product_categories")
+      .insert({ name, slug: slugify(name) }).select("id,name,slug").single();
+    if (insertError) setError(insertError.code === "23505" ? "That category already exists. Choose it from the category list." : insertError.message);
+    else {
+      const created = data as Category;
+      setCategories(current => [...current, created].sort((a,b)=>a.name.localeCompare(b.name)));
+      setDraft(current => ({ ...current, category: created.name }));
+      setNewCategoryName(""); setShowCategoryForm(false);
+      setMessage("Category added. It is now available for every product.");
+    }
+    setSavingCategory(false);
   };
 
   const saveProduct = async (event: FormEvent<HTMLFormElement>) => {
@@ -168,7 +201,7 @@ export default function ProductsAdminPage() {
           {editing && <p className="rounded-xl bg-[#eef5eb] px-3 py-2 text-[11px] font-bold text-[#386344]">Editing only: {products.find(item => item.id === editing)?.name}. Other products remain unchanged.</p>}
           <label className="block text-xs font-bold text-[#526352]">Product name<input required maxLength={100} value={draft.name} onChange={e=>setDraft({...draft,name:e.target.value,slug:editing?draft.slug:slugify(e.target.value)})} placeholder="e.g. Multigrain Tom Brown" className="mt-2 w-full rounded-xl border border-[#dfe7dc] bg-[#fbfcfa] px-3 py-3 text-sm outline-none focus:border-[#719477]"/></label>
           <label className="block text-xs font-bold text-[#526352]">URL slug<input required value={draft.slug} onChange={e=>setDraft({...draft,slug:slugify(e.target.value)})} placeholder="multigrain-tom-brown" className="mt-2 w-full rounded-xl border border-[#dfe7dc] bg-[#fbfcfa] px-3 py-3 text-sm outline-none focus:border-[#719477]"/></label>
-          <label className="block text-xs font-bold text-[#526352]">Category<input required value={draft.category} onChange={e=>setDraft({...draft,category:e.target.value})} placeholder="Tom Brown / Cereal" className="mt-2 w-full rounded-xl border border-[#dfe7dc] bg-[#fbfcfa] px-3 py-3 text-sm outline-none focus:border-[#719477]"/></label>
+          <div><div className="flex items-center justify-between gap-3"><label htmlFor="product-category" className="block text-xs font-bold text-[#526352]">Product category</label><button type="button" onClick={()=>{setShowCategoryForm(value=>!value);setNewCategoryName("");setError("");}} className="inline-flex items-center gap-1.5 rounded-full bg-[#edf5e9] px-3 py-1.5 text-[10px] font-extrabold text-[#245b42]"><Plus size={12}/> Add category</button></div><select id="product-category" required value={draft.category} onChange={e=>setDraft({...draft,category:e.target.value})} className="mt-2 w-full rounded-xl border border-[#dfe7dc] bg-[#fbfcfa] px-3 py-3 text-sm outline-none focus:border-[#719477]"><option value="" disabled>Select a category</option>{categories.map(category=><option key={category.id} value={category.name}>{category.name}</option>)}{draft.category&&!categories.some(category=>category.name===draft.category)&&<option value={draft.category}>{draft.category}</option>}</select>{showCategoryForm&&<form onSubmit={saveCategory} className="mt-3 rounded-xl border border-[#dce8d7] bg-[#f7faf4] p-3"><label htmlFor="new-product-category" className="block text-[11px] font-bold text-[#526352]">New category name</label><div className="mt-2 flex gap-2"><input id="new-product-category" required maxLength={60} value={newCategoryName} onChange={e=>setNewCategoryName(e.target.value)} placeholder="e.g. Grains & staples" className="min-w-0 flex-1 rounded-lg border border-[#dfe7dc] bg-white px-3 py-2.5 text-xs"/><button type="submit" disabled={savingCategory||!newCategoryName.trim()} className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-[#245b42] px-3 py-2.5 text-[10px] font-bold text-white disabled:opacity-50">{savingCategory?<LoaderCircle size={12} className="animate-spin"/>:<Plus size={12}/>} Save</button></div><p className="mt-2 text-[10px] text-[#849080]">Saved categories can be reused for any product.</p></form>}</div>
           <label className="block text-xs font-bold text-[#526352]">Short description / tagline<input maxLength={220} value={draft.short_description} onChange={e=>setDraft({...draft,short_description:e.target.value})} placeholder="A concise line shown on product cards" className="mt-2 w-full rounded-xl border border-[#dfe7dc] bg-[#fbfcfa] px-3 py-3 text-sm outline-none focus:border-[#719477]"/></label>
           <label className="block text-xs font-bold text-[#526352]">Full product description<textarea rows={5} value={draft.description} onChange={e=>setDraft({...draft,description:e.target.value})} placeholder="Tell customers what makes this product special, how it is prepared and what to expect." className="mt-2 w-full rounded-xl border border-[#dfe7dc] bg-[#fbfcfa] px-3 py-3 text-sm outline-none focus:border-[#719477]"/></label>
           <label className="block text-xs font-bold text-[#526352]">Key highlights (one per line)<textarea rows={3} value={draft.highlights} onChange={e=>setDraft({...draft,highlights:e.target.value})} placeholder={"Made with carefully selected grains\nConvenient for breakfast"} className="mt-2 w-full rounded-xl border border-[#dfe7dc] bg-[#fbfcfa] px-3 py-3 text-sm outline-none focus:border-[#719477]"/></label>
@@ -184,7 +217,7 @@ export default function ProductsAdminPage() {
       </section>
       <section className="space-y-4"><div className="flex flex-wrap items-end justify-between gap-3"><div><p className="text-[10px] font-extrabold uppercase tracking-[.16em] text-[#9a8351]">Your inventory</p><h2 className="mt-1 text-xl font-bold text-[#173e2d]">Product catalogue</h2><p className="mt-1 text-xs text-[#899487]">Search, review and manage each product.</p></div><span className="rounded-full bg-white/80 px-3 py-2 text-[10px] font-bold text-[#536b57]">{filteredProducts.length} shown</span></div><div className="rounded-2xl border border-white/80 bg-white/75 p-3 shadow-sm"><label className="flex items-center gap-2 rounded-xl border border-[#e2e9df] bg-[#fbfcfa] px-3 py-2.5"><Search size={15} className="shrink-0 text-[#81917d]"/><input value={searchTerm} onChange={event=>setSearchTerm(event.target.value)} placeholder="Search products, categories or URL slugs…" className="min-w-0 flex-1 border-0 bg-transparent text-xs outline-none focus:ring-0"/></label><div className="mt-3 flex flex-wrap gap-2">{([{value:"all",label:"All products"},{value:"published",label:"Published"},{value:"paused",label:"Paused"}] as const).map(option=><button key={option.value} type="button" onClick={()=>setStatusFilter(option.value)} className={`rounded-full px-3 py-2 text-[10px] font-bold transition ${statusFilter===option.value?"bg-[#245b42] text-white shadow-sm":"border border-[#e2e9df] bg-white text-[#657463] hover:bg-[#f3f7f0]"}`}>{option.label}</button>)}</div></div>
         {!products.length && <div className="rounded-2xl border border-dashed border-[#cbd8c8] bg-white/80 p-9 text-center"><Package className="mx-auto text-[#88a088]" size={30}/><p className="mt-3 text-sm font-bold text-[#405744]">No products yet</p><p className="mt-1 text-xs text-[#8b9688]">Add your first product using the form.</p></div>}{products.length>0 && filteredProducts.length===0 && <div className="rounded-2xl border border-dashed border-[#cbd8c8] bg-white/80 p-9 text-center"><Search className="mx-auto text-[#88a088]" size={26}/><p className="mt-3 text-sm font-bold text-[#405744]">No matching products</p><p className="mt-1 text-xs text-[#8b9688]">Try another search or change the status filter.</p></div>}
-        {filteredProducts.map(product=><article key={product.id} className="rounded-2xl border border-[#e5ebe2] bg-white p-4 shadow-sm sm:p-5">
+        {Object.entries(filteredProducts.reduce<Record<string, Product[]>>((groups, product) => { (groups[product.category || "Uncategorised"] ??= []).push(product); return groups; }, {})).map(([categoryName, categoryProducts])=><div key={categoryName} className="space-y-3"><div className="flex items-center justify-between rounded-xl border border-[#e3ebdf] bg-[#f3f7ef] px-4 py-3"><div><p className="text-[9px] font-black uppercase tracking-[.16em] text-[#9a8351]">Category</p><h3 className="mt-0.5 text-sm font-extrabold text-[#244b34]">{categoryName}</h3></div><span className="rounded-full bg-white px-3 py-1.5 text-[10px] font-bold text-[#60745f]">{categoryProducts.length} {categoryProducts.length===1?"product":"products"}</span></div>{categoryProducts.map(product=><article key={product.id} className="rounded-2xl border border-[#e5ebe2] bg-white p-4 shadow-sm sm:p-5">
           <div className="flex flex-wrap items-start justify-between gap-3"><div className="flex min-w-0 items-start gap-3"><div className="grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-xl bg-[#edf2e9] text-[#4a7652]">{product.image_url?<img src={product.image_url} alt="" className="h-full w-full object-cover"/>:<Package size={20}/>}</div><div className="min-w-0"><h3 className="font-bold text-[#304735]">{product.name}</h3><p className="mt-1 text-xs text-[#8a9687]">{product.category} · /products/{product.slug}</p>{product.short_description&&<p className="mt-1 line-clamp-2 text-xs text-[#607060]">{product.short_description}</p>}<div className="mt-2 flex flex-wrap gap-2"><span className={`rounded-full px-2 py-1 text-[9px] font-bold ${product.is_active?"bg-[#e9f3e7] text-[#3b7046]":"bg-[#f1f1ee] text-[#899184]"}`}>{product.is_active?"Published":"Paused"}</span>{product.is_featured&&<span className="rounded-full bg-[#f8f0df] px-2 py-1 text-[9px] font-bold text-[#96723a]">Featured</span>}</div></div></div>
             <div className="flex flex-wrap gap-2"><button onClick={()=>startEdit(product)} className="inline-flex items-center gap-1 rounded-lg bg-[#eef3eb] px-3 py-2 text-[10px] font-bold text-[#42664a]"><Pencil size={12}/> Edit</button><button onClick={()=>void toggleProduct(product)} className="inline-flex items-center gap-1 rounded-lg border border-[#e6ebe3] px-3 py-2 text-[10px] font-bold text-[#697866]">{product.is_active?<EyeOff size={12}/>:<Eye size={12}/>} {product.is_active?"Pause":"Publish"}</button></div>
           </div>
@@ -204,7 +237,7 @@ export default function ProductsAdminPage() {
               <div className="flex flex-wrap items-center justify-between gap-2"><p className="text-[10px] text-[#849080]">Discounts apply to this pack size only. Leave discount at 0 for the regular price.</p><div className="flex gap-2"><button disabled={saving} className="inline-flex items-center justify-center gap-1 rounded-lg bg-[#245b42] px-3 py-2 text-[10px] font-bold text-white"><Plus size={12}/>{editingVariants[product.id]?"Update this pack":"Add pack to this product"}</button>{editingVariants[product.id]&&<button type="button" onClick={()=>cancelVariantEdit(product.id)} className="text-[10px] font-bold text-[#738071]">Cancel edit</button>}</div></div>
             </form>
           </div>
-        </article>)}
+        </article>)}</div>)}
       </section>
     </div>
   </div></main>;
