@@ -73,7 +73,7 @@ export default async function ProductPage({params}:{params:Promise<{slug:string}
           {product.description&&<p className="mt-4 whitespace-pre-line text-sm leading-7 text-[#6d796e]">{product.description}</p>}
           {!product.description&&!product.short_description&&<p className="mt-4 text-sm leading-7 text-[#7a887a]">We are preparing more information for this product. For product questions, ingredients or availability, please contact our team before ordering.</p>}
 
-          <ProductPurchasePanel productId={product.id} productName={product.name} variants={variants}/>
+          <ProductPurchasePanel productId={product.id} productName={product.name} productImage={product.image_url??null} variants={variants}/>
 
           <div className="mt-5 grid grid-cols-2 gap-3">
             <div className="ec-product-promise rounded-xl p-3"><PackageCheck size={17}/><p className="mt-2 text-[10px] font-extrabold text-[#36523c]">Stock checked</p><p className="mt-1 text-[9px] leading-4 text-[#829083]">{totalStock>0?totalStock+" unit"+(totalStock===1?"":"s")+" currently listed":"Stock will be updated when available"}</p></div>

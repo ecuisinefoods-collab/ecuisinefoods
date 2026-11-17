@@ -7,11 +7,11 @@ import { ArrowRight, Check, ChevronRight, Minus, Plus, ShoppingBag, Tag, X } fro
 import { getEffectivePrice, getDiscountPercent } from "@/lib/product-pricing";
 
 type Variant = { id:string; pack_size:string; price:number; sale_price:number|null; sale_starts_at:string|null; sale_ends_at:string|null; stock_quantity:number };
-type CartItem = { variant_id:string; product_id:string; name:string; pack_size:string; price:number; original_price?:number; qty:number; stock_quantity?:number };
+type CartItem = { variant_id:string; product_id:string; name:string; pack_size:string; price:number; original_price?:number; qty:number; stock_quantity?:number; image_url?:string|null };
 const KEY="ecuisinefoods-cart-v1";
 const money=(value:number)=>"₦"+Number(value||0).toLocaleString("en-NG");
 
-export function ProductPurchasePanel({productId,productName,variants}:{productId:string;productName:string;variants:Variant[]}) {
+export function ProductPurchasePanel({productId,productName,productImage,variants}:{productId:string;productName:string;productImage:string|null;variants:Variant[]}) {
   const router=useRouter();
   const available=useMemo(()=>variants.filter(variant=>variant.stock_quantity>0),[variants]);
   const [selected,setSelected]=useState(available[0]?.id??"");
@@ -40,7 +40,7 @@ export function ProductPurchasePanel({productId,productName,variants}:{productId
     setShowOptions(true);
   }
 
-  function saveSelection(goToCheckout:boolean) {
+  function saveSelection() {
     if(!current||current.stock_quantity<1)return;
     try {
       let cart:CartItem[]=[];
@@ -49,13 +49,13 @@ export function ProductPurchasePanel({productId,productName,variants}:{productId
       const safeQty=Math.min(Math.max(1,qty),Math.max(0,current.stock_quantity-(found?.qty??0)));
       if(safeQty<1){setStorageError("Your cart already contains all currently available units of this pack size.");return;}
       const next=found
-        ?cart.map(item=>item.variant_id===current.id?{...item,qty:item.qty+safeQty,price:getEffectivePrice(current),original_price:Number(current.price),stock_quantity:current.stock_quantity}:item)
-        :[...cart,{variant_id:current.id,product_id:productId,name:productName,pack_size:current.pack_size,price:getEffectivePrice(current),original_price:Number(current.price),qty:safeQty,stock_quantity:current.stock_quantity}];
+        ?cart.map(item=>item.variant_id===current.id?{...item,qty:item.qty+safeQty,price:getEffectivePrice(current),original_price:Number(current.price),stock_quantity:current.stock_quantity,image_url:productImage}:item)
+        :[...cart,{variant_id:current.id,product_id:productId,name:productName,pack_size:current.pack_size,price:getEffectivePrice(current),original_price:Number(current.price),qty:safeQty,stock_quantity:current.stock_quantity,image_url:productImage}];
       localStorage.setItem(KEY,JSON.stringify(next));
       setStorageError("");
-      if(goToCheckout){router.push("/checkout");return;}
       setNotice(true);
       setShowOptions(false);
+      router.push("/cart");
     } catch {
       setStorageError("We could not save your selection. Please enable browser storage and try again.");
     }
@@ -81,27 +81,8 @@ export function ProductPurchasePanel({productId,productName,variants}:{productId
           <div><p className="text-[9px] font-black uppercase tracking-[.18em] text-[#a17c20]">eCuisine · Your selection</p><h2 id="ec-product-buy-title" className="mt-1 text-xl font-black text-[#173e2d]">{productName}</h2><p className="mt-1 text-xs text-[#778477]">Choose your pack size and quantity.</p></div>
           <button type="button" onClick={()=>setShowOptions(false)} aria-label="Close product options" className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-[#dfe8dc] bg-white text-[#4c6651]"><X size={17}/></button>
         </div>
-        <div className="mt-5 grid gap-2 sm:grid-cols-2">
-          {variants.map(variant=>{
-            const isSelected=selected===variant.id,off=getDiscountPercent(variant),inStock=variant.stock_quantity>0;
-            return <button type="button" key={variant.id} disabled={!inStock} aria-pressed={isSelected} onClick={()=>{setSelected(variant.id);setQty(1);setStorageError("");}} className={"ec-pack-choice flex items-center justify-between gap-3 rounded-xl border p-3.5 text-left transition "+(isSelected?"is-selected":"")+(inStock?"":" is-sold-out")}>
-              <span><span className="block text-sm font-extrabold text-[#304936]">{variant.pack_size}</span><span className="mt-1 block text-[10px] font-semibold text-[#829083]">{inStock?variant.stock_quantity+" available":"Out of stock"}</span></span>
-              <span className="text-right"><span className="block text-base font-black text-[#087f5b]">{money(getEffectivePrice(variant))}</span>{off>0&&<span className="mt-1 inline-flex items-center gap-1 rounded-full bg-[#fff0e6] px-2 py-1 text-[9px] font-black text-[#a64e30]"><Tag size={10}/>{off}% OFF</span>}</span>
-            </button>;
-          })}
-        </div>
-        {current&&current.stock_quantity>0&&<div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-[#f1f7ed] p-4">
-          <div><p className="text-[10px] font-bold uppercase tracking-wider text-[#71816f]">Quantity</p><div className="mt-2 flex items-center gap-3">
-            <button type="button" onClick={()=>setQty(value=>Math.max(1,value-1))} disabled={qty<=1} aria-label="Decrease quantity" className="grid h-9 w-9 place-items-center rounded-full border border-[#d4e2d0] bg-white text-[#315b43] disabled:opacity-35"><Minus size={14}/></button>
-            <span aria-live="polite" className="min-w-5 text-center text-base font-black tabular-nums text-[#203b2a]">{qty}</span>
-            <button type="button" onClick={()=>setQty(value=>Math.min(Math.max(1,remaining),value+1))} disabled={qty>=Math.max(1,remaining)} aria-label="Increase quantity" className="grid h-9 w-9 place-items-center rounded-full border border-[#d4e2d0] bg-white text-[#315b43] disabled:opacity-35"><Plus size={14}/></button>
-          </div></div>
-          <div className="text-right"><p className="text-[10px] font-bold uppercase tracking-wider text-[#71816f]">Total</p><p className="mt-1 text-xl font-black tabular-nums text-[#087f5b]">{money(lineTotal)}</p>{discount>0&&<p className="mt-1 text-[10px] font-semibold text-[#ad5a3e]">{discount}% off · <span className="line-through">{money(Number(current.price))}</span></p>}</div>
-        </div>}
-        {storageError&&<p role="alert" className="mt-3 rounded-xl bg-red-50 px-3.5 py-3 text-xs font-semibold text-red-700">{storageError}</p>}
-        {current&&current.stock_quantity>0?<div className="mt-5 grid gap-2 sm:grid-cols-2">
-          <button type="button" onClick={()=>saveSelection(false)} className="ec-purchase-add inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm font-extrabold"><ShoppingBag size={16}/> Add to cart</button>
-          <button type="button" onClick={()=>saveSelection(true)} disabled={qty>remaining||remaining<1} className="ec-buy-now inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-black text-white disabled:cursor-not-allowed disabled:opacity-50"><span aria-hidden="true">↗</span> Continue to checkout <ArrowRight size={15}/></button>
+        {current&&current.stock_quantity>0?<div className="mt-5">
+          <button type="button" onClick={()=>saveSelection()} disabled={qty>remaining||remaining<1} className="ec-buy-now inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-black uppercase tracking-wide text-white disabled:cursor-not-allowed disabled:opacity-50"><ShoppingBag size={17}/> Add to cart &amp; view cart <ArrowRight size={16}/></button>
         </div>:<p className="mt-4 rounded-xl bg-[#fff7e7] p-4 text-sm text-[#856c36]">This product is currently unavailable in all pack sizes.</p>}
         <button type="button" onClick={()=>setShowOptions(false)} className="mt-3 w-full rounded-xl px-4 py-3 text-xs font-bold text-[#6e7c70] hover:bg-[#f3f6f1]">Continue browsing</button>
       </section>
