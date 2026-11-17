@@ -81,7 +81,9 @@ export function ProductPurchasePanel({productId,productName,productImage,variant
           <div><p className="text-[9px] font-black uppercase tracking-[.18em] text-[#a17c20]">eCuisine · Your selection</p><h2 id="ec-product-buy-title" className="mt-1 text-xl font-black text-[#173e2d]">{productName}</h2><p className="mt-1 text-xs text-[#778477]">Choose your pack size and quantity.</p></div>
           <button type="button" onClick={()=>setShowOptions(false)} aria-label="Close product options" className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-[#dfe8dc] bg-white text-[#4c6651]"><X size={17}/></button>
         </div>
-        <div className="mt-5">\n          <button type="button" onClick={()=>saveSelection()} disabled={qty>remaining||remaining<1} className="ec-buy-now inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-black uppercase tracking-wide text-white disabled:cursor-not-allowed disabled:opacity-50"><ShoppingBag size={17}/> Add to cart &amp; view cart <ArrowRight size={16}/></button>\n        </div>:<p className="mt-4 rounded-xl bg-[#fff7e7] p-4 text-sm text-[#856c36]">This product is currently unavailable in all pack sizes.</p>}
+        <div className="mt-5">
+          <button type="button" onClick={()=>saveSelection()} disabled={qty>remaining||remaining<1} className="ec-buy-now inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-black uppercase tracking-wide text-white disabled:cursor-not-allowed disabled:opacity-50"><ShoppingBag size={17}/> Add to cart &amp; view cart <ArrowRight size={16}/></button>
+        </div>:<p className="mt-4 rounded-xl bg-[#fff7e7] p-4 text-sm text-[#856c36]">This product is currently unavailable in all pack sizes.</p>}
         <button type="button" onClick={()=>setShowOptions(false)} className="mt-3 w-full rounded-xl px-4 py-3 text-xs font-bold text-[#6e7c70] hover:bg-[#f3f6f1]">Continue browsing</button>
       </section>
     </div>}
