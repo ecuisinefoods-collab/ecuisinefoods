@@ -158,9 +158,8 @@ export function ProductCatalog({ products, initialCategory = "All products", ini
                 <Link href={"/products/"+product.slug} className="inline-flex shrink-0 items-center gap-1 text-[11px] font-extrabold text-[#245b42]">Product details <ArrowRight size={13}/></Link>
               </div>
               <div className="mt-5 border-t border-[#eef1e9] pt-4">
-                <button type="button" onClick={()=>openBuyOptions(product)} className="ec-shop-buy-button flex w-full items-center justify-center gap-2 rounded-xl bg-[#087f5b] px-5 py-3.5 text-sm font-extrabold text-white shadow-lg transition hover:-translate-y-0.5">
-                  <ShoppingBag size={17}/> Buy
-                  <span className="ml-1 text-[10px] font-semibold text-white/80">{available?"Choose size & quantity":"View availability"}</span>
+                <button type="button" onClick={()=>openBuyOptions(product)} className="ec-shop-buy-button flex w-full items-center justify-center gap-2 rounded-xl px-5 py-4 text-sm font-black uppercase tracking-[.08em] text-white transition" aria-label={"Buy "+product.name}>
+                  <ShoppingBag size={18} strokeWidth={2.5}/> <span>Buy now</span>
                 </button>
                 {!variants.length&&<p className="mt-2 text-center text-[10px] font-medium text-[#899288]">Pack sizes and prices will be announced soon.</p>}
               </div>
