@@ -35,6 +35,7 @@ export default function TeamManagementPage() {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [ownerId, setOwnerId] = useState("");
+  const [authorized, setAuthorized] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Staff | null>(null);
   const [deletePhrase, setDeletePhrase] = useState("");
   const [search, setSearch] = useState("");
@@ -50,6 +51,7 @@ export default function TeamManagementPage() {
       return;
     }
     setOwnerId(user.id);
+    setAuthorized(true);
     const { data, error: queryError } = await supabase
       .from("admin_profiles")
       .select("user_id,email,display_name,role,is_active,created_at")
@@ -76,8 +78,8 @@ export default function TeamManagementPage() {
     const { data, error: invokeError } = await supabase.functions.invoke("invite-admin", {
       body: { email: email.trim(), display_name: displayName.trim(), role },
     });
-    if (invokeError) setError(invokeError.message);
-    else if (data?.error) setError(data.error);
+    if (invokeError) { setError(invokeError.message); await load(); }
+    else if (data?.error) { setError(data.error); await load(); }
     else {
       setMessage(data?.message || "Invitation email sent.");
       setEmail(""); setDisplayName("");
@@ -128,6 +130,16 @@ export default function TeamManagementPage() {
   }
 
   if (loading) return <main className="admin-glass-shell grid min-h-screen place-items-center p-8 text-sm font-semibold text-[#42694b]">Loading team workspace…</main>;
+  if (!authorized) return (
+    <main className="admin-glass-shell grid min-h-[70vh] place-items-center px-5 py-12">
+      <section className="w-full max-w-md rounded-3xl border border-white/80 bg-white/85 p-7 text-center shadow-xl">
+        <ShieldCheck size={30} className="mx-auto text-[#9a7a33]"/>
+        <h1 className="mt-4 text-xl font-bold text-[#24432e]">Owner access required</h1>
+        <p className="mt-2 text-sm leading-6 text-[#788678]">{error || "Only the active CEO / owner account can manage administrator accounts."}</p>
+        <Link href="/admin" className="admin-team-primary-button mt-5 inline-flex rounded-xl px-5 py-3 text-xs font-bold">Return to dashboard</Link>
+      </section>
+    </main>
+  );
 
   return (
     <main className="admin-glass-shell admin-team-page min-h-screen px-4 py-7 text-[#24392c] sm:px-7 lg:px-9">
