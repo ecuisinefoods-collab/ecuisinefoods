@@ -117,8 +117,8 @@ export default function TeamManagementPage() {
     const { data, error: invokeError } = await supabase.functions.invoke("delete-admin", {
       body: { user_id: deleteTarget.user_id },
     });
-    if (invokeError) setError(invokeError.message);
-    else if (data?.error) setError(data.error);
+    if (invokeError) { setError(invokeError.message); await load(); }
+    else if (data?.error) { setError(data.error); await load(); }
     else {
       setMessage(data?.message || "Administrator account removed.");
       setStaff(current => current.filter(member => member.user_id !== deleteTarget.user_id));
