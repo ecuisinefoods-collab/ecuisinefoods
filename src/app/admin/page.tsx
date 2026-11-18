@@ -4,7 +4,7 @@ import { FormEvent, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import {
-  Activity, ArrowDownRight, ArrowUpRight, BarChart3, Boxes, CalendarDays, Truck,
+  Activity, ArrowDownRight, ArrowUpRight, BarChart3, Boxes, Truck,
   ChevronRight, CircleDollarSign, ClipboardList, LogOut, LayoutDashboard,
   Megaphone, Package, ShieldCheck, ShoppingBag, Users, Wallet, CreditCard,
   Handshake, MapPin, Tags, Image as ImageIcon, Star, Database, Bot,
