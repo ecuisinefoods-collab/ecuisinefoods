@@ -2185,3 +2185,153 @@ input[type="submit"]:active:not(:disabled) {
 @media(prefers-reduced-motion:reduce) {
   .admin-dashboard-metric,.admin-dashboard-category,.admin-dashboard-tool,.admin-dashboard-order-row,.admin-dashboard-hero-action { transition:none!important; }
 }
+
+
+/* Categorized dropdown navigation for the eCuisine admin workspace */
+.admin-global-dropdown-groups {
+  display:grid;
+  gap:7px;
+  margin-top:16px;
+}
+.admin-global-nav-group { margin:0; }
+.admin-global-group-toggle {
+  display:flex;
+  width:100%;
+  min-height:56px;
+  align-items:center;
+  gap:10px;
+  border:1px solid rgba(255,255,255,.09);
+  border-radius:13px;
+  padding:8px 10px;
+  background:rgba(255,255,255,.045);
+  color:#eaf2e8;
+  text-align:left;
+  cursor:pointer;
+  transition:background .2s,border-color .2s,transform .2s,box-shadow .2s;
+}
+.admin-global-group-toggle:hover,
+.admin-global-group-toggle.is-expanded {
+  border-color:rgba(242,218,146,.32);
+  background:rgba(255,255,255,.105);
+}
+.admin-global-group-toggle:focus-visible,
+.admin-global-mobile-group-toggle:focus-visible {
+  outline:3px solid #e7ca73;
+  outline-offset:3px;
+}
+.admin-global-group-icon {
+  display:grid;
+  width:34px;
+  height:34px;
+  flex:none;
+  place-items:center;
+  border:1px solid rgba(240,220,160,.18);
+  border-radius:10px;
+  background:rgba(241,209,111,.12);
+  color:#f1d16f;
+}
+.admin-global-group-copy { display:block; min-width:0; flex:1; }
+.admin-global-group-copy strong {
+  display:block;
+  color:#f2f5e9;
+  font-size:10px;
+  font-weight:850;
+  line-height:1.35;
+}
+.admin-global-group-copy small {
+  display:block;
+  margin-top:3px;
+  color:#a9c5ad;
+  font-size:8px;
+  font-weight:650;
+  letter-spacing:.04em;
+}
+.admin-global-group-chevron {
+  flex:none;
+  color:#c5d6c5;
+  transition:transform .2s ease;
+}
+.admin-global-group-toggle.is-expanded .admin-global-group-chevron,
+.admin-global-mobile-group-toggle.is-expanded .admin-global-group-chevron {
+  transform:rotate(180deg);
+}
+.admin-global-nav-group nav {
+  display:grid;
+  gap:3px;
+  margin:7px 0 2px 10px;
+  border-left:1px solid rgba(232,211,148,.28);
+  padding:3px 0 3px 10px;
+}
+.admin-global-nav-group .admin-global-link {
+  min-height:35px;
+  padding:7px 9px;
+  font-size:10px;
+}
+.admin-global-overview .admin-global-section-label { margin-bottom:8px; }
+.admin-global-overview > .admin-global-link { min-height:42px; }
+@media (max-width:1023px) {
+  .admin-global-mobile-nav .admin-global-mobile-menu {
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:7px;
+    padding:0 14px 12px;
+  }
+  .admin-global-mobile-overview,
+  .admin-global-mobile-group-toggle {
+    display:flex;
+    width:100%;
+    min-height:40px;
+    align-items:center;
+    gap:7px;
+    border:1px solid #e0e8db;
+    border-radius:11px;
+    padding:8px 10px;
+    background:#fff;
+    color:#4b654e;
+    font-size:10px;
+    font-weight:800;
+    text-align:left;
+    cursor:pointer;
+  }
+  .admin-global-mobile-overview { grid-column:1/-1; }
+  .admin-global-mobile-overview.is-active,
+  .admin-global-mobile-group-toggle.is-expanded {
+    border-color:#d9c17c;
+    background:#fbf4dc;
+    color:#234b33;
+  }
+  .admin-global-mobile-group { min-width:0; }
+  .admin-global-mobile-group:has(nav) { grid-column:1/-1; }
+  .admin-global-mobile-group-toggle > span { min-width:0; flex:1; }
+  .admin-global-mobile-group-toggle > svg:first-child { flex:none; color:#8b7131; }
+  .admin-global-mobile-group-toggle .admin-global-group-chevron { flex:none; margin-left:auto; color:#768a72; }
+  .admin-global-mobile-nav .admin-global-mobile-group nav {
+    display:grid;
+    gap:4px;
+    margin:6px 0 0;
+    border:1px solid #e6ecdf;
+    border-radius:12px;
+    padding:7px;
+    background:#f8faf5;
+  }
+  .admin-global-mobile-nav .admin-global-mobile-group nav .admin-global-link {
+    min-height:37px;
+    border:1px solid transparent;
+    border-radius:9px;
+    padding:8px 9px;
+    background:#fff;
+    color:#526b55;
+    font-size:10px;
+  }
+  .admin-global-mobile-nav .admin-global-mobile-group nav .admin-global-link.is-active {
+    border-color:#e4d397;
+    background:#f9efcf;
+    color:#244c32;
+  }
+}
+@media (prefers-reduced-motion:reduce) {
+  .admin-global-group-toggle,
+  .admin-global-group-chevron,
+  .admin-global-mobile-group-toggle,
+  .admin-global-mobile-group-toggle .admin-global-group-chevron { transition:none!important; }
+}
