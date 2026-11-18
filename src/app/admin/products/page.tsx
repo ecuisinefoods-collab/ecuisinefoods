@@ -24,6 +24,7 @@ export default function ProductsAdminPage() {
   const [editing, setEditing] = useState<string | null>(null);
   const [editingVariants, setEditingVariants] = useState<Record<string, string>>({});
   const [authorized, setAuthorized] = useState(false);
+  const [role, setRole] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
@@ -47,6 +48,7 @@ export default function ProductsAdminPage() {
       setError("Only the owner or an authorised store manager can manage products."); setLoading(false); return;
     }
     setAuthorized(true);
+    setRole(profile.role);
     const { data, error: queryError } = await supabase.from("products").select("id,name,slug,category,short_description,description,ingredients,highlights,usage_instructions,storage_instructions,allergy_info,nutrition_info,image_url,is_featured,is_active,product_variants(id,product_id,pack_size,price,sale_price,sale_starts_at,sale_ends_at,stock_quantity)").order("created_at", { ascending: false });
     if (queryError) setError(queryError.message);
     else setProducts((data ?? []) as Product[]);
@@ -142,9 +144,11 @@ export default function ProductsAdminPage() {
     else { setMessage(nextStock > 0 ? "Pack size marked Available." : "Pack size marked Out of stock."); await load(); }
   };
   const deleteVariant = async (id: string, productId: string) => {
-    if (!supabase || !window.confirm("Delete this pack size from this product? Existing order records may prevent deletion.")) return;
-    const { error: deleteError } = await supabase.from("product_variants").delete().eq("id", id).eq("product_id", productId);
-    if (deleteError) setError(deleteError.message); else { setMessage("Pack size deleted."); await load(); }
+    if (!supabase || role !== "owner" || !window.confirm("Permanently delete this pack size? Existing order and inventory references may prevent deletion.")) return;
+    const { data: deleted, error: deleteError } = await supabase.from("product_variants").delete().eq("id", id).eq("product_id", productId).select("id").maybeSingle();
+    if (deleteError) setError(deleteError.message);
+    else if (!deleted) setError("This pack size was not deleted. Refresh the catalogue or check whether it is still referenced by an order or inventory record.");
+    else { setMessage("Pack size deleted."); await load(); }
   };
   const toggleProduct = async (product: Product) => {
     if (!supabase) return;
@@ -189,7 +193,7 @@ export default function ProductsAdminPage() {
             <div className="flex flex-wrap gap-2"><button onClick={()=>startEdit(product)} className="inline-flex items-center gap-1 rounded-lg bg-[#eef3eb] px-3 py-2 text-[10px] font-bold text-[#42664a]"><Pencil size={12}/> Edit</button><button onClick={()=>void toggleProduct(product)} className="inline-flex items-center gap-1 rounded-lg border border-[#e6ebe3] px-3 py-2 text-[10px] font-bold text-[#697866]">{product.is_active?<EyeOff size={12}/>:<Eye size={12}/>} {product.is_active?"Pause":"Publish"}</button></div>
           </div>
           <div className="mt-4 border-t border-[#edf0eb] pt-4"><div className="mb-3 flex items-center justify-between"><h4 className="text-xs font-bold text-[#405744]">Pack sizes / weights, prices & stock</h4><span className="text-[10px] text-[#899487]">{product.product_variants?.length ?? 0} variants</span></div>
-            {product.product_variants?.length ? <div className="space-y-2">{product.product_variants.map(v=><div key={v.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-[#f8faf6] px-3 py-2"><div><p className="text-xs font-semibold text-[#405044]">{v.pack_size}</p><p className="mt-1 text-[10px] text-[#7b887c]">{v.sale_price != null ? <><span className="font-bold text-[#b45a3c]">{money(Number(v.sale_price))}</span> <span className="line-through">{money(Number(v.price))}</span> · {Math.round((1-Number(v.sale_price)/Number(v.price))*100)}% off</> : money(Number(v.price))} · {v.stock_quantity > 0 ? "Available" : "Out of stock"}</p></div><div className="flex flex-wrap gap-2"><button onClick={()=>void toggleVariantAvailability(v)} className={`rounded-lg px-2.5 py-1.5 text-[10px] font-bold ${v.stock_quantity > 0 ? "bg-[#edf3e9] text-[#42664a]" : "bg-[#f9ecea] text-[#a34b42]"}`}>{v.stock_quantity > 0 ? "Mark out of stock" : "Mark available"}</button><button onClick={()=>editVariant(v)} className="rounded-lg border border-[#e1e8de] px-2.5 py-1.5 text-[10px] font-bold text-[#42664a]">Edit</button><button onClick={()=>void deleteVariant(v.id,product.id)} aria-label="Delete pack size" className="rounded-lg border border-[#f0dfdc] p-1.5 text-[#a05f54]"><Trash2 size={12}/></button></div></div>)}</div>:<p className="text-xs text-[#899487]">No pack sizes yet. Add one below to make this product purchasable.</p>}
+            {product.product_variants?.length ? <div className="space-y-2">{product.product_variants.map(v=><div key={v.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-[#f8faf6] px-3 py-2"><div><p className="text-xs font-semibold text-[#405044]">{v.pack_size}</p><p className="mt-1 text-[10px] text-[#7b887c]">{v.sale_price != null ? <><span className="font-bold text-[#b45a3c]">{money(Number(v.sale_price))}</span> <span className="line-through">{money(Number(v.price))}</span> · {Math.round((1-Number(v.sale_price)/Number(v.price))*100)}% off</> : money(Number(v.price))} · {v.stock_quantity > 0 ? "Available" : "Out of stock"}</p></div><div className="flex flex-wrap gap-2"><button onClick={()=>void toggleVariantAvailability(v)} className={`rounded-lg px-2.5 py-1.5 text-[10px] font-bold ${v.stock_quantity > 0 ? "bg-[#edf3e9] text-[#42664a]" : "bg-[#f9ecea] text-[#a34b42]"}`}>{v.stock_quantity > 0 ? "Mark out of stock" : "Mark available"}</button><button onClick={()=>editVariant(v)} className="rounded-lg border border-[#e1e8de] px-2.5 py-1.5 text-[10px] font-bold text-[#42664a]">Edit</button>{role==="owner"&&<button onClick={()=>void deleteVariant(v.id,product.id)} aria-label="Delete pack size" className="rounded-lg border border-[#f0dfdc] p-1.5 text-[#a05f54]"><Trash2 size={12}/></button>}</div></div>)}</div>:<p className="text-xs text-[#899487]">No pack sizes yet. Add one below to make this product purchasable.</p>}
             <form onSubmit={e=>void saveVariant(e,product.id)} className="mt-3 space-y-2 rounded-xl border border-dashed border-[#dce5d8] p-3">
               <div className="grid gap-2 sm:grid-cols-3">
                 <input required maxLength={40} type="text" value={(variantDrafts[product.id]??blankVariant).pack_size} onChange={e=>updateVariantDraft(product.id,{pack_size:e.target.value})} placeholder="Pack size (e.g. 1 kg)" aria-label={`Pack size for ${product.name}`} className="min-w-0 rounded-lg border border-[#dfe7dc] bg-white px-2 py-2 text-xs"/>
