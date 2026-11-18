@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 
-const LIFETIME_SALES_MILESTONE = 2500;
 const JOURNEY_NOTES = [
   "Good food. Better everyday choices.",
   "Every order helps shape our next chapter.",
@@ -11,11 +10,11 @@ const JOURNEY_NOTES = [
   "Growing through every customer story."
 ];
 
-export function SalesCounter({ total }: { total: number }) {
+export function SalesCounter({ total, manualTotal = null }: { total: number; manualTotal?: number | null }) {
   const [count, setCount] = useState(0);
   const [activeNote, setActiveNote] = useState(0);
   const websiteSales = Math.max(0, Math.floor(Number.isFinite(total) ? total : 0));
-  const allTimeSales = Math.max(LIFETIME_SALES_MILESTONE, websiteSales);
+  const allTimeSales = manualTotal === null || manualTotal === undefined ? websiteSales : Math.max(0, Math.floor(Number.isFinite(manualTotal) ? manualTotal : 0));
   const display = new Intl.NumberFormat("en-NG").format(count);
 
   useEffect(() => {

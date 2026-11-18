@@ -29,31 +29,30 @@ const money = (value: number) =>
   new Intl.NumberFormat("en-NG", { style: "currency", currency: "NGN", maximumFractionDigits: 0 }).format(value || 0);
 
 const navGroups: { label: string; items: { label: string; icon: typeof LayoutDashboard; href: string; roles?: string[] }[] }[] = [
-  { label: "Store management", items: [
+  { label: "Storefront & catalogue", items: [
     { label: "Products & stock", icon: Package, href: "/admin/products", roles: ["owner","store_manager"] },
     { label: "Inventory history", icon: Boxes, href: "/admin/inventory", roles: ["owner","store_manager","analyst"] },
+    { label: "Sales counter display", icon: Activity, href: "/admin/sales-counter", roles: ["owner"] },
     { label: "Promotions & banners", icon: Megaphone, href: "/admin/promotions", roles: ["owner","marketing_manager"] },
     { label: "Customer reviews", icon: ClipboardList, href: "/admin/reviews", roles: ["owner","store_manager"] },
+    { label: "Storefront editor", icon: LayoutDashboard, href: "/admin/storefront", roles: ["owner","store_manager"] },
+    { label: "Our Story & team", icon: Users, href: "/admin/story", roles: ["owner","store_manager"] },
   ]},
-  { label: "Orders & fulfilment", items: [
+  { label: "Orders & payments", items: [
     { label: "Orders", icon: ClipboardList, href: "/admin/orders", roles: ["owner","store_manager","order_officer","finance_officer","analyst"] },
     { label: "Delivery setup", icon: Truck, href: "/admin/delivery", roles: ["owner","store_manager"] },
     { label: "Pickup locations", icon: MapPin, href: "/admin/pickups", roles: ["owner","store_manager"] },
     { label: "Payment settings", icon: CreditCard, href: "/admin/payments", roles: ["owner","store_manager"] },
+    { label: "Finances", icon: Wallet, href: "/admin/finance", roles: ["owner","finance_officer","analyst"] },
   ]},
-  { label: "Brand & content", items: [
-    { label: "Storefront editor", icon: LayoutDashboard, href: "/admin/storefront", roles: ["owner","store_manager"] },
-    { label: "Our Story & team", icon: Users, href: "/admin/story", roles: ["owner","store_manager"] },
+  { label: "Growth & reports", items: [
+    { label: "Analytics", icon: BarChart3, href: "/admin/analytics", roles: ["owner","store_manager","finance_officer","analyst"] },
     { label: "Partnership enquiries", icon: Handshake, href: "/admin/partnerships", roles: ["owner","store_manager","marketing_manager"] },
     { label: "Affiliate applications", icon: Users, href: "/admin/affiliates", roles: ["owner","store_manager","marketing_manager"] },
-    { label: "Partner operations & tasks", icon: ClipboardList, href: "/admin/partners", roles: ["owner","store_manager","marketing_manager"] },
+    { label: "Partner operations", icon: ClipboardList, href: "/admin/partners", roles: ["owner","store_manager","marketing_manager"] },
+    { label: "Backups & data exports", icon: ClipboardList, href: "/admin/exports", roles: ["owner"] },
   ]},
-  { label: "Reports & finance", items: [
-    { label: "Analytics", icon: BarChart3, href: "/admin/analytics", roles: ["owner","store_manager","finance_officer","analyst"] },
-    { label: "Finances", icon: Wallet, href: "/admin/finance", roles: ["owner","finance_officer","analyst"] },
-    { label: "Backups & data management", icon: ClipboardList, href: "/admin/exports", roles: ["owner"] },
-  ]},
-  { label: "People & AI", items: [
+  { label: "Team & tools", items: [
     { label: "Team & permissions", icon: Users, href: "/admin/team", roles: ["owner"] },
     { label: "AI assistant & knowledge", icon: Bot, href: "/admin/assistant", roles: ["owner","store_manager","order_officer"] },
   ]},
@@ -220,8 +219,8 @@ export default function AdminPage() {
 
       <section className="lg:pl-64">
         <header className="admin-topbar-premium sticky top-0 z-10 flex items-center justify-between border-b px-5 py-4 backdrop-blur sm:px-8">
-          <div><p className="admin-topbar-kicker text-[10px] font-bold uppercase tracking-[.18em]">Business overview</p><h1 className="admin-topbar-title mt-1 text-lg font-bold">Good day, {profile.display_name || "eCuisine Owner"}</h1></div>
-          <div className="flex items-center gap-3"><span className="admin-role-pill hidden rounded-full px-3 py-2 text-[10px] font-bold capitalize sm:inline-flex">{profile.role.replaceAll("_", " ")}</span><button onClick={signOut} className="admin-signout inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-bold"><LogOut size={15}/> Sign out</button></div>
+          <div><p className="admin-topbar-kicker text-[10px] font-bold uppercase tracking-[.18em]">Business overview</p><h1 className="admin-topbar-title mt-1 text-lg font-bold">{profile.role === "owner" ? "Welcome, CEO" : `Welcome, ${profile.display_name || profile.role.replaceAll("_", " ")}`}</h1></div>
+          <div className="flex items-center gap-3"><span className="admin-role-pill hidden rounded-full px-3 py-2 text-[10px] font-bold capitalize sm:inline-flex">{profile.role === "owner" ? "CEO" : profile.role.replaceAll("_", " ")}</span><button onClick={signOut} className="admin-signout inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-bold"><LogOut size={15}/> Sign out</button></div>
         </header>
         <div className="admin-dashboard-content mx-auto max-w-7xl px-5 py-7 sm:px-8 sm:py-9">
           <div className="admin-dashboard-intro mb-7 flex flex-wrap items-end justify-between gap-3"><div><h2 className="text-2xl font-semibold tracking-tight text-[#1e3b29] sm:text-3xl">Your business at a glance</h2><p className="mt-2 text-xs text-[#7b887a]">A live view of the information currently available in your eCuisine database.</p></div><span className="admin-connection-pill inline-flex items-center gap-2 rounded-full border px-3 py-2 text-[10px] font-semibold"><Activity size={13} className="text-[#4e8a5d]"/> Connected to Supabase</span></div>
