@@ -111,6 +111,10 @@ Deno.serve(async (req: Request) => {
     const body = await req.json();
     const action = clean(body.action, 32);
 
+    if (action === "delete" && profile.role !== "owner") {
+      return send({ error: "Only the active owner account can permanently delete AI knowledge files." }, 403, corsOrigin);
+    }
+
     if (action === "ask_knowledge") {
       const question = clean(body.question, 800);
       if (question.length < 3) return send({ error: "Enter a clear question to test the knowledge base." }, 400, corsOrigin);
