@@ -28,6 +28,7 @@ export default function AssistantAdminPage(){
  const [draft,setDraft]=useState(blankKnowledge);
  const [saving,setSaving]=useState(false);
  const canEdit=["owner","store_manager"].includes(role);
+ const isOwner=role==="owner";
 
  const loadConversations=useCallback(async()=>{
   if(!supabase)return;
@@ -104,9 +105,9 @@ export default function AssistantAdminPage(){
   setError("");setMessage("");
  };
  const removeKnowledge=async(item:Knowledge)=>{
-  if(!supabase||!canEdit||!window.confirm("Delete this knowledge entry from the assistant's approved business information?"))return;
-  const {error:deleteError}=await supabase.from("assistant_knowledge").delete().eq("id",item.id);
-  if(deleteError)setError(deleteError.message);else{setMessage("Knowledge entry deleted.");if(editing===item.id){setEditing(null);setDraft(blankKnowledge);}await loadKnowledge();}
+  if(!supabase||!isOwner||!window.confirm("Permanently delete this knowledge entry from the assistant's approved business information?"))return;
+  const {data:deleted,error:deleteError}=await supabase.from("assistant_knowledge").delete().eq("id",item.id).select("id").maybeSingle();
+  if(deleteError)setError(deleteError.message);else if(!deleted)setError("The knowledge entry was not deleted. Refresh and try again.");else{setMessage("Knowledge entry deleted.");if(editing===item.id){setEditing(null);setDraft(blankKnowledge);}await loadKnowledge();}
  };
  const visibleConversations=conversations.filter(item=>{
   const term=search.trim().toLowerCase();
@@ -164,7 +165,7 @@ export default function AssistantAdminPage(){
     </form>
    </div>
    <div className="rounded-2xl border border-[#e3eae0] bg-white p-5 shadow-sm sm:p-6"><div className="flex flex-wrap items-center justify-between gap-3"><div><h2 className="font-bold text-[#2d4934]">Approved business knowledge</h2><p className="mt-1 text-sm text-[#8a9688]">{knowledge.length} entries · {knowledge.filter(k=>k.is_active).length} active</p></div><button type="button" onClick={()=>{setEditing(null);setDraft(blankKnowledge);}} className="inline-flex items-center gap-2 rounded-full border border-[#dce5d8] px-4 py-2.5 text-xs font-bold text-[#42694b]"><Plus size={14}/> New entry</button></div>
-    <div className="mt-5 space-y-3">{knowledge.map(item=><article key={item.id} className="rounded-xl border border-[#e7ece4] p-4"><div className="flex flex-wrap items-start justify-between gap-3"><div className="min-w-0"><div className="flex flex-wrap items-center gap-2"><h3 className="text-base font-extrabold text-[#294633]">{item.title}</h3><span className="rounded-full bg-[#f0f4ec] px-2 py-1 text-[10px] font-bold text-[#697d68]">{item.category}</span><span className={"rounded-full px-2 py-1 text-[10px] font-bold "+(item.is_active?"bg-[#eaf3e8] text-[#3e704b]":"bg-[#f1f1ee] text-[#838c80]")}>{item.is_active?"Active":"Paused"}</span></div><p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-[#738071]">{item.content}</p><p className="mt-2 text-[10px] text-[#9aa396]">Updated {dateLabel(item.updated_at)}</p></div><div className="flex shrink-0 gap-2"><button type="button" onClick={()=>editKnowledge(item)} className="rounded-lg border border-[#dce7d9] px-3 py-2 text-xs font-bold text-[#42694b]">Edit</button><button type="button" onClick={()=>void removeKnowledge(item)} aria-label={"Delete "+item.title} className="rounded-lg border border-[#f0dfdc] p-2 text-[#a05f54]"><Trash2 size={14}/></button></div></div></article>)}
+    <div className="mt-5 space-y-3">{knowledge.map(item=><article key={item.id} className="rounded-xl border border-[#e7ece4] p-4"><div className="flex flex-wrap items-start justify-between gap-3"><div className="min-w-0"><div className="flex flex-wrap items-center gap-2"><h3 className="text-base font-extrabold text-[#294633]">{item.title}</h3><span className="rounded-full bg-[#f0f4ec] px-2 py-1 text-[10px] font-bold text-[#697d68]">{item.category}</span><span className={"rounded-full px-2 py-1 text-[10px] font-bold "+(item.is_active?"bg-[#eaf3e8] text-[#3e704b]":"bg-[#f1f1ee] text-[#838c80]")}>{item.is_active?"Active":"Paused"}</span></div><p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-[#738071]">{item.content}</p><p className="mt-2 text-[10px] text-[#9aa396]">Updated {dateLabel(item.updated_at)}</p></div><div className="flex shrink-0 gap-2"><button type="button" onClick={()=>editKnowledge(item)} className="rounded-lg border border-[#dce7d9] px-3 py-2 text-xs font-bold text-[#42694b]">Edit</button>{isOwner&&<button type="button" onClick={()=>void removeKnowledge(item)} aria-label={"Delete "+item.title} className="rounded-lg border border-[#f0dfdc] p-2 text-[#a05f54]"><Trash2 size={14}/></button>}</div></div></article>)}
      {!knowledge.length&&<div className="rounded-xl border border-dashed border-[#d7e1d4] p-8 text-center"><BookOpen size={26} className="mx-auto text-[#9aa998]"/><p className="mt-3 text-sm font-bold text-[#506b54]">No knowledge entries yet</p></div>}
     </div>
    </div>

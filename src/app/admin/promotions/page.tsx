@@ -26,6 +26,7 @@ export default function PromotionsPage() {
   const [draft, setDraft] = useState<Draft>(emptyDraft);
   const [editing, setEditing] = useState<string | null>(null);
   const [authorized, setAuthorized] = useState(false);
+  const [role, setRole] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
@@ -41,6 +42,7 @@ export default function PromotionsPage() {
     if (!profile?.is_active || !["owner", "marketing_manager"].includes(profile.role)) {
       setError("Your admin role does not have permission to manage promotions."); setLoading(false); return;
     }
+    setRole(profile.role);
     setAuthorized(true);
     const { data, error: queryError } = await supabase.from("promotional_banners").select("*").order("sort_order", { ascending: true });
     if (queryError) setError(queryError.message);
@@ -104,9 +106,11 @@ export default function PromotionsPage() {
     if (updateError) setError(updateError.message); else await load();
   };
   const remove = async (id: string) => {
-    if (!supabase || !window.confirm("Delete this promotion? This cannot be undone.")) return;
-    const { error: deleteError } = await supabase.from("promotional_banners").delete().eq("id", id);
-    if (deleteError) setError(deleteError.message); else { if (editing === id) { setEditing(null); setDraft(emptyDraft); } await load(); }
+    if (!supabase || role !== "owner" || !window.confirm("Permanently delete this promotion? This cannot be undone.")) return;
+    const { data: deleted, error: deleteError } = await supabase.from("promotional_banners").delete().eq("id", id).select("id").maybeSingle();
+    if (deleteError) setError(deleteError.message);
+    else if (!deleted) setError("The promotion was not deleted. Refresh the list and try again.");
+    else { if (editing === id) { setEditing(null); setDraft(emptyDraft); } setMessage("Promotion deleted."); await load(); }
   };
   const reorder = async (index: number, direction: -1 | 1) => {
     const next = [...banners]; const target = index + direction;
@@ -131,7 +135,7 @@ export default function PromotionsPage() {
           <section className="space-y-3">
             <h2 className="text-sm font-bold text-[#405744]">Your slides ({banners.length})</h2>
             {banners.length === 0 && <div className="rounded-2xl border border-dashed border-[#cbd8c8] bg-white p-9 text-center"><ImagePlus className="mx-auto text-[#88a088]" size={30}/><p className="mt-3 text-sm font-bold text-[#405744]">No promotions created yet</p><p className="mt-1 text-xs text-[#8b9688]">Create your first banner to replace the default offer.</p></div>}
-            {banners.map((banner,index) => <article key={banner.id} className="flex gap-3 rounded-2xl border border-[#e5ebe2] bg-white p-4 shadow-sm"><div className="grid h-14 w-16 shrink-0 place-items-center overflow-hidden rounded-xl bg-[#edf2e9] text-[#4a7652]">{banner.image_url ? (banner.media_type === "video" ? <video src={banner.image_url} muted className="h-full w-full object-cover"/> : <img src={banner.image_url} alt="" className="h-full w-full object-cover"/>) : <ImagePlus size={20}/>}</div><div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><h3 className="truncate text-sm font-bold text-[#304735]">{banner.title}</h3><span className={`rounded-full px-2 py-1 text-[9px] font-bold ${banner.is_active ? "bg-[#e9f3e7] text-[#3b7046]" : "bg-[#f1f1ee] text-[#899184]"}`}>{banner.is_active ? "Enabled" : "Paused"}</span></div><p className="mt-1 truncate text-xs text-[#8a9687]">{banner.subtitle || "No subtitle"}</p><p className="mt-2 text-[10px] font-semibold capitalize text-[#66806a]">{banner.animation_effect} · {banner.slide_duration_ms/1000}s display</p><div className="mt-3 flex flex-wrap gap-2"><button onClick={() => edit(banner)} className="rounded-lg bg-[#eef3eb] px-3 py-2 text-[10px] font-bold text-[#42664a]">Edit</button><button onClick={() => void updateBanner(banner.id,{is_active:!banner.is_active})} className="inline-flex items-center gap-1 rounded-lg border border-[#e6ebe3] px-3 py-2 text-[10px] font-bold text-[#697866]">{banner.is_active ? <EyeOff size={12}/> : <Eye size={12}/>} {banner.is_active ? "Pause" : "Enable"}</button><button onClick={() => void remove(banner.id)} className="inline-flex items-center gap-1 rounded-lg border border-[#f0dfdc] px-3 py-2 text-[10px] font-bold text-[#a05f54]"><Trash2 size={12}/> Delete</button><button disabled={index===0} onClick={() => void reorder(index,-1)} aria-label="Move up" className="rounded-lg border border-[#e6ebe3] p-2 text-[#71816e] disabled:opacity-30"><ArrowUp size={13}/></button><button disabled={index===banners.length-1} onClick={() => void reorder(index,1)} aria-label="Move down" className="rounded-lg border border-[#e6ebe3] p-2 text-[#71816e] disabled:opacity-30"><ArrowDown size={13}/></button></div></div></article>)}
+            {banners.map((banner,index) => <article key={banner.id} className="flex gap-3 rounded-2xl border border-[#e5ebe2] bg-white p-4 shadow-sm"><div className="grid h-14 w-16 shrink-0 place-items-center overflow-hidden rounded-xl bg-[#edf2e9] text-[#4a7652]">{banner.image_url ? (banner.media_type === "video" ? <video src={banner.image_url} muted className="h-full w-full object-cover"/> : <img src={banner.image_url} alt="" className="h-full w-full object-cover"/>) : <ImagePlus size={20}/>}</div><div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><h3 className="truncate text-sm font-bold text-[#304735]">{banner.title}</h3><span className={`rounded-full px-2 py-1 text-[9px] font-bold ${banner.is_active ? "bg-[#e9f3e7] text-[#3b7046]" : "bg-[#f1f1ee] text-[#899184]"}`}>{banner.is_active ? "Enabled" : "Paused"}</span></div><p className="mt-1 truncate text-xs text-[#8a9687]">{banner.subtitle || "No subtitle"}</p><p className="mt-2 text-[10px] font-semibold capitalize text-[#66806a]">{banner.animation_effect} · {banner.slide_duration_ms/1000}s display</p><div className="mt-3 flex flex-wrap gap-2"><button onClick={() => edit(banner)} className="rounded-lg bg-[#eef3eb] px-3 py-2 text-[10px] font-bold text-[#42664a]">Edit</button><button onClick={() => void updateBanner(banner.id,{is_active:!banner.is_active})} className="inline-flex items-center gap-1 rounded-lg border border-[#e6ebe3] px-3 py-2 text-[10px] font-bold text-[#697866]">{banner.is_active ? <EyeOff size={12}/> : <Eye size={12}/>} {banner.is_active ? "Pause" : "Enable"}</button>{role === "owner" && <button onClick={() => void remove(banner.id)} className="inline-flex items-center gap-1 rounded-lg border border-[#f0dfdc] px-3 py-2 text-[10px] font-bold text-[#a05f54]"><Trash2 size={12}/> Delete</button>}<button disabled={index===0} onClick={() => void reorder(index,-1)} aria-label="Move up" className="rounded-lg border border-[#e6ebe3] p-2 text-[#71816e] disabled:opacity-30"><ArrowUp size={13}/></button><button disabled={index===banners.length-1} onClick={() => void reorder(index,1)} aria-label="Move down" className="rounded-lg border border-[#e6ebe3] p-2 text-[#71816e] disabled:opacity-30"><ArrowDown size={13}/></button></div></div></article>)}
           </section>
           <section className="h-fit rounded-2xl border border-[#e5ebe2] bg-white p-5 shadow-sm sm:p-6">
             <div className="flex items-center justify-between"><h2 className="text-sm font-bold text-[#304735]">{editing ? "Edit promotion" : "Create promotion"}</h2><span className="text-[10px] text-[#91a08d]">Changes show on homepage</span></div>

@@ -31,6 +31,7 @@ function mimeFor(file:File) {
 
 export default function AssistantKnowledgePage(){
  const [authorized,setAuthorized]=useState(false);
+ const [role,setRole]=useState("");
  const [loading,setLoading]=useState(true);
  const [error,setError]=useState("");
  const [message,setMessage]=useState("");
@@ -61,6 +62,7 @@ export default function AssistantKnowledgePage(){
     setError("Only active owners and store managers can manage the AI knowledge library.");setLoading(false);return;
    }
    if(!alive)return;
+   setRole(profile.role);
    setAuthorized(true);
    await loadDocuments();
    if(alive)setLoading(false);
@@ -121,7 +123,7 @@ export default function AssistantKnowledgePage(){
   finally{setBusyId(null);}
  };
  const remove=async(item:DocumentRow)=>{
-  if(!window.confirm("Remove "+item.file_name+" and its searchable copy from the AI knowledge library?"))return;
+  if(role!=="owner"||!window.confirm("Remove "+item.file_name+" and its searchable copy from the AI knowledge library? Only the owner can permanently remove knowledge files."))return;
   setBusyId(item.id);setError("");setMessage("");
   try{
    await invokeKnowledge("delete",{document_id:item.id});
@@ -163,7 +165,7 @@ export default function AssistantKnowledgePage(){
     <div className="space-y-5">
      <section className="rounded-2xl border border-[#e3eae0] bg-white p-5 shadow-sm sm:p-6">
       <div className="flex flex-wrap items-center justify-between gap-3"><div><h2 className="font-bold text-[#2d4934]">Your business knowledge files</h2><p className="mt-1 text-xs text-[#8a9688]">{documents.length} files · {documents.filter(d=>d.status==="active").length} searchable</p></div><button type="button" onClick={()=>void loadDocuments()} className="inline-flex items-center gap-2 rounded-full border border-[#dce5d8] px-3 py-2 text-xs font-bold text-[#42694b]"><RefreshCw size={14}/> Refresh</button></div>
-      <div className="mt-4 space-y-3">{documents.map(item=><article key={item.id} className="rounded-xl border border-[#e7ece4] p-4"><div className="flex flex-wrap items-start justify-between gap-3"><div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><FileText size={16} className="text-[#66816a]"/><h3 className="max-w-full break-words text-sm font-extrabold text-[#294633]">{item.title}</h3><span className={"rounded-full px-2 py-1 text-[10px] font-bold "+(item.status==="active"?"bg-[#eaf3e8] text-[#3e704b]":item.status==="error"?"bg-[#fff0ed] text-[#a34c40]":"bg-[#fff5dd] text-[#8a6616]")}>{statusLabel(item.status)}</span></div><p className="mt-2 break-words text-xs text-[#849080]">{item.file_name} · {(item.file_size/1024/1024).toFixed(2)} MB · {dateLabel(item.created_at)}</p>{item.error_message&&<p className="mt-2 text-xs text-red-700">{item.error_message}</p>}</div><div className="flex shrink-0 gap-2">{item.status!=="active"&&<button type="button" disabled={busyId===item.id} onClick={()=>void process(item)} className="rounded-lg border border-[#dce7d9] px-3 py-2 text-xs font-bold text-[#42694b] disabled:opacity-40">{item.status==="processing"?"Check status":"Process"}</button>}<button type="button" disabled={busyId===item.id} onClick={()=>void remove(item)} className="rounded-lg border border-[#f0dfdc] p-2 text-[#a05f54] disabled:opacity-40" aria-label={"Delete "+item.title}><Trash2 size={14}/></button></div></div></article>)}
+      <div className="mt-4 space-y-3">{documents.map(item=><article key={item.id} className="rounded-xl border border-[#e7ece4] p-4"><div className="flex flex-wrap items-start justify-between gap-3"><div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><FileText size={16} className="text-[#66816a]"/><h3 className="max-w-full break-words text-sm font-extrabold text-[#294633]">{item.title}</h3><span className={"rounded-full px-2 py-1 text-[10px] font-bold "+(item.status==="active"?"bg-[#eaf3e8] text-[#3e704b]":item.status==="error"?"bg-[#fff0ed] text-[#a34c40]":"bg-[#fff5dd] text-[#8a6616]")}>{statusLabel(item.status)}</span></div><p className="mt-2 break-words text-xs text-[#849080]">{item.file_name} · {(item.file_size/1024/1024).toFixed(2)} MB · {dateLabel(item.created_at)}</p>{item.error_message&&<p className="mt-2 text-xs text-red-700">{item.error_message}</p>}</div><div className="flex shrink-0 gap-2">{item.status!=="active"&&<button type="button" disabled={busyId===item.id} onClick={()=>void process(item)} className="rounded-lg border border-[#dce7d9] px-3 py-2 text-xs font-bold text-[#42694b] disabled:opacity-40">{item.status==="processing"?"Check status":"Process"}</button>}{role==="owner"&&<button type="button" disabled={busyId===item.id} onClick={()=>void remove(item)} className="rounded-lg border border-[#f0dfdc] p-2 text-[#a05f54] disabled:opacity-40" aria-label={"Delete "+item.title}><Trash2 size={14}/></button>}</div></div></article>)}
        {!documents.length&&<div className="rounded-xl border border-dashed border-[#d7e1d4] p-8 text-center"><FileText size={25} className="mx-auto text-[#9aa998]"/><p className="mt-3 text-sm font-bold text-[#506b54]">Your knowledge library is empty</p><p className="mt-1 text-xs text-[#909a8d]">Upload your first approved business document to get started.</p></div>}
       </div>
      </section>

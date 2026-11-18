@@ -21,6 +21,7 @@ export default function AdminOrdersPage(){
  const [items,setItems]=useState<Item[]>([]);
  const [loading,setLoading]=useState(true);
  const [error,setError]=useState("");
+ const [notice,setNotice]=useState("");
  const [allowed,setAllowed]=useState(false);
  const [role,setRole]=useState("");
  const [saving,setSaving]=useState("");
@@ -75,8 +76,17 @@ export default function AdminOrdersPage(){
  }
  async function deleteOrder(order:Order){
   if(!supabase||role!=="owner")return;
-  if(!window.confirm("Permanently erase order #"+order.order_number+" and its line items? This cannot be undone and affects sales reports."))return;
-  setSaving(order.id);const {error:e}=await supabase.from("orders").delete().eq("id",order.id);if(e)setError(e.message);else await load();setSaving("");
+  const confirmed=window.confirm("Erase test/order #"+order.order_number+"? Orders that are not paid or refunded and are not completed or dispatched can be erased, including pending bank-transfer test orders. Reserved stock and coupon usage will be restored. Orders with reviews or affiliate commission records are protected.");
+  if(!confirmed)return;
+  setSaving(order.id);setError("");setNotice("");
+  const {data,error:deleteError}=await supabase.rpc("admin_delete_customer_order",{p_order_id:order.id});
+  if(deleteError)setError(deleteError.message);
+  else{
+   const result=data as {order_number?:number;stock_restored?:boolean;coupon_usage_reversed?:boolean}|null;
+   setNotice("Order #"+(result?.order_number??order.order_number)+" was erased."+(result?.stock_restored?" Reserved stock was restored and recorded.":"")+(result?.coupon_usage_reversed?" Coupon usage was restored.":""));
+   await load();
+  }
+  setSaving("");
  }
  const filtered=useMemo(()=>orders.filter(o=>{
   const term=search.trim().toLowerCase();
@@ -90,6 +100,7 @@ export default function AdminOrdersPage(){
   <div className="mt-5 grid gap-3 sm:grid-cols-3"><article className="rounded-2xl border border-white/70 bg-white/65 p-4 shadow backdrop-blur-xl"><p className="text-xs text-[#7b887a]">All loaded orders</p><p className="mt-1 text-2xl font-bold">{orders.length}</p></article><article className="rounded-2xl border border-white/70 bg-white/65 p-4 shadow backdrop-blur-xl"><p className="text-xs text-[#7b887a]">Awaiting confirmation</p><p className="mt-1 text-2xl font-bold text-amber-700">{pending}</p></article><article className="rounded-2xl border border-white/70 bg-white/65 p-4 shadow backdrop-blur-xl"><p className="text-xs text-[#7b887a]">Completed orders</p><p className="mt-1 text-2xl font-bold text-green-700">{orders.filter(o=>o.status==="Completed").length}</p></article></div>
   <div className="mt-5 flex flex-col gap-3 sm:flex-row"><label className="relative flex-1"><Search size={15} className="absolute left-3 top-3.5 text-[#8a9689]"/><input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search order number, customer, phone or email" className="w-full rounded-xl border border-white/70 bg-white/75 py-3 pl-9 pr-3 text-sm shadow backdrop-blur-xl"/></label><select value={statusFilter} onChange={e=>setStatusFilter(e.target.value)} className="rounded-xl border border-white/70 bg-white/75 px-4 py-3 text-sm shadow backdrop-blur-xl"><option value="all">All statuses</option>{statuses.map(s=><option key={s}>{s}</option>)}</select></div>
   {error&&<p role="alert" className="mt-5 flex items-center gap-2 rounded-xl bg-red-50 p-4 text-sm text-red-700"><ShieldAlert size={17}/>{error}</p>}
+  {notice&&<p role="status" className="mt-5 rounded-xl bg-green-50 p-4 text-sm text-green-800">{notice}</p>}
   {loading?<p className="mt-8 text-sm text-[#68806b]">Loading orders…</p>:!allowed?null:orders.length===0?<div className="mt-8 rounded-2xl border border-white/70 bg-white/65 p-10 text-center shadow-xl backdrop-blur-xl"><h2 className="font-bold">No customer orders yet</h2><p className="mt-2 text-sm text-[#879286]">Saved customer requests will appear here as soon as customers submit checkout.</p></div>:filtered.length===0?<div className="mt-8 rounded-2xl border border-white/70 bg-white/65 p-8 text-center text-sm text-[#879286] shadow-xl backdrop-blur-xl">No orders match these filters.</div>:
    <div className="mt-7 space-y-4">{filtered.map(order=><article key={order.id} className="rounded-3xl border border-white/70 bg-white/70 p-5 shadow-xl shadow-[#506f56]/10 backdrop-blur-2xl">
     <div className="flex flex-wrap items-start justify-between gap-3"><div><p className="text-xs font-bold uppercase tracking-wider text-[#7d8b7c]">Order #{order.order_number}</p><h2 className="mt-1 text-lg font-bold">{order.customer_name}</h2><p className="mt-1 text-xs text-[#7d8b7c]">{order.phone}{order.email?" · "+order.email:""} · {new Date(order.created_at).toLocaleString("en-NG")}</p></div>
