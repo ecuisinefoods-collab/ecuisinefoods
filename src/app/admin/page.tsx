@@ -208,7 +208,7 @@ export default function AdminPage() {
         { label: "Coupons", description: "Create and manage discount codes.", href: "/admin/coupons", icon: Tags, roles: ["owner", "marketing_manager"], action: "Manage coupons" },
         { label: "Partnership enquiries", description: "Review business and collaboration enquiries.", href: "/admin/partnerships", icon: Handshake, roles: ["owner", "store_manager", "marketing_manager"], action: "View enquiries" },
         { label: "Affiliate programme", description: "Manage affiliate applications and activity.", href: "/admin/affiliates", icon: Users, roles: ["owner", "store_manager", "marketing_manager"], action: "Manage affiliates" },
-        { label: "Partner operations", description: "Manage approved partner activity and tasks.", href: "/admin/partners", icon: ClipboardList, roles: ["owner", "store_manager", "marketing_manager"], action: "Open operations" },
+        { label: "Affiliate performance", description: "Review referral traffic, attributed orders, conversions and commissions by affiliate.", href: "/admin/partners", icon: ClipboardList, roles: ["owner", "store_manager", "marketing_manager", "affiliate_manager"], action: "View performance" },
       ],
     },
     {

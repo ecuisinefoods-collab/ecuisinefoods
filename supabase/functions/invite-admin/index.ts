@@ -6,7 +6,7 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Content-Type": "application/json",
 };
-const allowedRoles = ["store_manager", "order_officer", "finance_officer", "marketing_manager", "analyst"];
+const allowedRoles = ["store_manager", "order_officer", "finance_officer", "marketing_manager", "affiliate_manager", "analyst"];
 
 Deno.serve(async (request: Request) => {
   if (request.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
