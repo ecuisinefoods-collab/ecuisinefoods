@@ -1,6 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.119.0";
 
-const allowedRoles = ["store_manager", "order_officer", "finance_officer", "marketing_manager", "analyst"];
+const allowedRoles = ["store_manager", "order_officer", "finance_officer", "marketing_manager", "affiliate_manager", "analyst"];
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 function responseHeaders(requestOrigin: string | null, allowedOrigins: Set<string>, fallbackOrigin: string) {
