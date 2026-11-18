@@ -36,7 +36,7 @@ const groups: NavGroup[] = [
     { label: "Coupons", href: "/admin/coupons", icon: Tags, roles: ["owner", "marketing_manager"] },
     { label: "Partnerships", href: "/admin/partnerships", icon: Handshake, roles: ["owner", "store_manager", "marketing_manager"] },
     { label: "Affiliates", href: "/admin/affiliates", icon: Users, roles: ["owner", "store_manager", "marketing_manager"] },
-    { label: "Partner operations", href: "/admin/partners", icon: ClipboardList, roles: ["owner", "store_manager", "marketing_manager"] },
+    { label: "Affiliate performance", href: "/admin/partners", icon: ClipboardList, roles: ["owner", "store_manager", "marketing_manager", "affiliate_manager"] },
   ]},
   { label: "Finance & reports", icon: BarChart3, items: [
     { label: "Finance", href: "/admin/finance", icon: Wallet, roles: ["owner", "finance_officer", "analyst"] },
