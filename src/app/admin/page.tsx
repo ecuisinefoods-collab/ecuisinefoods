@@ -4,8 +4,8 @@ import { FormEvent, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import {
-  Activity, ArrowDownRight, ArrowUpRight, BarChart3, Boxes, CalendarDays, Truck, MapPin, Bot, Handshake,
-  ChevronRight, CircleDollarSign, ClipboardList, LayoutDashboard, LogOut,
+  Activity, ArrowDownRight, ArrowUpRight, BarChart3, Boxes, CalendarDays, Truck,
+  ChevronRight, CircleDollarSign, ClipboardList, LogOut,
   Megaphone, Package, ShieldCheck, ShoppingBag, Users, Wallet, CreditCard,
 } from "lucide-react";
 
