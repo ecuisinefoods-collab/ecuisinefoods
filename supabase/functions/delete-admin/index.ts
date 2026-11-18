@@ -15,10 +15,12 @@ function responseHeaders(requestOrigin: string | null, allowedOrigins: Set<strin
 
 Deno.serve(async (request: Request) => {
   const appOrigin = (Deno.env.get("SITE_URL") || "https://ecuisinefoods.onrender.com").replace(/\/$/, "");
+  const renderOrigin = "https://ecuisinefoods.onrender.com";
+  const allowedOrigins = new Set([appOrigin, renderOrigin]);
   const origin = request.headers.get("Origin");
-  const headers = responseHeaders(appOrigin);
+  const headers = responseHeaders(origin, allowedOrigins, appOrigin);
 
-  if (origin && origin !== appOrigin) {
+  if (origin && !allowedOrigins.has(origin)) {
     return new Response(JSON.stringify({ error: "This origin is not allowed to manage administrator accounts." }), { status: 403, headers });
   }
   if (request.method === "OPTIONS") return new Response("ok", { headers });
