@@ -23,7 +23,7 @@ export default function SalesCounterAdminPage() {
     if (queryError) setError(queryError.message);
     else {
       const raw = data?.setting_value;
-      const parsed = raw !== undefined && raw !== null && /^\\d+$/.test(String(raw)) ? Number(raw) : null;
+      const parsed = raw !== undefined && raw !== null && /^\d+$/.test(String(raw)) ? Number(raw) : null;
       setSavedValue(parsed);
       setValue(parsed === null ? "" : String(parsed));
     }
@@ -35,7 +35,7 @@ export default function SalesCounterAdminPage() {
   const save = async () => {
     if (!supabase) return;
     const trimmed = value.trim();
-    if (!/^\\d+$/.test(trimmed)) { setError("Enter a whole number of zero or more, or clear the field to use the real order count."); return; }
+    if (!/^\d+$/.test(trimmed)) { setError("Enter a whole number of zero or more, or clear the field to use the real order count."); return; }
     setSaving(true); setError(""); setMessage("");
     const { error: saveError } = await supabase.from("site_settings").upsert({
       setting_key: "sales_counter_manual_value",
@@ -72,7 +72,7 @@ export default function SalesCounterAdminPage() {
                 <input id="sales-count" type="number" min="0" step="1" inputMode="numeric" value={value} onChange={e => setValue(e.target.value)} placeholder="Leave empty to use actual sales" className="mt-2 w-full rounded-xl border border-[#dfe6dc] bg-white px-4 py-3 text-lg font-bold text-[#1d3928] outline-none focus:border-[#4c805b]"/>
                 <p className="mt-2 text-[11px] leading-5 text-[#879286]">Enter any whole number, including 0. This changes only the public display; it does not create, delete or alter orders, revenue, inventory or accounting records.</p>
                 <div className="mt-4 flex flex-wrap gap-3">
-                  <button type="button" onClick={() => void save()} disabled={saving || !/^\\d+$/.test(value.trim())} className="inline-flex items-center gap-2 rounded-xl bg-[#245b42] px-5 py-3 text-xs font-bold text-white disabled:opacity-50"><Save size={15}/>{saving ? "Saving…" : "Save figure"}</button>
+                  <button type="button" onClick={() => void save()} disabled={saving || !/^\d+$/.test(value.trim())} className="inline-flex items-center gap-2 rounded-xl bg-[#245b42] px-5 py-3 text-xs font-bold text-white disabled:opacity-50"><Save size={15}/>{saving ? "Saving…" : "Save figure"}</button>
                   <button type="button" onClick={() => void clear()} disabled={saving || savedValue === null} className="inline-flex items-center gap-2 rounded-xl border border-[#e1e8de] px-5 py-3 text-xs font-bold text-[#526b55] disabled:opacity-50"><Trash2 size={15}/> Clear manual figure</button>
                   <button type="button" onClick={() => { setLoading(true); void load(); }} disabled={saving} className="inline-flex items-center gap-2 rounded-xl border border-[#e1e8de] px-4 py-3 text-xs font-bold text-[#526b55]"><RefreshCw size={14}/> Refresh</button>
                 </div>
