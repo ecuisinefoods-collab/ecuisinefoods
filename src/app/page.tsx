@@ -93,7 +93,7 @@ export default async function HomePage() {
     const raw = settingsResult.data?.find(row => row.setting_key === "storefront_config")?.setting_value;
     const logo = settingsResult.data?.find(row => row.setting_key === "store_logo_url")?.setting_value;
     const manualSalesRaw = settingsResult.data?.find(row => row.setting_key === "sales_counter_manual_value")?.setting_value;
-    if (manualSalesRaw !== undefined && manualSalesRaw !== null && /^\\d+$/.test(String(manualSalesRaw))) manualSalesCount = Number(manualSalesRaw);
+    if (manualSalesRaw !== undefined && manualSalesRaw !== null && /^\d+$/.test(String(manualSalesRaw))) manualSalesCount = Number(manualSalesRaw);
     if (typeof logo === "string" && /^https?:\/\//i.test(logo)) storeLogoUrl = logo;
     if (raw) {
       try { config = { ...defaults, ...JSON.parse(raw) }; } catch { config = { ...defaults }; }
