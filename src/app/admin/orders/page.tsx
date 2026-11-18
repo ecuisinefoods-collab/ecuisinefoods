@@ -76,14 +76,14 @@ export default function AdminOrdersPage(){
  }
  async function deleteOrder(order:Order){
   if(!supabase||role!=="owner")return;
-  const confirmed=window.confirm("Erase test/order #"+order.order_number+"? Only unpaid or failed-payment orders that are not completed or dispatched can be erased. If stock was reserved, it will be restored. Orders with reviews or affiliate commission records are protected.");
+  const confirmed=window.confirm("Erase test/order #"+order.order_number+"? Orders that are not paid or refunded and are not completed or dispatched can be erased, including pending bank-transfer test orders. Reserved stock and coupon usage will be restored. Orders with reviews or affiliate commission records are protected.");
   if(!confirmed)return;
   setSaving(order.id);setError("");setNotice("");
   const {data,error:deleteError}=await supabase.rpc("admin_delete_customer_order",{p_order_id:order.id});
   if(deleteError)setError(deleteError.message);
   else{
-   const result=data as {order_number?:number;stock_restored?:boolean}|null;
-   setNotice("Order #"+(result?.order_number??order.order_number)+" was erased."+(result?.stock_restored?" Reserved stock was restored and recorded.":""));
+   const result=data as {order_number?:number;stock_restored?:boolean;coupon_usage_reversed?:boolean}|null;
+   setNotice("Order #"+(result?.order_number??order.order_number)+" was erased."+(result?.stock_restored?" Reserved stock was restored and recorded.":"")+(result?.coupon_usage_reversed?" Coupon usage was restored.":""));
    await load();
   }
   setSaving("");
