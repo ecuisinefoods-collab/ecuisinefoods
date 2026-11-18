@@ -25,7 +25,7 @@ export default function AffiliatesPage() {
               <a href="#affiliate-application" className="inline-flex items-center gap-2 rounded-xl bg-[#e7c96e] px-5 py-3.5 text-xs font-black text-[#173b2b] shadow-lg transition hover:-translate-y-0.5 hover:bg-[#f4da89]">Register as an affiliate <ArrowRight size={15}/></a>
               <Link href="/about" className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-5 py-3.5 text-xs font-bold text-white transition hover:bg-white/10">Meet eCuisine</Link><Link href="/affiliate" className="inline-flex items-center gap-2 rounded-xl border border-[#e7c96e]/40 bg-[#e7c96e]/10 px-5 py-3.5 text-xs font-bold text-[#f0d98c] transition hover:bg-[#e7c96e]/20">Affiliate Hub login <ArrowRight size={14}/></Link>
             </div>
-            <p className="mt-5 text-[11px] leading-5 text-[#a9bcae]">No payment is required to apply. Approved affiliates earn 15% commission on eligible product sales from referred orders after payment is confirmed and the order is completed. Delivery charges are excluded.</p>
+            <p className="mt-5 text-[11px] leading-5 text-[#a9bcae]">No payment is required to apply. The standard commission is 15% on eligible product sales from referred orders after payment is confirmed and the order is completed. Some affiliates may have an individually agreed rate, which is displayed in their Affiliate Hub. Delivery charges are excluded.</p>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
             <article className="rounded-3xl border border-white/10 bg-white/[.06] p-5 backdrop-blur">
