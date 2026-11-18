@@ -3,9 +3,9 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.99.0";
 const allowedRoles = ["store_manager", "order_officer", "finance_officer", "marketing_manager", "analyst"];
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
-function responseHeaders(origin: string | null, allowedOrigin: string) {
+function responseHeaders(allowedOrigin: string) {
   return {
-    "Access-Control-Allow-Origin": origin === allowedOrigin ? allowedOrigin : allowedOrigin,
+    "Access-Control-Allow-Origin": allowedOrigin,
     "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
     "Access-Control-Allow-Methods": "POST, OPTIONS",
     "Vary": "Origin",
@@ -16,7 +16,7 @@ function responseHeaders(origin: string | null, allowedOrigin: string) {
 Deno.serve(async (request: Request) => {
   const appOrigin = (Deno.env.get("SITE_URL") || "https://ecuisinefoods.onrender.com").replace(/\/$/, "");
   const origin = request.headers.get("Origin");
-  const headers = responseHeaders(origin, appOrigin);
+  const headers = responseHeaders(appOrigin);
 
   if (origin && origin !== appOrigin) {
     return new Response(JSON.stringify({ error: "This origin is not allowed to manage administrator accounts." }), { status: 403, headers });
