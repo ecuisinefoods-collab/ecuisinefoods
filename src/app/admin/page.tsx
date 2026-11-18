@@ -4,9 +4,10 @@ import { FormEvent, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import {
-  Activity, ArrowDownRight, ArrowUpRight, BarChart3, Boxes, CalendarDays, Truck,
-  ChevronRight, CircleDollarSign, ClipboardList, LogOut,
+  Activity, ArrowDownRight, ArrowUpRight, BarChart3, Boxes, Truck,
+  ChevronRight, CircleDollarSign, ClipboardList, LogOut, LayoutDashboard,
   Megaphone, Package, ShieldCheck, ShoppingBag, Users, Wallet, CreditCard,
+  Handshake, MapPin, Tags, Image as ImageIcon, Star, Database, Bot,
 } from "lucide-react";
 
 type AdminProfile = {
@@ -156,29 +157,181 @@ export default function AdminPage() {
   }
 
   const cards = [
-    { label: "Completed sales", value: money(stats.revenue), note: "From completed orders in the latest records", icon: CircleDollarSign, tone: "bg-[#e8f2e8] text-[#2c6841]" },
-    { label: "Recent orders", value: String(stats.orders), note: "Latest orders visible to your role", icon: ShoppingBag, tone: "bg-[#edf1fa] text-[#4b6090]" },
-    { label: "Active products", value: String(stats.products), note: "Products currently listed", icon: Boxes, tone: "bg-[#f8f0df] text-[#96723a]" },
-    { label: "Recorded income", value: money(stats.income), note: "Manual finance entries", icon: ArrowUpRight, tone: "bg-[#e8f3ef] text-[#34745d]" },
-    { label: "Recorded expenses", value: money(stats.expenses), note: "Manual finance entries", icon: ArrowDownRight, tone: "bg-[#f8eae7] text-[#a75d4e]" },
-    { label: "Recorded net", value: money(stats.income - stats.expenses), note: "Income less recorded expenses", icon: Wallet, tone: "bg-[#f0ebf8] text-[#765b9c]" },
+    { label: "Completed sales", value: money(stats.revenue), note: "Revenue from completed website orders", icon: CircleDollarSign, tone: "green" },
+    { label: "Total orders", value: String(stats.orders), note: "Orders recorded in the store", icon: ShoppingBag, tone: "blue" },
+    { label: "Listed products", value: String(stats.products), note: "Products in your catalogue", icon: Boxes, tone: "gold" },
+    { label: "Recorded income", value: money(stats.income), note: "Manually recorded finance entries", icon: ArrowUpRight, tone: "teal" },
+    { label: "Recorded expenses", value: money(stats.expenses), note: "Manually recorded finance entries", icon: ArrowDownRight, tone: "rose" },
+    { label: "Recorded net", value: money(stats.income - stats.expenses), note: "Recorded income less expenses", icon: Wallet, tone: "purple" },
   ];
 
+  const sections = [
+    {
+      id: "store",
+      number: "01",
+      title: "Store & catalogue",
+      description: "Your products, stock, storefront appearance and customer-facing content.",
+      icon: Package,
+      tone: "green",
+      tools: [
+        { label: "Products", description: "Add and edit products, pack sizes and prices.", href: "/admin/products", icon: Package, roles: ["owner", "store_manager"], action: "Manage catalogue" },
+        { label: "Inventory", description: "Review stock levels and inventory movements.", href: "/admin/inventory", icon: Boxes, roles: ["owner", "store_manager", "analyst"], action: "View inventory" },
+        { label: "Storefront editor", description: "Manage homepage content and storefront sections.", href: "/admin/storefront", icon: LayoutDashboard, roles: ["owner", "store_manager"], action: "Edit storefront" },
+        { label: "Media library", description: "Manage images used around the storefront.", href: "/admin/storefront/media", icon: ImageIcon, roles: ["owner", "store_manager"], action: "Open library" },
+        { label: "Customer reviews", description: "Review and moderate customer feedback.", href: "/admin/reviews", icon: Star, roles: ["owner", "store_manager"], action: "View reviews" },
+        { label: "Sales counter", description: "Set the historical products-sold baseline.", href: "/admin/sales-counter", icon: Activity, roles: ["owner"], action: "Edit baseline" },
+      ],
+    },
+    {
+      id: "orders",
+      number: "02",
+      title: "Orders & fulfilment",
+      description: "Keep customer orders, payments, pickups and deliveries moving.",
+      icon: ShoppingBag,
+      tone: "blue",
+      tools: [
+        { label: "Orders", description: "Confirm, process and complete customer orders.", href: "/admin/orders", icon: ClipboardList, roles: ["owner", "store_manager", "order_officer", "finance_officer", "analyst"], action: "Manage orders" },
+        { label: "Payment settings", description: "Configure supported checkout payment methods.", href: "/admin/payments", icon: CreditCard, roles: ["owner", "store_manager"], action: "Configure payments" },
+        { label: "Delivery setup", description: "Manage delivery destinations and fees.", href: "/admin/delivery", icon: Truck, roles: ["owner", "store_manager"], action: "Manage delivery" },
+        { label: "Pickup locations", description: "Manage customer pickup locations.", href: "/admin/pickups", icon: MapPin, roles: ["owner", "store_manager"], action: "Manage pickups" },
+      ],
+    },
+    {
+      id: "growth",
+      number: "03",
+      title: "Marketing & growth",
+      description: "Run campaigns, build partnerships and grow your customer reach.",
+      icon: Megaphone,
+      tone: "gold",
+      tools: [
+        { label: "Promotions & banners", description: "Create and schedule storefront offers.", href: "/admin/promotions", icon: Megaphone, roles: ["owner", "marketing_manager"], action: "Manage promotions" },
+        { label: "Coupons", description: "Create and manage discount codes.", href: "/admin/coupons", icon: Tags, roles: ["owner", "marketing_manager"], action: "Manage coupons" },
+        { label: "Partnership enquiries", description: "Review business and collaboration enquiries.", href: "/admin/partnerships", icon: Handshake, roles: ["owner", "store_manager", "marketing_manager"], action: "View enquiries" },
+        { label: "Affiliate programme", description: "Manage affiliate applications and activity.", href: "/admin/affiliates", icon: Users, roles: ["owner", "store_manager", "marketing_manager"], action: "Manage affiliates" },
+        { label: "Partner operations", description: "Manage approved partner activity and tasks.", href: "/admin/partners", icon: ClipboardList, roles: ["owner", "store_manager", "marketing_manager"], action: "Open operations" },
+      ],
+    },
+    {
+      id: "finance",
+      number: "04",
+      title: "Finance & reports",
+      description: "Understand revenue, expenses and how the business is performing.",
+      icon: BarChart3,
+      tone: "purple",
+      tools: [
+        { label: "Finance", description: "Review recorded income, expenses and transactions.", href: "/admin/finance", icon: Wallet, roles: ["owner", "finance_officer", "analyst"], action: "Open finance" },
+        { label: "Analytics", description: "Explore store traffic, activity and business trends.", href: "/admin/analytics", icon: BarChart3, roles: ["owner", "store_manager", "finance_officer", "analyst"], action: "View analytics" },
+        { label: "Data exports", description: "Download business records and reports.", href: "/admin/exports", icon: Database, roles: ["owner"], action: "Export records" },
+      ],
+    },
+    {
+      id: "people",
+      number: "05",
+      title: "People & administration",
+      description: "Control team access and use the tools that support daily operations.",
+      icon: ShieldCheck,
+      tone: "teal",
+      tools: [
+        { label: "Team & permissions", description: "Invite staff, assign roles and remove old accounts.", href: "/admin/team", icon: Users, roles: ["owner"], action: "Manage team" },
+        { label: "AI assistant & knowledge", description: "Manage the assistant and its business knowledge.", href: "/admin/assistant", icon: Bot, roles: ["owner", "store_manager", "order_officer"], action: "Open assistant" },
+      ],
+    },
+  ].map(section => ({
+    ...section,
+    tools: section.tools.filter(tool => tool.roles.includes(profile.role)),
+  })).filter(section => section.tools.length > 0);
+
+  const firstName = profile.display_name?.trim().split(/\\s+/)[0] || (profile.role === "owner" ? "CEO" : "there");
+
   return (
-    <main className="admin-glass-shell admin-dashboard-root min-h-screen text-[#25392b]">
+    <main className="admin-glass-shell admin-dashboard-root admin-dashboard-page min-h-screen text-[#25392b]">
       <section>
         <header className="admin-topbar-premium sticky top-0 z-10 flex items-center justify-between border-b px-5 py-4 backdrop-blur sm:px-8">
-          <div><p className="admin-topbar-kicker text-[10px] font-bold uppercase tracking-[.18em]">Business overview</p><h1 className="admin-topbar-title mt-1 text-lg font-bold">{profile.role === "owner" ? "Welcome, CEO" : `Welcome, ${profile.display_name || profile.role.replaceAll("_", " ")}`}</h1></div>
-          <div className="flex items-center gap-3"><span className="admin-role-pill hidden rounded-full px-3 py-2 text-[10px] font-bold capitalize sm:inline-flex">{profile.role === "owner" ? "CEO" : profile.role.replaceAll("_", " ")}</span><button onClick={signOut} className="admin-signout inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-bold"><LogOut size={15}/> Sign out</button></div>
-        </header>
-        <div className="admin-dashboard-content mx-auto max-w-7xl px-5 py-7 sm:px-8 sm:py-9">
-          <div className="admin-dashboard-intro mb-7 flex flex-wrap items-end justify-between gap-3"><div><h2 className="text-2xl font-semibold tracking-tight text-[#1e3b29] sm:text-3xl">Your business at a glance</h2><p className="mt-2 text-xs text-[#7b887a]">A live view of the information currently available in your eCuisine database.</p></div><span className="admin-connection-pill inline-flex items-center gap-2 rounded-full border px-3 py-2 text-[10px] font-semibold"><Activity size={13} className="text-[#4e8a5d]"/> Connected to Supabase</span></div>
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">{cards.map((card, index) => <article key={card.label} className={"admin-stat-card admin-stat-card--"+(index+1)+" rounded-2xl border p-5 shadow-sm"}><div className="flex items-center justify-between"><p className="text-xs font-semibold text-[#7c897b]">{card.label}</p><span className={`admin-stat-icon grid h-11 w-11 place-items-center rounded-2xl ${card.tone}`}><card.icon size={19}/></span></div><p className="mt-4 text-2xl font-bold tracking-tight text-[#1d3928]">{card.value}</p><p className="mt-2 text-[10px] text-[#929d90]">{card.note}</p></article>)}</div>
-          <div className="mt-7 grid gap-5 xl:grid-cols-[1.5fr_1fr]">
-            <section className="admin-module-panel overflow-hidden rounded-2xl border bg-white"><div className="flex items-center justify-between border-b border-[#edf0eb] px-5 py-4"><div><h3 className="text-sm font-bold text-[#294332]">Recent orders</h3><p className="mt-1 text-[10px] text-[#899487]">Latest customer activity</p></div><ClipboardList size={18} className="text-[#82917e]"/></div>{orders.length ? <div className="divide-y divide-[#f0f2ee]">{orders.map((order) => <div key={order.id} className="flex flex-wrap items-center justify-between gap-3 px-5 py-4"><div><p className="text-xs font-bold text-[#304936]">#{order.order_number} · {order.customer_name}</p><p className="mt-1 text-[10px] text-[#929d90]">{new Date(order.created_at).toLocaleString("en-NG")}</p></div><div className="text-right"><p className="text-xs font-bold text-[#304936]">{money(Number(order.total))}</p><span className="mt-1 inline-flex rounded-full bg-[#f1f5ee] px-2.5 py-1 text-[9px] font-bold text-[#5e795f]">{order.status}</span></div></div>)}</div> : <div className="px-5 py-12 text-center"><ShoppingBag className="mx-auto text-[#b5c1b1]" size={28}/><p className="mt-3 text-xs font-semibold text-[#687968]">No orders yet</p><p className="mt-1 text-[10px] text-[#9aa497]">New customer orders will appear here.</p></div>}</section>
-            <section className="admin-module-panel rounded-2xl border bg-white p-5"><div className="flex items-center gap-2"><CalendarDays size={17} className="text-[#66816a]"/><h3 className="text-sm font-bold text-[#294332]">Management modules</h3></div><p className="mt-2 text-[10px] leading-5 text-[#8b9688]">Open the working modules below. More business tools will be activated in the next build stages.</p><div className="mt-5 space-y-3"><Link href="/admin/products" className="admin-module-link flex items-center gap-3 rounded-xl p-3"><span className="grid h-9 w-9 place-items-center rounded-lg bg-white text-[#4b7655]"><Package size={16}/></span><span><b className="block text-[11px] text-[#405744]">Products & stock</b><small className="text-[10px] text-[#8a9688]">Add products, pack sizes, prices and inventory</small></span><ChevronRight size={14} className="ml-auto text-[#a5b0a1]"/></Link><Link href="/admin/promotions" className="admin-module-link flex items-center gap-3 rounded-xl p-3"><span className="grid h-9 w-9 place-items-center rounded-lg bg-white text-[#4b7655]"><Megaphone size={16}/></span><span><b className="block text-[11px] text-[#405744]">Promotions & banners</b><small className="text-[10px] text-[#8a9688]">Create, schedule and reorder storefront slides</small></span><ChevronRight size={14} className="ml-auto text-[#a5b0a1]"/></Link>{[{name:"Orders",desc:"Review and update customer orders",icon:ClipboardList},{name:"Finance & reports",desc:"Track income, expenses and operating performance",icon:Wallet},{name:"Team & permissions",desc:"Manage business staff access",icon:Users},{name:"Delivery setup",desc:"Configure states, service areas and delivery fees",icon:Truck,href:"/admin/delivery"},{name:"Payment settings",desc:"Manage bank transfer details and cash payment options",icon:CreditCard,href:"/admin/payments"},{name:"Analytics & activity history",desc:"Monitor business trends and admin actions",icon:BarChart3,href:"/admin/analytics"},{name:"Download business records",desc:"Export records to spreadsheet files",icon:ClipboardList,href:"/admin/exports"}].map((item) => item.href ? <Link href={item.href} key={item.name} className="admin-module-link flex items-start gap-3 rounded-xl p-3"><span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-white text-[#4b7655]"><item.icon size={16}/></span><div><p className="text-[11px] font-bold text-[#405744]">{item.name}</p><p className="mt-1 text-[10px] leading-4 text-[#8a9688]">{item.desc}</p></div><ChevronRight size={14} className="ml-auto text-[#a5b0a1]"/></Link> : <div key={item.name} className="admin-module-link admin-module-link--pending flex items-start gap-3 rounded-xl p-3"><span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-white text-[#4b7655]"><item.icon size={16}/></span><div><p className="text-[11px] font-bold text-[#405744]">{item.name}</p><p className="mt-1 text-[10px] leading-4 text-[#8a9688]">{item.desc}</p></div><span className="ml-auto text-[9px] text-[#a6afa2]">Next</span></div>)}</div></section>
+          <div>
+            <p className="admin-topbar-kicker text-[10px] font-bold uppercase tracking-[.18em]">eCuisine business workspace</p>
+            <h1 className="admin-topbar-title mt-1 text-lg font-bold">Business dashboard</h1>
           </div>
-          <p className="mt-7 flex items-center gap-2 text-[10px] leading-5 text-[#97a194]"><ShieldCheck size={13}/> Financial figures are separated into order sales and manually recorded income/expenses to avoid double-counting.</p>
+          <div className="flex items-center gap-3">
+            <span className="admin-role-pill hidden rounded-full px-3 py-2 text-[10px] font-bold capitalize sm:inline-flex">{profile.role === "owner" ? "CEO / Owner" : profile.role.replaceAll("_", " ")}</span>
+            <button onClick={signOut} className="admin-signout inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-bold"><LogOut size={15}/> Sign out</button>
+          </div>
+        </header>
+
+        <div className="admin-dashboard-content mx-auto max-w-[1440px] px-5 py-6 sm:px-8 sm:py-9">
+          <section className="admin-dashboard-hero mb-7 overflow-hidden rounded-[28px] px-6 py-7 sm:px-8 sm:py-9">
+            <div className="admin-dashboard-hero-orb admin-dashboard-hero-orb--one"/>
+            <div className="admin-dashboard-hero-orb admin-dashboard-hero-orb--two"/>
+            <div className="relative z-[1] flex flex-wrap items-end justify-between gap-6">
+              <div className="max-w-2xl">
+                <span className="admin-dashboard-hero-eyebrow"><span/> YOUR CONTROL CENTRE</span>
+                <h2 className="mt-4 text-3xl font-bold leading-tight tracking-tight text-white sm:text-4xl">Welcome back, {firstName}.</h2>
+                <p className="mt-3 max-w-xl text-sm leading-6 text-[#e2eee3]">Everything you need to manage eCuisine in one place. Choose a business area below to get straight to the right tools.</p>
+              </div>
+              <div className="admin-dashboard-hero-actions">
+                <Link href="/admin/orders" className="admin-dashboard-hero-action admin-dashboard-hero-action--primary"><ShoppingBag size={16}/> View orders</Link>
+                {(profile.role === "owner" || profile.role === "store_manager") && <Link href="/admin/products" className="admin-dashboard-hero-action"><Package size={16}/> Manage products</Link>}
+              </div>
+            </div>
+            <div className="admin-dashboard-hero-foot">
+              <span><Activity size={13}/> Live workspace</span>
+              <span className="admin-dashboard-hero-foot-divider"/>
+              <span>{profile.role === "owner" ? "Full owner access" : profile.role.replaceAll("_", " ") + " access"}</span>
+            </div>
+          </section>
+
+          <section aria-labelledby="dashboard-metrics-title">
+            <div className="admin-dashboard-section-heading">
+              <div><p className="admin-dashboard-section-eyebrow">AT A GLANCE</p><h2 id="dashboard-metrics-title">Business snapshot</h2><p>Key figures from your current eCuisine records.</p></div>
+              <span className="admin-connection-pill inline-flex items-center gap-2 rounded-full border px-3 py-2 text-[10px] font-semibold"><Activity size={13}/> Connected to Supabase</span>
+            </div>
+            <div className="admin-dashboard-metrics grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              {cards.map(card => <article key={card.label} className={"admin-dashboard-metric admin-dashboard-metric--"+card.tone}>
+                <div className="flex items-start justify-between gap-3"><div><p className="admin-dashboard-metric-label">{card.label}</p><p className="admin-dashboard-metric-value">{card.value}</p><p className="admin-dashboard-metric-note">{card.note}</p></div><span className="admin-dashboard-metric-icon"><card.icon size={19}/></span></div>
+              </article>)}
+            </div>
+          </section>
+
+          <section className="mt-9" aria-labelledby="dashboard-categories-title">
+            <div className="admin-dashboard-section-heading">
+              <div><p className="admin-dashboard-section-eyebrow">WORKSPACE DIRECTORY</p><h2 id="dashboard-categories-title">Explore by business area</h2><p>Tools are organised by what you need to get done.</p></div>
+              <span className="admin-dashboard-tool-count">{sections.reduce((sum, section) => sum + section.tools.length, 0)} available tools</span>
+            </div>
+            <div className="admin-dashboard-category-grid">
+              {sections.map(section => <section key={section.id} id={"dashboard-"+section.id} className={"admin-dashboard-category admin-dashboard-category--"+section.tone}>
+                <div className="admin-dashboard-category-head">
+                  <span className="admin-dashboard-category-icon"><section.icon size={20}/></span>
+                  <div className="min-w-0 flex-1">
+                    <span className="admin-dashboard-category-number">AREA {section.number}</span>
+                    <h3>{section.title}</h3>
+                  </div>
+                  <span className="admin-dashboard-category-count">{section.tools.length}</span>
+                </div>
+                <p className="admin-dashboard-category-description">{section.description}</p>
+                <div className="admin-dashboard-tool-list">
+                  {section.tools.map(tool => <Link href={tool.href} key={tool.href} className="admin-dashboard-tool">
+                    <span className="admin-dashboard-tool-icon"><tool.icon size={16}/></span>
+                    <span className="min-w-0 flex-1"><strong>{tool.label}</strong><small>{tool.description}</small></span>
+                    <span className="admin-dashboard-tool-go"><ChevronRight size={15}/></span>
+                  </Link>)}
+                </div>
+              </section>)}
+            </div>
+          </section>
+
+          <section className="mt-9" aria-labelledby="recent-orders-title">
+            <div className="admin-dashboard-section-heading">
+              <div><p className="admin-dashboard-section-eyebrow">LATEST ACTIVITY</p><h2 id="recent-orders-title">Recent orders</h2><p>Keep an eye on your latest customer activity.</p></div>
+              <Link href="/admin/orders" className="admin-dashboard-view-all">View all orders <ChevronRight size={15}/></Link>
+            </div>
+            <section className="admin-dashboard-orders overflow-hidden rounded-2xl border">
+              {orders.length ? <div className="divide-y divide-[#edf1e9]">{orders.map(order => <div key={order.id} className="admin-dashboard-order-row flex flex-wrap items-center justify-between gap-3 px-5 py-4 sm:px-6">
+                <div className="flex min-w-0 items-center gap-3"><span className="admin-dashboard-order-icon"><ShoppingBag size={16}/></span><div className="min-w-0"><p className="truncate text-xs font-bold text-[#304936]">#{order.order_number} · {order.customer_name}</p><p className="mt-1 text-[10px] text-[#929d90]">{new Date(order.created_at).toLocaleString("en-NG")}</p></div></div>
+                <div className="ml-auto text-right"><p className="text-xs font-bold text-[#304936]">{money(Number(order.total))}</p><span className="mt-1 inline-flex rounded-full bg-[#f1f5ee] px-2.5 py-1 text-[9px] font-bold text-[#5e795f]">{order.status}</span></div>
+              </div>)}</div> : <div className="px-5 py-12 text-center"><ShoppingBag className="mx-auto text-[#b5c1b1]" size={28}/><p className="mt-3 text-xs font-semibold text-[#687968]">No orders yet</p><p className="mt-1 text-[10px] text-[#9aa497]">New customer orders will appear here.</p></div>}
+            </section>
+          </section>
+
+          <p className="admin-dashboard-footnote mt-7 flex items-start gap-2 text-[10px] leading-5"><ShieldCheck size={13} className="mt-0.5 shrink-0"/> Financial figures are separated into completed order sales and manually recorded income/expenses to avoid double-counting.</p>
         </div>
       </section>
     </main>
