@@ -76,14 +76,14 @@ function categoryDescription(category: string) {
 export default async function HomePage() {
   let products: Product[] = [];
   let completedProductUnits = 0;
-  let manualSalesCount: number | null = null;
+  let historicalSalesBaseline = 2500;
   let storeLogoUrl: string | null = null;
   let config: StoreConfig = { ...defaults };
 
   if (supabase) {
     const [settingsResult, productsResult, salesResult] = await Promise.all([
       supabase.from("site_settings").select("setting_key,setting_value")
-        .in("setting_key", ["storefront_config", "store_logo_url", "sales_counter_manual_value"]),
+        .in("setting_key", ["storefront_config", "store_logo_url", "sales_counter_historical_baseline"]),
       supabase.from("products")
         .select("id,name,slug,category,short_description,description,ingredients,highlights,image_url,is_featured,created_at,product_variants(id,pack_size,price,sale_price,sale_starts_at,sale_ends_at,stock_quantity)")
         .eq("is_active", true).order("created_at", { ascending: false }).limit(60),
@@ -92,8 +92,8 @@ export default async function HomePage() {
 
     const raw = settingsResult.data?.find(row => row.setting_key === "storefront_config")?.setting_value;
     const logo = settingsResult.data?.find(row => row.setting_key === "store_logo_url")?.setting_value;
-    const manualSalesRaw = settingsResult.data?.find(row => row.setting_key === "sales_counter_manual_value")?.setting_value;
-    if (manualSalesRaw !== undefined && manualSalesRaw !== null && /^\d+$/.test(String(manualSalesRaw))) manualSalesCount = Number(manualSalesRaw);
+    const baselineRaw = settingsResult.data?.find(row => row.setting_key === "sales_counter_historical_baseline")?.setting_value;
+    if (baselineRaw !== undefined && baselineRaw !== null && /^\d+$/.test(String(baselineRaw))) historicalSalesBaseline = Number(baselineRaw);
     if (typeof logo === "string" && /^https?:\/\//i.test(logo)) storeLogoUrl = logo;
     if (raw) {
       try { config = { ...defaults, ...JSON.parse(raw) }; } catch { config = { ...defaults }; }
@@ -167,7 +167,7 @@ export default async function HomePage() {
       </section>
 
       <section className="mx-auto w-full max-w-7xl px-5" aria-label="eCuisine all-time sales milestone">
-        <SalesCounter total={completedProductUnits} manualTotal={manualSalesCount} />
+        <SalesCounter total={completedProductUnits} historicalBaseline={historicalSalesBaseline} />
       </section>
 
       <section className="ec-benefit-strip mx-auto grid max-w-7xl grid-cols-2 gap-3 px-5 py-6 sm:grid-cols-3 lg:grid-cols-5 sm:py-8">

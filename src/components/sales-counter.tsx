@@ -10,11 +10,12 @@ const JOURNEY_NOTES = [
   "Growing through every customer story."
 ];
 
-export function SalesCounter({ total, manualTotal = null }: { total: number; manualTotal?: number | null }) {
+export function SalesCounter({ total, historicalBaseline = 2500 }: { total: number; historicalBaseline?: number }) {
   const [count, setCount] = useState(0);
   const [activeNote, setActiveNote] = useState(0);
   const websiteSales = Math.max(0, Math.floor(Number.isFinite(total) ? total : 0));
-  const allTimeSales = manualTotal === null || manualTotal === undefined ? websiteSales : Math.max(0, Math.floor(Number.isFinite(manualTotal) ? manualTotal : 0));
+  const baseline = Math.max(0, Math.floor(Number.isFinite(historicalBaseline) ? historicalBaseline : 2500));
+  const allTimeSales = baseline + websiteSales;
   const display = new Intl.NumberFormat("en-NG").format(count);
 
   useEffect(() => {
