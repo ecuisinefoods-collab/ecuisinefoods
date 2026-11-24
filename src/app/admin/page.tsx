@@ -7,7 +7,7 @@ import {
   Activity, ArrowDownRight, ArrowUpRight, BarChart3, Boxes, Truck,
   ChevronRight, CircleDollarSign, ClipboardList, LogOut, LayoutDashboard,
   Megaphone, Package, ShieldCheck, ShoppingBag, Users, Wallet, CreditCard,
-  Handshake, MapPin, Tags, Image as ImageIcon, Star, Database, Bot,
+  Handshake, MapPin, Tags, Image as ImageIcon, Star, Database, Bot, CalendarDays,
 } from "lucide-react";
 
 type AdminProfile = {
