@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  Activity, BarChart3, Bot, Boxes, ChevronDown, ClipboardList, CreditCard, Handshake,
+  Activity, BarChart3, Bot, Boxes, CalendarDays, ChevronDown, ClipboardList, CreditCard, Handshake,
   LayoutDashboard, MapPin, Megaphone, Package, ShieldCheck, ShoppingBag,
   Store, Truck, Wallet, Database, Star, Image as ImageIcon, Tags, Users,
   type LucideIcon,
@@ -15,6 +15,7 @@ type AdminIdentity = { user_id: string; role: string; display_name: string | nul
 type NavItem = { label: string; href: string; icon: LucideIcon; roles?: string[] };
 type NavGroup = { label: string; icon: LucideIcon; items: NavItem[] };
 
+const staffRoles = ["owner", "store_manager", "finance_officer", "marketing_manager", "order_officer", "analyst"];
 const groups: NavGroup[] = [
   { label: "Store & catalogue", icon: Store, items: [
     { label: "Products", href: "/admin/products", icon: Package, roles: ["owner", "store_manager"] },
@@ -44,6 +45,7 @@ const groups: NavGroup[] = [
     { label: "Data exports", href: "/admin/exports", icon: Database, roles: ["owner"] },
   ]},
   { label: "People & administration", icon: ShieldCheck, items: [
+    { label: "Staff activities & tasks", href: "/admin/activities", icon: CalendarDays, roles: staffRoles },
     { label: "Team & permissions", href: "/admin/team", icon: ShieldCheck, roles: ["owner"] },
     { label: "AI assistant", href: "/admin/assistant", icon: Bot, roles: ["owner", "store_manager", "order_officer"] },
   ]},
