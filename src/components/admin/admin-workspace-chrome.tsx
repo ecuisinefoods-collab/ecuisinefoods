@@ -18,10 +18,12 @@ const staffRoles = ["owner", "store_manager", "finance_officer", "marketing_mana
 const groups: NavGroup[] = [
   { label: "Operations & Production", icon: Boxes, items: [
     { label: "Products & pack sizes", href: "/admin/products", icon: Package, roles: ["owner", "store_manager"] },
-    { label: "Inventory & stock movements", href: "/admin/inventory", icon: Boxes, roles: ["owner", "store_manager", "analyst"] },\n    { label: "Production batches", href: "/admin/production", icon: Activity, roles: ["owner", "store_manager", "analyst"] },
+    { label: "Inventory & stock movements", href: "/admin/inventory", icon: Boxes, roles: ["owner", "store_manager", "analyst"] },
+    { label: "Production batches", href: "/admin/production", icon: Activity, roles: ["owner", "store_manager", "analyst"] },
   ]},
   { label: "Sales & Customer Relations", icon: ShoppingBag, items: [
-    { label: "Customer orders", href: "/admin/orders", icon: ClipboardList, roles: ["owner", "store_manager", "order_officer", "finance_officer", "analyst"] },\n    { label: "Manual & offline sales", href: "/admin/manual-sales", icon: ShoppingBag, roles: ["owner", "store_manager", "order_officer", "finance_officer", "analyst"] },
+    { label: "Customer orders", href: "/admin/orders", icon: ClipboardList, roles: ["owner", "store_manager", "order_officer", "finance_officer", "analyst"] },
+    { label: "Manual & offline sales", href: "/admin/manual-sales", icon: ShoppingBag, roles: ["owner", "store_manager", "order_officer", "finance_officer", "analyst"] },
     { label: "Customer reviews", href: "/admin/reviews", icon: Star, roles: ["owner", "store_manager"] },
     { label: "Delivery setup", href: "/admin/delivery", icon: Truck, roles: ["owner", "store_manager"] },
     { label: "Pickup locations", href: "/admin/pickups", icon: MapPin, roles: ["owner", "store_manager"] },
@@ -41,7 +43,9 @@ const groups: NavGroup[] = [
     { label: "Affiliate programme", href: "/admin/affiliates", icon: Users, roles: ["owner", "store_manager", "marketing_manager"] },
     { label: "Affiliate performance", href: "/admin/partners", icon: ClipboardList, roles: ["owner", "store_manager", "marketing_manager", "affiliate_manager"] },
   ]},
-  { label: "Procurement & Supply", icon: Truck, items: [\n    { label: "Suppliers & raw materials", href: "/admin/procurement", icon: Truck, roles: ["owner", "store_manager", "finance_officer", "analyst"] },\n  ] },
+  { label: "Procurement & Supply", icon: Truck, items: [
+    { label: "Suppliers & raw materials", href: "/admin/procurement", icon: Truck, roles: ["owner", "store_manager", "finance_officer", "analyst"] },
+  ] },
   { label: "Administration & Human Resources", icon: ShieldCheck, items: [
     { label: "Staff activities, meetings & tasks", href: "/admin/activities", icon: CalendarDays, roles: staffRoles },
     { label: "Team & permissions", href: "/admin/team", icon: ShieldCheck, roles: ["owner"] },
