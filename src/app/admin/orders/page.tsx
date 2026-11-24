@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
-import { ArrowLeft, RefreshCw, ShieldAlert, Download, Pencil, Trash2, Search, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, RefreshCw, ShieldAlert, Download, Pencil, Search, CheckCircle2 } from "lucide-react";
 
 type Order = {
   id:string; order_number:number; customer_name:string; phone:string; email:string|null;
