@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
+type Account={id:string;name:string;account_type:"cash"|"bank"|"payment_provider";opening_balance:number;is_active:boolean};
 type Tx = {
   id: string;
   transaction_type: "income" | "expense";
@@ -18,6 +19,7 @@ type Tx = {
   reference: string | null;
   status: "pending" | "posted" | "void";
   reversal_of_id: string | null;
+  account_id: string | null;
 };
 
 const money = (n: number) => new Intl.NumberFormat("en-NG", {
@@ -27,6 +29,11 @@ const csv = (value: unknown) => '"' + String(value ?? "").replace(/"/g, '""') + 
 
 export default function AdminFinancePage() {
   const [rows, setRows] = useState<Tx[]>([]);
+  const [accounts,setAccounts]=useState<Account[]>([]);
+  const [accountId,setAccountId]=useState("");
+  const [newAccountName,setNewAccountName]=useState("");
+  const [newAccountType,setNewAccountType]=useState<"cash"|"bank"|"payment_provider">("cash");
+  const [openingBalance,setOpeningBalance]=useState("0");
   const [role, setRole] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -62,14 +69,14 @@ export default function AdminFinancePage() {
 
   function reset() {
     setEditing(null); setType("income"); setCategory(""); setDescription("");
-    setAmount(""); setDate(new Date().toISOString().slice(0, 10)); setReference("");
+    setAmount(""); setDate(new Date().toISOString().slice(0, 10)); setReference("");setAccountId("");
   }
 
   function editPending(row: Tx) {
     if (row.status !== "pending" || role === "analyst") return;
     setEditing(row.id); setType(row.transaction_type); setCategory(row.category);
     setDescription(row.description); setAmount(String(row.amount));
-    setDate(row.transaction_date); setReference(row.reference || "");
+    setDate(row.transaction_date); setReference(row.reference || "");setAccountId(row.account_id||"");
     setNotice(""); setError("");
   }
 
@@ -83,7 +90,7 @@ export default function AdminFinancePage() {
     setSaving(true); setError(""); setNotice("");
     const payload = {
       transaction_type: type, category: category.trim(), description: description.trim(),
-      amount: numericAmount, transaction_date: date, reference: reference.trim() || null,
+      amount: numericAmount, transaction_date: date, reference: reference.trim() || null, account_id: accountId||null,
     };
     const result = editing
       ? await supabase.from("financial_transactions").update(payload).eq("id", editing).eq("status", "pending")
@@ -156,11 +163,12 @@ export default function AdminFinancePage() {
   }
 
   function download() {
-    const headers = ["id", "transaction_type", "category", "description", "amount", "transaction_date", "reference", "status", "reversal_of_id"];
+    const headers = ["id", "transaction_type", "category", "description", "amount", "transaction_date", "reference", "status", "reversal_of_id", "account_id"];
     const body = [
       headers.map(csv).join(","),
       ...rows.map(row => headers.map(key => csv((row as unknown as Record<string, unknown>)[key])).join(",")),
-    ].join("\r\n");
+    ].join("\r
+");
     const url = URL.createObjectURL(new Blob(["\uFEFF" + body], { type: "text/csv;charset=utf-8" }));
     const anchor = document.createElement("a");
     anchor.href = url; anchor.download = "ecuisinefoods-finance-" + new Date().toISOString().slice(0, 10) + ".csv";
@@ -171,6 +179,7 @@ export default function AdminFinancePage() {
   const income = posted.filter(row => row.transaction_type === "income").reduce((sum, row) => sum + Number(row.amount), 0);
   const expenses = posted.filter(row => row.transaction_type === "expense").reduce((sum, row) => sum + Number(row.amount), 0);
   const pendingCount = rows.filter(row => row.status === "pending").length;
+  async function createAccount(event:FormEvent){event.preventDefault();if(!supabase||role!=="owner")return;if(!newAccountName.trim()){setError("Enter an account name.");return}setSaving(true);setError("");const {data:{user}}=await supabase.auth.getUser();const {error:e}=await supabase.from("finance_accounts").insert({name:newAccountName.trim(),account_type:newAccountType,opening_balance:Number(openingBalance||0),is_active:true});if(e)setError(e.message);else{if(user)await supabase.from("admin_audit_logs").insert({actor_user_id:user.id,actor_email:user.email,action:"create_finance_account",resource_type:"finance_account",details:{name:newAccountName.trim(),account_type:newAccountType,opening_balance:Number(openingBalance||0)}});setNewAccountName("");setOpeningBalance("0");setNotice("Finance account created.");await load()}setSaving(false)}
 
   return (
     <main className="admin-glass-shell min-h-screen bg-[#f5f7f3] px-4 py-8 text-[#25392b] sm:px-8">
@@ -200,10 +209,13 @@ export default function AdminFinancePage() {
             )}
           </div>
 
+          <section className="mt-6 rounded-2xl border border-[#e5ebe2] bg-white p-5"><h2 className="font-bold">Cash, bank & payment accounts</h2><div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{accounts.map(a=>{const activity=rows.filter(r=>r.account_id===a.id&&r.status==="posted").reduce((sum,r)=>sum+(r.transaction_type==="income"?1:-1)*Number(r.amount),0);return <article key={a.id} className="rounded-xl border border-[#e8ede5] bg-[#fbfcfa] p-4"><p className="text-xs text-[#7b887a]">{a.name} · {a.account_type.replaceAll("_"," ")}</p><p className="mt-2 text-xl font-bold">{money(Number(a.opening_balance)+activity)}</p><p className="mt-1 text-[10px] text-[#899487]">Opening balance {money(Number(a.opening_balance))}</p></article>})}{!accounts.length&&<p className="text-sm text-[#899487]">No finance accounts created yet.</p>}</div>{role==="owner"&&<form onSubmit={createAccount} className="mt-4 grid gap-2 border-t pt-4 sm:grid-cols-4"><input required value={newAccountName} onChange={e=>setNewAccountName(e.target.value)} placeholder="Account name (e.g. Main bank)" className="rounded-xl border p-3 text-sm sm:col-span-2"/><select value={newAccountType} onChange={e=>setNewAccountType(e.target.value as "cash"|"bank"|"payment_provider")} className="rounded-xl border p-3 text-sm"><option value="cash">Cash</option><option value="bank">Bank</option><option value="payment_provider">POS / Wallet / Payment provider</option></select><input type="number" min="0" step=".01" value={openingBalance} onChange={e=>setOpeningBalance(e.target.value)} placeholder="Opening balance ₦" className="rounded-xl border p-3 text-sm"/><button disabled={saving} className="rounded-xl bg-[#245b42] px-4 py-3 text-xs font-bold text-white sm:col-span-4">Add finance account</button></form>}</section>
+
           {role !== "analyst" && <form onSubmit={submit} className="mt-6 rounded-2xl border border-[#e5ebe2] bg-white p-5">
             <div className="flex items-center gap-2"><PlusCircle size={18}/><h2 className="font-bold">{editing ? "Edit pending transaction" : "Record financial activity"}</h2></div>
             <p className="mt-2 text-xs text-[#7b887a]">{role === "owner" ? "Entries you record are posted immediately under Founder authority." : "Your entry will be submitted as pending for Founder approval."}</p>
             <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              <label className="text-xs font-semibold">Account<select value={accountId} onChange={event=>setAccountId(event.target.value)} className="mt-1 w-full rounded-xl border p-3"><option value="">No account selected</option>{accounts.map(a=><option key={a.id} value={a.id}>{a.name}</option>)}</select></label>
               <label className="text-xs font-semibold">Type<select value={type} onChange={event => setType(event.target.value as "income" | "expense")} className="mt-1 w-full rounded-xl border p-3"><option value="income">Income</option><option value="expense">Expense</option></select></label>
               <label className="text-xs font-semibold">Category<input required value={category} onChange={event => setCategory(event.target.value)} placeholder="e.g. Packaging" className="mt-1 w-full rounded-xl border p-3"/></label>
               <label className="text-xs font-semibold">Amount (₦)<input required min="0.01" step="0.01" type="number" value={amount} onChange={event => setAmount(event.target.value)} className="mt-1 w-full rounded-xl border p-3"/></label>
@@ -221,7 +233,7 @@ export default function AdminFinancePage() {
             <div className="flex items-center gap-2 border-b p-5"><h2 className="font-bold">Transaction history</h2><span className="ml-auto text-xs text-[#8a9787]">{rows.length} records</span></div>
             {rows.length ? <div className="overflow-x-auto">
               <table className="w-full min-w-[900px] text-left text-xs">
-                <thead className="bg-[#f7f9f5] text-[#71806f]"><tr><th className="p-4">Date</th><th className="p-4">Type</th><th className="p-4">Category / description</th><th className="p-4">Reference</th><th className="p-4 text-right">Amount</th><th className="p-4">Status</th><th className="p-4">Actions</th></tr></thead>
+                <thead className="bg-[#f7f9f5] text-[#71806f]"><tr><th className="p-4">Date</th><th className="p-4">Type</th><th className="p-4">Category / description</th><th className="p-4">Account</th><th className="p-4">Reference</th><th className="p-4 text-right">Amount</th><th className="p-4">Status</th><th className="p-4">Actions</th></tr></thead>
                 <tbody>{rows.map(row => {
                   const hasReversal = rows.some(item => item.reversal_of_id === row.id);
                   const label = row.reversal_of_id ? "Reversal" : hasReversal ? "Reversed" : row.status === "pending" ? "Pending approval" : row.status === "void" ? "Void" : "Posted";
@@ -229,7 +241,7 @@ export default function AdminFinancePage() {
                     <td className="p-4">{row.transaction_date}</td>
                     <td className="p-4 capitalize">{row.transaction_type}</td>
                     <td className="p-4"><b>{row.category}</b><p className="mt-1 text-[#899487]">{row.description}</p></td>
-                    <td className="p-4">{row.reference || "—"}</td>
+                    <td className="p-4">{accounts.find(a=>a.id===row.account_id)?.name||"—"}</td><td className="p-4">{row.reference || "—"}</td>
                     <td className="p-4 text-right font-bold">{money(Number(row.amount))}</td>
                     <td className="p-4"><span className="inline-flex rounded-full bg-[#f1f5ee] px-2.5 py-1 text-[10px] font-bold text-[#5e795f]">{label}</span></td>
                     <td className="p-4"><div className="flex gap-2">
