@@ -18,7 +18,7 @@ type Extension = { id: string; task_id: string; requested_by: string; requested_
 type Notification = { id: string; title: string; body: string; notification_type: string; read_at: string | null; created_at: string };
 type Tab = "overview" | "meetings" | "tasks" | "announcements";
 
-const departments = ["Management", "Administration", "Finance", "Marketing and Sales", "Production", "Distribution and Delivery", "Customer Service", "Other"];
+const departments = ["Operations & Production", "Sales & Customer Relations", "Finance & Accounts", "Marketing & Growth", "Procurement & Supply", "Administration & Human Resources"];
 const dateTime = (value: string) => new Intl.DateTimeFormat("en-NG", { dateStyle: "medium", timeStyle: "short" }).format(new Date(value));
 const toLocalInput = (value: string) => { const date = new Date(value); date.setMinutes(date.getMinutes() - date.getTimezoneOffset()); return date.toISOString().slice(0, 16); };
 const statusLabel = (status: string) => ({ pending: "Pending", accepted: "Accepted", in_progress: "In Progress", submitted_for_review: "Submitted for Review", completed: "Completed", cancelled: "Cancelled" }[status] || status);
