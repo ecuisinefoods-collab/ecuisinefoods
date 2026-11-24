@@ -167,79 +167,78 @@ export default function AdminPage() {
 
   const sections = [
     {
-      id: "store",
-      number: "01",
-      title: "Store & catalogue",
-      description: "Your products, stock, storefront appearance and customer-facing content.",
-      icon: Package,
-      tone: "green",
+      id: "operations", number: "01", title: "Operations & Production",
+      description: "Manage products, pack sizes and finished-product stock. Production and batch-record tools can be added to this workspace as the operating process is finalised.",
+      icon: Boxes, tone: "green",
       tools: [
-        { label: "Products", description: "Add and edit products, pack sizes and prices.", href: "/admin/products", icon: Package, roles: ["owner", "store_manager"], action: "Manage catalogue" },
-        { label: "Inventory", description: "Review stock levels and inventory movements.", href: "/admin/inventory", icon: Boxes, roles: ["owner", "store_manager", "analyst"], action: "View inventory" },
-        { label: "Storefront editor", description: "Manage homepage content and storefront sections.", href: "/admin/storefront", icon: LayoutDashboard, roles: ["owner", "store_manager"], action: "Edit storefront" },
-        { label: "Media library", description: "Manage images used around the storefront.", href: "/admin/storefront/media", icon: ImageIcon, roles: ["owner", "store_manager"], action: "Open library" },
-        { label: "Customer reviews", description: "Review and moderate customer feedback.", href: "/admin/reviews", icon: Star, roles: ["owner", "store_manager"], action: "View reviews" },
-        { label: "Sales counter", description: "Set the historical products-sold baseline.", href: "/admin/sales-counter", icon: Activity, roles: ["owner"], action: "Edit baseline" },
+        { label: "Products & pack sizes", description: "Manage the catalogue, pack sizes, prices and product information.", href: "/admin/products", icon: Package, roles: ["owner", "store_manager"], action: "Manage products" },
+        { label: "Inventory & stock movements", description: "Track stock separately for each pack size and review movements.", href: "/admin/inventory", icon: Boxes, roles: ["owner", "store_manager", "analyst"], action: "View inventory" },
       ],
     },
     {
-      id: "orders",
-      number: "02",
-      title: "Orders & fulfilment",
-      description: "Keep customer orders, payments, pickups and deliveries moving.",
-      icon: ShoppingBag,
-      tone: "blue",
+      id: "sales", number: "02", title: "Sales & Customer Relations",
+      description: "Manage website orders, customer feedback and order fulfilment.",
+      icon: ShoppingBag, tone: "blue",
       tools: [
-        { label: "Orders", description: "Confirm, process and complete customer orders.", href: "/admin/orders", icon: ClipboardList, roles: ["owner", "store_manager", "order_officer", "finance_officer", "analyst"], action: "Manage orders" },
-        { label: "Payment settings", description: "Configure supported checkout payment methods.", href: "/admin/payments", icon: CreditCard, roles: ["owner", "store_manager"], action: "Configure payments" },
+        { label: "Customer orders", description: "Review, confirm, process and complete website orders.", href: "/admin/orders", icon: ClipboardList, roles: ["owner", "store_manager", "order_officer", "finance_officer", "analyst"], action: "Manage orders" },
+        { label: "Customer reviews", description: "Review and moderate customer feedback.", href: "/admin/reviews", icon: Star, roles: ["owner", "store_manager"], action: "View reviews" },
         { label: "Delivery setup", description: "Manage delivery destinations and fees.", href: "/admin/delivery", icon: Truck, roles: ["owner", "store_manager"], action: "Manage delivery" },
         { label: "Pickup locations", description: "Manage customer pickup locations.", href: "/admin/pickups", icon: MapPin, roles: ["owner", "store_manager"], action: "Manage pickups" },
+        { label: "Checkout payment settings", description: "Configure customer checkout payment methods.", href: "/admin/payments", icon: CreditCard, roles: ["owner", "store_manager"], action: "Configure payments" },
+        { label: "Sales counter baseline", description: "Maintain the historical products-sold baseline.", href: "/admin/sales-counter", icon: Activity, roles: ["owner"], action: "Edit baseline" },
       ],
     },
     {
-      id: "growth",
-      number: "03",
-      title: "Marketing & growth",
-      description: "Run campaigns, build partnerships and grow your customer reach.",
-      icon: Megaphone,
-      tone: "gold",
+      id: "finance", number: "03", title: "Finance & Accounts",
+      description: "Review manually recorded financial activity separately from website order sales.",
+      icon: Wallet, tone: "purple",
+      tools: [
+        { label: "Financial records", description: "Record and review income, expenses and business transactions.", href: "/admin/finance", icon: Wallet, roles: ["owner", "finance_officer", "analyst"], action: "Open finance" },
+      ],
+    },
+    {
+      id: "marketing", number: "04", title: "Marketing & Growth",
+      description: "Manage storefront campaigns, brand content, partnerships and the affiliate programme.",
+      icon: Megaphone, tone: "gold",
       tools: [
         { label: "Promotions & banners", description: "Create and schedule storefront offers.", href: "/admin/promotions", icon: Megaphone, roles: ["owner", "marketing_manager"], action: "Manage promotions" },
         { label: "Coupons", description: "Create and manage discount codes.", href: "/admin/coupons", icon: Tags, roles: ["owner", "marketing_manager"], action: "Manage coupons" },
+        { label: "Media library", description: "Manage images used around the storefront.", href: "/admin/storefront/media", icon: ImageIcon, roles: ["owner", "store_manager"], action: "Open library" },
+        { label: "Storefront editor", description: "Manage homepage content and storefront sections.", href: "/admin/storefront", icon: LayoutDashboard, roles: ["owner", "store_manager"], action: "Edit storefront" },
+        { label: "Our story", description: "Manage the brand story page.", href: "/admin/story", icon: Users, roles: ["owner", "store_manager"], action: "Edit story" },
         { label: "Partnership enquiries", description: "Review business and collaboration enquiries.", href: "/admin/partnerships", icon: Handshake, roles: ["owner", "store_manager", "marketing_manager"], action: "View enquiries" },
         { label: "Affiliate programme", description: "Manage affiliate applications and activity.", href: "/admin/affiliates", icon: Users, roles: ["owner", "store_manager", "marketing_manager"], action: "Manage affiliates" },
-        { label: "Affiliate performance", description: "Review referral traffic, attributed orders, conversions and commissions by affiliate.", href: "/admin/partners", icon: ClipboardList, roles: ["owner", "store_manager", "marketing_manager", "affiliate_manager"], action: "View performance" },
+        { label: "Affiliate performance", description: "Review referral traffic, attributed orders and commissions.", href: "/admin/partners", icon: ClipboardList, roles: ["owner", "store_manager", "marketing_manager", "affiliate_manager"], action: "View performance" },
       ],
     },
     {
-      id: "finance",
-      number: "04",
-      title: "Finance & reports",
-      description: "Understand revenue, expenses and how the business is performing.",
-      icon: BarChart3,
-      tone: "purple",
+      id: "procurement", number: "05", title: "Procurement & Supply",
+      description: "This workspace is reserved for supplier records, raw-material purchases and supply tracking. It is intentionally not activated until those tools are built.",
+      icon: Truck, tone: "teal", tools: [],
+    },
+    {
+      id: "administration", number: "06", title: "Administration & Human Resources",
+      description: "Manage meetings, tasks, announcements and future team access from one place.",
+      icon: ShieldCheck, tone: "teal",
       tools: [
-        { label: "Finance", description: "Review recorded income, expenses and transactions.", href: "/admin/finance", icon: Wallet, roles: ["owner", "finance_officer", "analyst"], action: "Open finance" },
-        { label: "Analytics", description: "Explore store traffic, activity and business trends.", href: "/admin/analytics", icon: BarChart3, roles: ["owner", "store_manager", "finance_officer", "analyst"], action: "View analytics" },
-        { label: "Data exports", description: "Download business records and reports.", href: "/admin/exports", icon: Database, roles: ["owner"], action: "Export records" },
+        { label: "Staff activities, meetings & tasks", description: "Coordinate meetings, announcements and assigned work.", href: "/admin/activities", icon: CalendarDays, roles: ["owner", "store_manager", "finance_officer", "marketing_manager", "order_officer", "analyst", "affiliate_manager"], action: "Open activities" },
+        { label: "Team & permissions", description: "Create future staff accounts and manage access when hiring begins.", href: "/admin/team", icon: Users, roles: ["owner"], action: "Manage team" },
       ],
     },
     {
-      id: "people",
-      number: "05",
-      title: "People & administration",
-      description: "Control team access and use the tools that support daily operations.",
-      icon: ShieldCheck,
-      tone: "teal",
+      id: "organisation", number: "07", title: "Organisation-wide tools",
+      description: "Central reporting, controlled data exports and the business knowledge assistant.",
+      icon: BarChart3, tone: "purple",
       tools: [
-        { label: "Team & permissions", description: "Invite staff, assign roles and remove old accounts.", href: "/admin/team", icon: Users, roles: ["owner"], action: "Manage team" },
-        { label: "AI assistant & knowledge", description: "Manage the assistant and its business knowledge.", href: "/admin/assistant", icon: Bot, roles: ["owner", "store_manager", "order_officer"], action: "Open assistant" },
+        { label: "Central analytics", description: "Explore store traffic, business activity and performance trends.", href: "/admin/analytics", icon: BarChart3, roles: ["owner", "store_manager", "finance_officer", "analyst"], action: "View analytics" },
+        { label: "Data exports", description: "Download business records and reports. Access is restricted.", href: "/admin/exports", icon: Database, roles: ["owner"], action: "Export records" },
+        { label: "AI assistant & knowledge", description: "Use and manage the assistant's business knowledge.", href: "/admin/assistant", icon: Bot, roles: ["owner", "store_manager", "order_officer"], action: "Open assistant" },
       ],
     },
   ].map(section => ({
     ...section,
     tools: section.tools.filter(tool => tool.roles.includes(profile.role)),
-  })).filter(section => section.tools.length > 0);
+  })).filter(section => section.tools.length > 0 || (profile.role === "owner" && section.id === "procurement"));
 
   const firstName = profile.display_name?.trim().split(/\\s+/)[0] || (profile.role === "owner" ? "CEO" : "there");
 
@@ -249,7 +248,7 @@ export default function AdminPage() {
         <header className="admin-topbar-premium sticky top-0 z-10 flex items-center justify-between border-b px-5 py-4 backdrop-blur sm:px-8">
           <div>
             <p className="admin-topbar-kicker text-[10px] font-bold uppercase tracking-[.18em]">eCuisine business workspace</p>
-            <h1 className="admin-topbar-title mt-1 text-lg font-bold">Business dashboard</h1>
+            <h1 className="admin-topbar-title mt-1 text-lg font-bold">{profile.role === "owner" ? "Founder workspace" : "Department workspace"}</h1>
           </div>
           <div className="flex items-center gap-3">
             <span className="admin-role-pill hidden rounded-full px-3 py-2 text-[10px] font-bold capitalize sm:inline-flex">{profile.role === "owner" ? "CEO / Owner" : profile.role.replaceAll("_", " ")}</span>
@@ -265,7 +264,7 @@ export default function AdminPage() {
               <div className="max-w-2xl">
                 <span className="admin-dashboard-hero-eyebrow"><span/> YOUR CONTROL CENTRE</span>
                 <h2 className="mt-4 text-3xl font-bold leading-tight tracking-tight text-white sm:text-4xl">Welcome back, {firstName}.</h2>
-                <p className="mt-3 max-w-xl text-sm leading-6 text-[#e2eee3]">Everything you need to manage eCuisine in one place. Choose a business area below to get straight to the right tools.</p>
+                <p className="mt-3 max-w-xl text-sm leading-6 text-[#e2eee3]">Everything you need to manage eCuisine in one place. Manage the business through its six departments and shared organisation-wide tools.</p>
               </div>
               <div className="admin-dashboard-hero-actions">
                 <Link href="/admin/orders" className="admin-dashboard-hero-action admin-dashboard-hero-action--primary"><ShoppingBag size={16}/> View orders</Link>
@@ -293,7 +292,7 @@ export default function AdminPage() {
 
           <section className="mt-9" aria-labelledby="dashboard-categories-title">
             <div className="admin-dashboard-section-heading">
-              <div><p className="admin-dashboard-section-eyebrow">WORKSPACE DIRECTORY</p><h2 id="dashboard-categories-title">Explore by business area</h2><p>Tools are organised by what you need to get done.</p></div>
+              <div><p className="admin-dashboard-section-eyebrow">WORKSPACE DIRECTORY</p><h2 id="dashboard-categories-title">Explore departments & shared tools</h2><p>Your departments are organised around eCuisinefoods’ approved operating structure.</p></div>
               <span className="admin-dashboard-tool-count">{sections.reduce((sum, section) => sum + section.tools.length, 0)} available tools</span>
             </div>
             <div className="admin-dashboard-category-grid">
