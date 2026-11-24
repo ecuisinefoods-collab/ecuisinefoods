@@ -1,265 +1,62 @@
 "use client";
-
-import { FormEvent, useCallback, useEffect, useState } from "react";
+import {FormEvent,useCallback,useEffect,useState} from "react";
 import Link from "next/link";
-import {
-  ArrowLeft, CheckCircle2, Download, Pencil, PlusCircle, RefreshCw,
-  RotateCcw, Save, ShieldCheck, Clock3,
-} from "lucide-react";
-import { supabase } from "@/lib/supabase";
+import {ArrowLeft,CheckCircle2,Download,Pencil,PlusCircle,RefreshCw,RotateCcw,Save,ShieldCheck,ArrowLeftRight} from "lucide-react";
+import {supabase} from "@/lib/supabase";
 
 type Account={id:string;name:string;account_type:"cash"|"bank"|"payment_provider";opening_balance:number;is_active:boolean};
-type Tx = {
-  id: string;
-  transaction_type: "income" | "expense";
-  category: string;
-  description: string;
-  amount: number;
-  transaction_date: string;
-  reference: string | null;
-  status: "pending" | "posted" | "void";
-  reversal_of_id: string | null;
-  account_id: string | null;
-};
+type Tx={id:string;transaction_type:"income"|"expense";category:string;description:string;amount:number;transaction_date:string;reference:string|null;status:"pending"|"posted"|"void";reversal_of_id:string|null;account_id:string|null};
+type Transfer={id:string;from_account_id:string;to_account_id:string;amount:number;transfer_date:string;reference:string|null;notes:string|null;status:"pending"|"posted"|"void"};
+const money=(n:number)=>new Intl.NumberFormat("en-NG",{style:"currency",currency:"NGN",maximumFractionDigits:2}).format(n||0);
+const csv=(v:unknown)=>'"'+String(v??"").replace(/"/g,'""')+'"';
 
-const money = (n: number) => new Intl.NumberFormat("en-NG", {
-  style: "currency", currency: "NGN", maximumFractionDigits: 0,
-}).format(n || 0);
-const csv = (value: unknown) => '"' + String(value ?? "").replace(/"/g, '""') + '"';
-
-export default function AdminFinancePage() {
-  const [rows, setRows] = useState<Tx[]>([]);
-  const [accounts,setAccounts]=useState<Account[]>([]);
-  const [accountId,setAccountId]=useState("");
-  const [newAccountName,setNewAccountName]=useState("");
-  const [newAccountType,setNewAccountType]=useState<"cash"|"bank"|"payment_provider">("cash");
-  const [openingBalance,setOpeningBalance]=useState("0");
-  const [role, setRole] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [notice, setNotice] = useState("");
-  const [saving, setSaving] = useState(false);
-  const [editing, setEditing] = useState<string | null>(null);
-  const [type, setType] = useState<"income" | "expense">("income");
-  const [category, setCategory] = useState("");
-  const [description, setDescription] = useState("");
-  const [amount, setAmount] = useState("");
-  const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
-  const [reference, setReference] = useState("");
-
-  const load = useCallback(async () => {
-    if (!supabase) { setError("Database connection unavailable."); setLoading(false); return; }
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) { setError("Sign in through the admin dashboard first."); setLoading(false); return; }
-    const { data: profile } = await supabase.from("admin_profiles")
-      .select("role,is_active").eq("user_id", session.user.id).maybeSingle();
-    if (!profile?.is_active || !["owner", "finance_officer", "analyst"].includes(profile.role)) {
-      setError("Your role cannot access finance records."); setLoading(false); return;
-    }
-    setRole(profile.role);
-    const { data, error: queryError } = await supabase.from("financial_transactions")
-      .select("id,transaction_type,category,description,amount,transaction_date,reference,status,reversal_of_id")
-      .order("transaction_date", { ascending: false }).limit(5000);
-    if (queryError) setError(queryError.message);
-    else setRows((data || []) as Tx[]);
-    setLoading(false);
-  }, []);
-
-  useEffect(() => { void load(); }, [load]);
-
-  function reset() {
-    setEditing(null); setType("income"); setCategory(""); setDescription("");
-    setAmount(""); setDate(new Date().toISOString().slice(0, 10)); setReference("");setAccountId("");
-  }
-
-  function editPending(row: Tx) {
-    if (row.status !== "pending" || role === "analyst") return;
-    setEditing(row.id); setType(row.transaction_type); setCategory(row.category);
-    setDescription(row.description); setAmount(String(row.amount));
-    setDate(row.transaction_date); setReference(row.reference || "");setAccountId(row.account_id||"");
-    setNotice(""); setError("");
-  }
-
-  async function submit(event: FormEvent) {
-    event.preventDefault();
-    if (!supabase || role === "analyst") return;
-    const numericAmount = Number(amount);
-    if (!Number.isFinite(numericAmount) || numericAmount <= 0) {
-      setError("Enter an amount greater than zero."); return;
-    }
-    setSaving(true); setError(""); setNotice("");
-    const payload = {
-      transaction_type: type, category: category.trim(), description: description.trim(),
-      amount: numericAmount, transaction_date: date, reference: reference.trim() || null, account_id: accountId||null,
-    };
-    const result = editing
-      ? await supabase.from("financial_transactions").update(payload).eq("id", editing).eq("status", "pending")
-      : await supabase.from("financial_transactions").insert({
-          ...payload, status: role === "owner" ? "posted" : "pending",
-          recorded_by: (await supabase.auth.getUser()).data.user?.id,
-        });
-    if (result.error) setError(result.error.message);
-    else {
-      setNotice(editing ? "Pending transaction updated." : role === "owner"
-        ? "Financial transaction recorded and posted."
-        : "Financial transaction submitted for Founder approval.");
-      reset(); await load();
-    }
-    setSaving(false);
-  }
-
-  async function approve(row: Tx) {
-    if (!supabase || role !== "owner" || row.status !== "pending") return;
-    if (!window.confirm("Approve and post this financial transaction? Once posted, it cannot be edited or deleted.")) return;
-    setSaving(true); setError(""); setNotice("");
-    const { error: updateError } = await supabase.from("financial_transactions")
-      .update({ status: "posted", updated_at: new Date().toISOString() })
-      .eq("id", row.id).eq("status", "pending");
-    if (updateError) setError(updateError.message);
-    else {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) await supabase.from("admin_audit_logs").insert({
-        actor_user_id: user.id, actor_email: user.email,
-        action: "approve_financial_transaction", resource_type: "financial_transaction",
-        resource_id: row.id, details: { amount: row.amount, transaction_type: row.transaction_type },
-      });
-      setNotice("Transaction approved and posted."); await load();
-    }
-    setSaving(false);
-  }
-
-  async function reverse(row: Tx) {
-    if (!supabase || role !== "owner" || row.status !== "posted" || row.reversal_of_id) return;
-    if (rows.some(item => item.reversal_of_id === row.id)) {
-      setNotice("This transaction already has a reversal."); return;
-    }
-    if (!window.confirm("Create a linked reversal for this posted transaction? The original record will remain unchanged.")) return;
-    setSaving(true); setError(""); setNotice("");
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { setError("Your session has expired. Sign in again."); setSaving(false); return; }
-    const reversal = {
-      transaction_type: row.transaction_type === "income" ? "expense" : "income",
-      category: "Reversal - " + row.category,
-      description: "Reversal of transaction " + row.id + ": " + row.description,
-      amount: Number(row.amount),
-      transaction_date: new Date().toISOString().slice(0, 10),
-      reference: "Reversal of " + row.id,
-      recorded_by: user.id,
-      status: "posted",
-      reversal_of_id: row.id,
-    };
-    const { data, error: insertError } = await supabase.from("financial_transactions")
-      .insert(reversal).select("id").single();
-    if (insertError) setError(insertError.message);
-    else {
-      await supabase.from("admin_audit_logs").insert({
-        actor_user_id: user.id, actor_email: user.email,
-        action: "reverse_financial_transaction", resource_type: "financial_transaction",
-        resource_id: row.id, details: { reversal_id: data.id, amount: row.amount },
-      });
-      setNotice("Reversal recorded. The original financial entry has been retained."); await load();
-    }
-    setSaving(false);
-  }
-
-  function download() {
-    const headers = ["id", "transaction_type", "category", "description", "amount", "transaction_date", "reference", "status", "reversal_of_id", "account_id"];
-    const body = [
-      headers.map(csv).join(","),
-      ...rows.map(row => headers.map(key => csv((row as unknown as Record<string, unknown>)[key])).join(",")),
-    ].join("\r
-");
-    const url = URL.createObjectURL(new Blob(["\uFEFF" + body], { type: "text/csv;charset=utf-8" }));
-    const anchor = document.createElement("a");
-    anchor.href = url; anchor.download = "ecuisinefoods-finance-" + new Date().toISOString().slice(0, 10) + ".csv";
-    anchor.click(); URL.revokeObjectURL(url);
-  }
-
-  const posted = rows.filter(row => row.status === "posted");
-  const income = posted.filter(row => row.transaction_type === "income").reduce((sum, row) => sum + Number(row.amount), 0);
-  const expenses = posted.filter(row => row.transaction_type === "expense").reduce((sum, row) => sum + Number(row.amount), 0);
-  const pendingCount = rows.filter(row => row.status === "pending").length;
-  async function createAccount(event:FormEvent){event.preventDefault();if(!supabase||role!=="owner")return;if(!newAccountName.trim()){setError("Enter an account name.");return}setSaving(true);setError("");const {data:{user}}=await supabase.auth.getUser();const {error:e}=await supabase.from("finance_accounts").insert({name:newAccountName.trim(),account_type:newAccountType,opening_balance:Number(openingBalance||0),is_active:true});if(e)setError(e.message);else{if(user)await supabase.from("admin_audit_logs").insert({actor_user_id:user.id,actor_email:user.email,action:"create_finance_account",resource_type:"finance_account",details:{name:newAccountName.trim(),account_type:newAccountType,opening_balance:Number(openingBalance||0)}});setNewAccountName("");setOpeningBalance("0");setNotice("Finance account created.");await load()}setSaving(false)}
-
-  return (
-    <main className="admin-glass-shell min-h-screen bg-[#f5f7f3] px-4 py-8 text-[#25392b] sm:px-8">
-      <div className="mx-auto max-w-6xl">
-        <Link href="/admin" className="inline-flex items-center gap-2 text-sm font-semibold text-[#42694b]"><ArrowLeft size={16}/> Admin dashboard</Link>
-        <div className="mt-6 flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <p className="text-[10px] font-bold uppercase tracking-[.18em] text-[#8a9787]">Business accounts</p>
-            <h1 className="mt-1 text-3xl font-semibold text-[#1e3b29]">Finance & transactions</h1>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-[#7b887a]">Finance submissions remain pending until Founder approval. Posted entries are locked; corrections are recorded through linked reversals, never silent edits or deletion.</p>
-          </div>
-          <div className="flex gap-2">
-            <button onClick={download} className="inline-flex items-center gap-2 rounded-xl border bg-white px-4 py-3 text-xs font-bold"><Download size={14}/> Download CSV</button>
-            <button onClick={() => { setLoading(true); void load(); }} className="inline-flex items-center gap-2 rounded-xl border bg-white px-4 py-3 text-xs font-bold"><RefreshCw size={14}/> Refresh</button>
-          </div>
-        </div>
-        {error && <p role="alert" className="mt-5 rounded-xl bg-red-50 p-4 text-sm text-red-700">{error}</p>}
-        {notice && <p role="status" className="mt-5 rounded-xl bg-green-50 p-4 text-sm text-green-800">{notice}</p>}
-
-        {!loading && role && <>
-          <div className="mt-7 grid gap-4 sm:grid-cols-4">
-            {[{ label: "Posted income", value: income }, { label: "Posted expenses", value: expenses }, { label: "Posted net", value: income - expenses }, { label: "Pending approval", value: pendingCount }].map(item =>
-              <div key={item.label} className="rounded-2xl border border-[#e5ebe2] bg-white p-5">
-                <p className="text-xs text-[#7b887a]">{item.label}</p>
-                <p className="mt-2 text-2xl font-bold">{item.label === "Pending approval" ? item.value : money(item.value)}</p>
-              </div>
-            )}
-          </div>
-
-          <section className="mt-6 rounded-2xl border border-[#e5ebe2] bg-white p-5"><h2 className="font-bold">Cash, bank & payment accounts</h2><div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{accounts.map(a=>{const activity=rows.filter(r=>r.account_id===a.id&&r.status==="posted").reduce((sum,r)=>sum+(r.transaction_type==="income"?1:-1)*Number(r.amount),0);return <article key={a.id} className="rounded-xl border border-[#e8ede5] bg-[#fbfcfa] p-4"><p className="text-xs text-[#7b887a]">{a.name} · {a.account_type.replaceAll("_"," ")}</p><p className="mt-2 text-xl font-bold">{money(Number(a.opening_balance)+activity)}</p><p className="mt-1 text-[10px] text-[#899487]">Opening balance {money(Number(a.opening_balance))}</p></article>})}{!accounts.length&&<p className="text-sm text-[#899487]">No finance accounts created yet.</p>}</div>{role==="owner"&&<form onSubmit={createAccount} className="mt-4 grid gap-2 border-t pt-4 sm:grid-cols-4"><input required value={newAccountName} onChange={e=>setNewAccountName(e.target.value)} placeholder="Account name (e.g. Main bank)" className="rounded-xl border p-3 text-sm sm:col-span-2"/><select value={newAccountType} onChange={e=>setNewAccountType(e.target.value as "cash"|"bank"|"payment_provider")} className="rounded-xl border p-3 text-sm"><option value="cash">Cash</option><option value="bank">Bank</option><option value="payment_provider">POS / Wallet / Payment provider</option></select><input type="number" min="0" step=".01" value={openingBalance} onChange={e=>setOpeningBalance(e.target.value)} placeholder="Opening balance ₦" className="rounded-xl border p-3 text-sm"/><button disabled={saving} className="rounded-xl bg-[#245b42] px-4 py-3 text-xs font-bold text-white sm:col-span-4">Add finance account</button></form>}</section>
-
-          {role !== "analyst" && <form onSubmit={submit} className="mt-6 rounded-2xl border border-[#e5ebe2] bg-white p-5">
-            <div className="flex items-center gap-2"><PlusCircle size={18}/><h2 className="font-bold">{editing ? "Edit pending transaction" : "Record financial activity"}</h2></div>
-            <p className="mt-2 text-xs text-[#7b887a]">{role === "owner" ? "Entries you record are posted immediately under Founder authority." : "Your entry will be submitted as pending for Founder approval."}</p>
-            <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              <label className="text-xs font-semibold">Account<select value={accountId} onChange={event=>setAccountId(event.target.value)} className="mt-1 w-full rounded-xl border p-3"><option value="">No account selected</option>{accounts.map(a=><option key={a.id} value={a.id}>{a.name}</option>)}</select></label>
-              <label className="text-xs font-semibold">Type<select value={type} onChange={event => setType(event.target.value as "income" | "expense")} className="mt-1 w-full rounded-xl border p-3"><option value="income">Income</option><option value="expense">Expense</option></select></label>
-              <label className="text-xs font-semibold">Category<input required value={category} onChange={event => setCategory(event.target.value)} placeholder="e.g. Packaging" className="mt-1 w-full rounded-xl border p-3"/></label>
-              <label className="text-xs font-semibold">Amount (₦)<input required min="0.01" step="0.01" type="number" value={amount} onChange={event => setAmount(event.target.value)} className="mt-1 w-full rounded-xl border p-3"/></label>
-              <label className="text-xs font-semibold sm:col-span-2">Description<input required value={description} onChange={event => setDescription(event.target.value)} placeholder="What was this transaction for?" className="mt-1 w-full rounded-xl border p-3"/></label>
-              <label className="text-xs font-semibold">Date<input required type="date" value={date} onChange={event => setDate(event.target.value)} className="mt-1 w-full rounded-xl border p-3"/></label>
-              <label className="text-xs font-semibold lg:col-span-3">Reference (optional)<input value={reference} onChange={event => setReference(event.target.value)} className="mt-1 w-full rounded-xl border p-3"/></label>
-            </div>
-            <div className="mt-4 flex gap-2">
-              <button disabled={saving} className="inline-flex items-center gap-2 rounded-xl bg-[#245b42] px-5 py-3 text-xs font-bold text-white disabled:opacity-50"><Save size={14}/>{saving ? "Saving…" : editing ? "Save pending changes" : "Save transaction"}</button>
-              {editing && <button type="button" onClick={reset} className="rounded-xl border px-4 py-3 text-xs font-bold">Cancel</button>}
-            </div>
-          </form>}
-
-          <section className="mt-6 overflow-hidden rounded-2xl border border-[#e5ebe2] bg-white">
-            <div className="flex items-center gap-2 border-b p-5"><h2 className="font-bold">Transaction history</h2><span className="ml-auto text-xs text-[#8a9787]">{rows.length} records</span></div>
-            {rows.length ? <div className="overflow-x-auto">
-              <table className="w-full min-w-[900px] text-left text-xs">
-                <thead className="bg-[#f7f9f5] text-[#71806f]"><tr><th className="p-4">Date</th><th className="p-4">Type</th><th className="p-4">Category / description</th><th className="p-4">Account</th><th className="p-4">Reference</th><th className="p-4 text-right">Amount</th><th className="p-4">Status</th><th className="p-4">Actions</th></tr></thead>
-                <tbody>{rows.map(row => {
-                  const hasReversal = rows.some(item => item.reversal_of_id === row.id);
-                  const label = row.reversal_of_id ? "Reversal" : hasReversal ? "Reversed" : row.status === "pending" ? "Pending approval" : row.status === "void" ? "Void" : "Posted";
-                  return <tr key={row.id} className="border-t border-[#edf0eb]">
-                    <td className="p-4">{row.transaction_date}</td>
-                    <td className="p-4 capitalize">{row.transaction_type}</td>
-                    <td className="p-4"><b>{row.category}</b><p className="mt-1 text-[#899487]">{row.description}</p></td>
-                    <td className="p-4">{accounts.find(a=>a.id===row.account_id)?.name||"—"}</td><td className="p-4">{row.reference || "—"}</td>
-                    <td className="p-4 text-right font-bold">{money(Number(row.amount))}</td>
-                    <td className="p-4"><span className="inline-flex rounded-full bg-[#f1f5ee] px-2.5 py-1 text-[10px] font-bold text-[#5e795f]">{label}</span></td>
-                    <td className="p-4"><div className="flex gap-2">
-                      {row.status === "pending" && role !== "analyst" && <button disabled={saving} onClick={() => editPending(row)} className="rounded-lg bg-[#eef3eb] p-2 text-[#42664a]" title="Edit pending record"><Pencil size={14}/></button>}
-                      {row.status === "pending" && role === "owner" && <button disabled={saving} onClick={() => void approve(row)} className="rounded-lg bg-[#edf5e9] p-2 text-[#3d704b]" title="Approve and post"><CheckCircle2 size={14}/></button>}
-                      {row.status === "posted" && !row.reversal_of_id && role === "owner" && <button disabled={saving || hasReversal} onClick={() => void reverse(row)} className="rounded-lg bg-[#f1effa] p-2 text-[#62508a]" title={hasReversal ? "Already reversed" : "Create linked reversal"}><RotateCcw size={14}/></button>}
-                      {row.reversal_of_id && <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-[#62508a]"><RotateCcw size={12}/> Linked</span>}
-                      {row.status === "pending" && role === "owner" && <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-[#8a6a2f]"><Clock3 size={12}/> Awaiting approval</span>}
-                    </div></td>
-                  </tr>;
-                })}</tbody>
-              </table>
-            </div> : <p className="p-8 text-center text-sm text-[#899487]">No finance entries have been recorded.</p>}
-          </section>
-          <p className="mt-4 flex items-start gap-2 text-xs leading-5 text-[#7b887a]"><ShieldCheck size={15} className="mt-0.5 shrink-0"/> Posted transactions are immutable. The Founder can approve pending entries or create a linked reversal; original entries are retained in the audit trail.</p>
-        </>}
-        {loading && <p className="mt-8 text-sm text-[#68806b]">Loading finance records…</p>}
-      </div>
-    </main>
-  );
+export default function AdminFinancePage(){
+ const [rows,setRows]=useState<Tx[]>([]);const [accounts,setAccounts]=useState<Account[]>([]);const [transfers,setTransfers]=useState<Transfer[]>([]);const [role,setRole]=useState("");
+ const [loading,setLoading]=useState(true);const [saving,setSaving]=useState(false);const [error,setError]=useState("");const [notice,setNotice]=useState("");
+ const [editing,setEditing]=useState<string|null>(null);const [type,setType]=useState<"income"|"expense">("income");const [category,setCategory]=useState("");const [description,setDescription]=useState("");const [amount,setAmount]=useState("");const [date,setDate]=useState(new Date().toISOString().slice(0,10));const [reference,setReference]=useState("");const [accountId,setAccountId]=useState("");
+ const [newAccountName,setNewAccountName]=useState("");const [newAccountType,setNewAccountType]=useState<"cash"|"bank"|"payment_provider">("cash");const [openingBalance,setOpeningBalance]=useState("0");
+ const [fromAccount,setFromAccount]=useState("");const [toAccount,setToAccount]=useState("");const [transferAmount,setTransferAmount]=useState("");const [transferReference,setTransferReference]=useState("");
+ const load=useCallback(async()=>{
+  if(!supabase){setError("Database connection unavailable.");setLoading(false);return}
+  const {data:{user}}=await supabase.auth.getUser();if(!user){setError("Sign in through the admin dashboard first.");setLoading(false);return}
+  const {data:profile}=await supabase.from("admin_profiles").select("role,is_active").eq("user_id",user.id).maybeSingle();
+  if(!profile?.is_active||!["owner","finance_officer","analyst"].includes(profile.role)){setError("Your role cannot access finance records.");setLoading(false);return}
+  setRole(profile.role);
+  const [t,a,x]=await Promise.all([
+   supabase.from("financial_transactions").select("id,transaction_type,category,description,amount,transaction_date,reference,status,reversal_of_id,account_id").order("transaction_date",{ascending:false}).limit(5000),
+   supabase.from("finance_accounts").select("id,name,account_type,opening_balance,is_active").eq("is_active",true).order("name"),
+   supabase.from("finance_transfers").select("id,from_account_id,to_account_id,amount,transfer_date,reference,notes,status").order("transfer_date",{ascending:false}).limit(500)
+  ]);
+  if(t.error||a.error||x.error)setError(t.error?.message||a.error?.message||x.error?.message||"Could not load finance records.");
+  setRows((t.data||[]) as Tx[]);setAccounts((a.data||[]) as Account[]);setTransfers((x.data||[]) as Transfer[]);setLoading(false);
+ },[]);
+ useEffect(()=>{void load()},[load]);
+ function reset(){setEditing(null);setType("income");setCategory("");setDescription("");setAmount("");setDate(new Date().toISOString().slice(0,10));setReference("");setAccountId("")}
+ function editPending(row:Tx){if(row.status!=="pending"||role==="analyst")return;setEditing(row.id);setType(row.transaction_type);setCategory(row.category);setDescription(row.description);setAmount(String(row.amount));setDate(row.transaction_date);setReference(row.reference||"");setAccountId(row.account_id||"");setNotice("");setError("")}
+ async function submit(e:FormEvent){e.preventDefault();if(!supabase||role==="analyst")return;const n=Number(amount);if(!Number.isFinite(n)||n<=0){setError("Enter an amount greater than zero.");return}
+ setSaving(true);setError("");setNotice("");const payload={transaction_type:type,category:category.trim(),description:description.trim(),amount:n,transaction_date:date,reference:reference.trim()||null,account_id:accountId||null};
+ const result=editing?await supabase.from("financial_transactions").update(payload).eq("id",editing).eq("status","pending"):await supabase.from("financial_transactions").insert({...payload,status:"pending",recorded_by:(await supabase.auth.getUser()).data.user?.id});
+ if(result.error)setError(result.error.message);else{setNotice(editing?"Pending financial entry updated.":"Entry saved as a draft and submitted for Founder approval.");reset();await load()}setSaving(false)}
+ async function createAccount(e:FormEvent){e.preventDefault();if(!supabase||role!=="owner")return;if(!newAccountName.trim()||Number(openingBalance)<0){setError("Enter a valid account name and opening balance.");return}setSaving(true);setError("");const {data:{user}}=await supabase.auth.getUser();const {error:e1}=await supabase.from("finance_accounts").insert({name:newAccountName.trim(),account_type:newAccountType,opening_balance:Number(openingBalance),is_active:true});if(e1)setError(e1.message);else{if(user)await supabase.from("admin_audit_logs").insert({actor_user_id:user.id,actor_email:user.email,action:"create_finance_account",resource_type:"finance_account",details:{name:newAccountName.trim(),account_type:newAccountType,opening_balance:Number(openingBalance)}});setNewAccountName("");setOpeningBalance("0");setNotice("Finance account created.");await load()}setSaving(false)}
+ async function createTransfer(e:FormEvent){e.preventDefault();if(!supabase||role!=="owner")return;if(!fromAccount||!toAccount||fromAccount===toAccount||Number(transferAmount)<=0){setError("Choose two different accounts and enter a valid amount.");return}setSaving(true);setError("");const {data:{user}}=await supabase.auth.getUser();const {data,error:e1}=await supabase.from("finance_transfers").insert({from_account_id:fromAccount,to_account_id:toAccount,amount:Number(transferAmount),reference:transferReference.trim()||null,recorded_by:user?.id,status:"pending"}).select("id").single();if(e1)setError(e1.message);else{if(user)await supabase.from("admin_audit_logs").insert({actor_user_id:user.id,actor_email:user.email,action:"record_account_transfer",resource_type:"finance_transfer",resource_id:data.id,details:{from_account_id:fromAccount,to_account_id:toAccount,amount:Number(transferAmount)}});setTransferAmount("");setTransferReference("");setNotice("Transfer submitted as a draft for Founder approval.");await load()}setSaving(false)}
+ async function approveTransfer(t:Transfer){if(!supabase||role!=="owner"||t.status!=="pending")return;setSaving(true);const {error:e}=await supabase.from("finance_transfers").update({status:"posted",updated_at:new Date().toISOString()}).eq("id",t.id).eq("status","pending");if(e)setError(e.message);else{setNotice("Account transfer approved and posted.");await load()}setSaving(false)}
+ async function approve(row:Tx){if(!supabase||role!=="owner"||row.status!=="pending")return;if(!window.confirm("Approve and post this financial entry? Posted entries are locked."))return;setSaving(true);setError("");const {error:e}=await supabase.from("financial_transactions").update({status:"posted",updated_at:new Date().toISOString()}).eq("id",row.id).eq("status","pending");if(e)setError(e.message);else{const {data:{user}}=await supabase.auth.getUser();if(user)await supabase.from("admin_audit_logs").insert({actor_user_id:user.id,actor_email:user.email,action:"approve_financial_transaction",resource_type:"financial_transaction",resource_id:row.id,details:{amount:row.amount,transaction_type:row.transaction_type}});setNotice("Financial entry approved and posted.");await load()}setSaving(false)}
+ async function reverse(row:Tx){if(!supabase||role!=="owner"||row.status!=="posted"||row.reversal_of_id||rows.some(x=>x.reversal_of_id===row.id))return;if(!window.confirm("Create a linked reversal? The original entry will be retained."))return;setSaving(true);const {data:{user}}=await supabase.auth.getUser();if(!user){setError("Session expired.");setSaving(false);return}const {error:e}=await supabase.from("financial_transactions").insert({transaction_type:row.transaction_type==="income"?"expense":"income",category:"Reversal - "+row.category,description:"Reversal of "+row.id+": "+row.description,amount:Number(row.amount),transaction_date:new Date().toISOString().slice(0,10),reference:"Reversal of "+row.id,recorded_by:user.id,status:"posted",reversal_of_id:row.id,account_id:row.account_id});if(e)setError(e.message);else{await supabase.from("admin_audit_logs").insert({actor_user_id:user.id,actor_email:user.email,action:"reverse_financial_transaction",resource_type:"financial_transaction",resource_id:row.id,details:{amount:row.amount}});setNotice("Linked reversal posted; the original entry remains in the ledger.");await load()}setSaving(false)}
+ function download(){const keys=["id","transaction_type","category","description","amount","transaction_date","reference","status","reversal_of_id","account_id"];const body=[keys.map(csv).join(","),...rows.map(r=>keys.map(k=>csv((r as unknown as Record<string,unknown>)[k])).join(","))].join("\r\n");const url=URL.createObjectURL(new Blob(["\uFEFF"+body],{type:"text/csv;charset=utf-8"}));const a=document.createElement("a");a.href=url;a.download="ecuisinefoods-finance-"+new Date().toISOString().slice(0,10)+".csv";a.click();URL.revokeObjectURL(url)}
+ const posted=rows.filter(r=>r.status==="posted");const income=posted.filter(r=>r.transaction_type==="income").reduce((s,r)=>s+Number(r.amount),0);const expenses=posted.filter(r=>r.transaction_type==="expense").reduce((s,r)=>s+Number(r.amount),0);const pending=rows.filter(r=>r.status==="pending").length;
+ const accountBalance=(a:Account)=>Number(a.opening_balance)+rows.filter(r=>r.account_id===a.id&&r.status==="posted").reduce((s,r)=>s+(r.transaction_type==="income"?1:-1)*Number(r.amount),0)+transfers.filter(t=>t.status==="posted"&&t.to_account_id===a.id).reduce((s,t)=>s+Number(t.amount),0)-transfers.filter(t=>t.status==="posted"&&t.from_account_id===a.id).reduce((s,t)=>s+Number(t.amount),0);
+ if(loading)return <main className="p-10">Loading finance records…</main>;
+ return <main className="admin-glass-shell min-h-screen bg-[#f5f7f3] px-4 py-8 text-[#25392b] sm:px-8"><div className="mx-auto max-w-6xl">
+ <Link href="/admin" className="inline-flex items-center gap-2 text-sm font-semibold text-[#42694b]"><ArrowLeft size={16}/> Admin dashboard</Link>
+ <header className="mt-6 flex flex-wrap items-end justify-between gap-3"><div><p className="text-[10px] font-bold uppercase tracking-[.18em] text-[#8a9787]">Finance & Accounts</p><h1 className="mt-1 text-3xl font-semibold text-[#1e3b29]">Finance, accounts & reports</h1><p className="mt-2 max-w-2xl text-sm text-[#7b887a]">Record business income and expenses, manage cash and bank accounts, track transfers and review approval drafts. Website orders remain separate from manual sales.</p></div><div className="flex gap-2"><button onClick={download} className="inline-flex items-center gap-2 rounded-xl border bg-white px-4 py-3 text-xs font-bold"><Download size={14}/> CSV</button><button onClick={()=>{setLoading(true);void load()}} className="inline-flex items-center gap-2 rounded-xl border bg-white px-4 py-3 text-xs font-bold"><RefreshCw size={14}/> Refresh</button></div></header>
+ {error&&<p role="alert" className="mt-5 rounded-xl bg-red-50 p-4 text-sm text-red-700">{error}</p>}{notice&&<p role="status" className="mt-5 rounded-xl bg-green-50 p-4 text-sm text-green-800">{notice}</p>}
+ <div className="mt-6 grid gap-3 sm:grid-cols-4">{[{label:"Posted income",value:money(income)},{label:"Posted expenses",value:money(expenses)},{label:"Net operating result",value:money(income-expenses)},{label:"Awaiting Founder approval",value:String(pending)}].map(x=><article key={x.label} className="rounded-2xl border bg-white p-5"><p className="text-xs text-[#7b887a]">{x.label}</p><p className="mt-2 text-2xl font-bold">{x.value}</p></article>)}</div>
+ <section className="mt-6 rounded-2xl border bg-white p-5"><h2 className="font-bold">Cash, bank & payment accounts</h2><div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{accounts.map(a=><article key={a.id} className="rounded-xl border bg-[#fbfcfa] p-4"><p className="text-xs text-[#7b887a]">{a.name} · {a.account_type.replaceAll("_"," ")}</p><p className="mt-2 text-xl font-bold">{money(accountBalance(a))}</p><p className="mt-1 text-[10px] text-[#899487]">Opening balance {money(Number(a.opening_balance))}</p></article>)}{!accounts.length&&<p className="text-sm text-[#899487]">No accounts created yet.</p>}</div>
+ {role==="owner"&&<form onSubmit={createAccount} className="mt-4 grid gap-2 border-t pt-4 sm:grid-cols-4"><input required value={newAccountName} onChange={e=>setNewAccountName(e.target.value)} placeholder="Account name" className="rounded-xl border p-3 text-sm sm:col-span-2"/><select value={newAccountType} onChange={e=>setNewAccountType(e.target.value as "cash"|"bank"|"payment_provider")} className="rounded-xl border p-3 text-sm"><option value="cash">Cash</option><option value="bank">Bank</option><option value="payment_provider">POS / wallet / payment provider</option></select><input type="number" min="0" step=".01" value={openingBalance} onChange={e=>setOpeningBalance(e.target.value)} placeholder="Opening balance ₦" className="rounded-xl border p-3 text-sm"/><button disabled={saving} className="rounded-xl bg-[#245b42] px-4 py-3 text-xs font-bold text-white sm:col-span-4">Add account</button></form>}</section>
+ {role==="owner"&&<form onSubmit={createTransfer} className="mt-6 rounded-2xl border bg-white p-5"><h2 className="flex items-center gap-2 font-bold"><ArrowLeftRight size={17}/> Transfer between accounts</h2><p className="mt-1 text-xs text-[#829080]">Internal transfers change account balances but do not count as sales or expenses.</p><div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4"><select required value={fromAccount} onChange={e=>setFromAccount(e.target.value)} className="rounded-xl border p-3 text-sm"><option value="">From account</option>{accounts.map(a=><option key={a.id} value={a.id}>{a.name}</option>)}</select><select required value={toAccount} onChange={e=>setToAccount(e.target.value)} className="rounded-xl border p-3 text-sm"><option value="">To account</option>{accounts.map(a=><option key={a.id} value={a.id}>{a.name}</option>)}</select><input required type="number" min=".01" step=".01" value={transferAmount} onChange={e=>setTransferAmount(e.target.value)} placeholder="Amount ₦" className="rounded-xl border p-3 text-sm"/><input value={transferReference} onChange={e=>setTransferReference(e.target.value)} placeholder="Reference (optional)" className="rounded-xl border p-3 text-sm"/></div><button disabled={saving||accounts.length<2} className="mt-4 rounded-xl bg-[#245b42] px-5 py-3 text-xs font-bold text-white">Save transfer draft</button></form>}
+ {role!=="analyst"&&<form onSubmit={submit} className="mt-6 rounded-2xl border bg-white p-5"><h2 className="flex items-center gap-2 font-bold"><PlusCircle size={18}/>{editing?"Edit pending transaction":"Record business income or expense"}</h2><p className="mt-2 text-xs text-[#829080]">Every new entry is saved as a draft for Founder approval. Posted records cannot be edited or deleted.</p><div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3"><label className="text-xs font-semibold">Type<select value={type} onChange={e=>setType(e.target.value as "income"|"expense")} className="mt-1 w-full rounded-xl border p-3"><option value="income">Money received / income</option><option value="expense">Expense / money paid</option></select></label><label className="text-xs font-semibold">Category<input required value={category} onChange={e=>setCategory(e.target.value)} placeholder="e.g. Packaging, sales, utilities" className="mt-1 w-full rounded-xl border p-3"/></label><label className="text-xs font-semibold">Amount ₦<input required type="number" min=".01" step=".01" value={amount} onChange={e=>setAmount(e.target.value)} className="mt-1 w-full rounded-xl border p-3"/></label><label className="text-xs font-semibold sm:col-span-2">Description<input required value={description} onChange={e=>setDescription(e.target.value)} placeholder="What was this transaction for?" className="mt-1 w-full rounded-xl border p-3"/></label><label className="text-xs font-semibold">Date<input required type="date" value={date} onChange={e=>setDate(e.target.value)} className="mt-1 w-full rounded-xl border p-3"/></label><label className="text-xs font-semibold">Account<select value={accountId} onChange={e=>setAccountId(e.target.value)} className="mt-1 w-full rounded-xl border p-3"><option value="">No account selected</option>{accounts.map(a=><option key={a.id} value={a.id}>{a.name}</option>)}</select></label><label className="text-xs font-semibold sm:col-span-2">Reference<input value={reference} onChange={e=>setReference(e.target.value)} className="mt-1 w-full rounded-xl border p-3"/></label></div><div className="mt-4 flex gap-2"><button disabled={saving} className="inline-flex items-center gap-2 rounded-xl bg-[#245b42] px-5 py-3 text-xs font-bold text-white"><Save size={14}/>{saving?"Saving…":editing?"Save changes":"Save draft for approval"}</button>{editing&&<button type="button" onClick={reset} className="rounded-xl border px-4 py-3 text-xs font-bold">Cancel</button>}</div></form>}
+ <section className="mt-6 rounded-2xl border bg-white p-5"><h2 className="font-bold">Account transfers</h2><div className="mt-3 divide-y">{transfers.map(t=><div key={t.id} className="flex flex-wrap items-center justify-between gap-3 py-3"><div><p className="text-sm font-bold">{accounts.find(a=>a.id===t.from_account_id)?.name||"Account"} → {accounts.find(a=>a.id===t.to_account_id)?.name||"Account"}</p><p className="mt-1 text-xs text-[#829080]">{t.transfer_date} · {money(t.amount)} · {t.reference||"No reference"}</p></div><div className="flex items-center gap-2"><span className="rounded-full bg-[#eff3ec] px-3 py-1 text-[10px] font-bold capitalize">{t.status}</span>{role==="owner"&&t.status==="pending"&&<button disabled={saving} onClick={()=>void approveTransfer(t)} className="rounded-lg bg-[#edf5e9] px-3 py-2 text-xs font-bold">Approve</button>}</div></div>)}{!transfers.length&&<p className="py-4 text-sm text-[#829080]">No transfers recorded.</p>}</div></section>
+ <section className="mt-6 overflow-hidden rounded-2xl border bg-white"><div className="flex items-center gap-2 border-b p-5"><h2 className="font-bold">Financial transaction ledger</h2><span className="ml-auto text-xs text-[#8a9787]">{rows.length} entries</span></div>{rows.length?<div className="overflow-x-auto"><table className="w-full min-w-[950px] text-left text-xs"><thead className="bg-[#f7f9f5] text-[#71806f]"><tr><th className="p-4">Date</th><th className="p-4">Type</th><th className="p-4">Category / description</th><th className="p-4">Account</th><th className="p-4">Reference</th><th className="p-4 text-right">Amount</th><th className="p-4">Status</th><th className="p-4">Actions</th></tr></thead><tbody>{rows.map(row=>{const hasReversal=rows.some(x=>x.reversal_of_id===row.id);const label=row.reversal_of_id?"Reversal":hasReversal?"Reversed":row.status==="pending"?"Pending approval":row.status==="void"?"Void":"Posted";return <tr key={row.id} className="border-t border-[#edf0eb]"><td className="p-4">{row.transaction_date}</td><td className="p-4 capitalize">{row.transaction_type}</td><td className="p-4"><b>{row.category}</b><p className="mt-1 text-[#899487]">{row.description}</p></td><td className="p-4">{accounts.find(a=>a.id===row.account_id)?.name||"—"}</td><td className="p-4">{row.reference||"—"}</td><td className="p-4 text-right font-bold">{money(Number(row.amount))}</td><td className="p-4"><span className="rounded-full bg-[#f1f5ee] px-2.5 py-1 text-[10px] font-bold">{label}</span></td><td className="p-4"><div className="flex gap-2">{row.status==="pending"&&role!=="analyst"&&<button disabled={saving} onClick={()=>editPending(row)} className="rounded-lg bg-[#eef3eb] p-2" title="Edit pending entry"><Pencil size={14}/></button>}{row.status==="pending"&&role==="owner"&&<button disabled={saving} onClick={()=>void approve(row)} className="rounded-lg bg-[#edf5e9] p-2" title="Approve"><CheckCircle2 size={14}/></button>}{row.status==="posted"&&!row.reversal_of_id&&role==="owner"&&<button disabled={saving||hasReversal} onClick={()=>void reverse(row)} className="rounded-lg bg-[#f1effa] p-2" title="Create reversal"><RotateCcw size={14}/></button>}</div></td></tr>})}</tbody></table></div>:<p className="p-8 text-center text-sm text-[#899487]">No financial transactions recorded.</p>}</section>
+ <p className="mt-4 flex items-start gap-2 text-xs leading-5 text-[#7b887a]"><ShieldCheck size={15} className="mt-0.5 shrink-0"/> The Founder approves official entries. Posted transactions and transfers are retained; corrections use linked reversals or correcting transfers.</p>
+ </div></main>
 }
