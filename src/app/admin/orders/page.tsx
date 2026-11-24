@@ -74,20 +74,6 @@ export default function AdminOrdersPage(){
   setSaving(order.id);const {error:e}=await supabase.from("orders").update({customer_name:customer_name.trim(),phone:phone.trim(),email:email.trim()||null,order_notes:order_notes.trim()||null,updated_at:new Date().toISOString()}).eq("id",order.id);
   if(e)setError(e.message);else await load();setSaving("");
  }
- async function deleteOrder(order:Order){
-  if(!supabase||role!=="owner")return;
-  const confirmed=window.confirm("Erase test/order #"+order.order_number+"? Orders that are not paid or refunded and are not completed or dispatched can be erased, including pending bank-transfer test orders. Reserved stock and coupon usage will be restored. Orders with reviews or affiliate commission records are protected.");
-  if(!confirmed)return;
-  setSaving(order.id);setError("");setNotice("");
-  const {data,error:deleteError}=await supabase.rpc("admin_delete_customer_order",{p_order_id:order.id});
-  if(deleteError)setError(deleteError.message);
-  else{
-   const result=data as {order_number?:number;stock_restored?:boolean;coupon_usage_reversed?:boolean}|null;
-   setNotice("Order #"+(result?.order_number??order.order_number)+" was erased."+(result?.stock_restored?" Reserved stock was restored and recorded.":"")+(result?.coupon_usage_reversed?" Coupon usage was restored.":""));
-   await load();
-  }
-  setSaving("");
- }
  const filtered=useMemo(()=>orders.filter(o=>{
   const term=search.trim().toLowerCase();
   const matches=!term||String(o.order_number).includes(term)||o.customer_name.toLowerCase().includes(term)||o.phone.toLowerCase().includes(term)||(o.email||"").toLowerCase().includes(term);
