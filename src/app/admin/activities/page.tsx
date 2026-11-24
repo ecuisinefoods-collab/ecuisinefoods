@@ -223,7 +223,46 @@ export default function StaffActivitiesPage() {
     if (updateError) setError(updateError.message);
     else { const task = tasks.find(item => item.id === request.task_id); if (approved && task) await supabase.from("staff_tasks").update({ due_at: request.requested_due_at, updated_at: new Date().toISOString() }).eq("id", task.id); if (task?.assigned_to_user_id) await notifyUser(task.assigned_to_user_id, approved ? "Deadline extension approved" : "Deadline extension declined", "Your request for " + task.title + " was " + (approved ? "approved." : "declined."), "task", task.id); setNotice("Deadline request reviewed."); await load(); }
   }
-  async function saveMeeting(meeting: Meeting) {\n    if (!supabase || !isOwner) return;\n    const draft = meetingDrafts[meeting.id]; if (!draft) return;\n    setSaving(true); setError(""); setNotice("");\n    const startsAt = new Date(draft.starts_at).toISOString();\n    const { error: updateError } = await supabase.from("staff_meetings").update({\n      starts_at: startsAt, meeting_url: draft.meeting_url.trim() || null, status: draft.status, agenda: draft.agenda.trim(),\n      discussion_notes: draft.discussion_notes.trim() || null, decisions: draft.decisions.trim() || null, action_points: draft.action_points.trim() || null, updated_at: new Date().toISOString(),\n    }).eq("id", meeting.id);\n    if (updateError) setError(updateError.message);\n    else {\n      const changes: string[] = [];\n      if (startsAt !== meeting.starts_at) changes.push("rescheduled");\n      if ((draft.meeting_url.trim() || null) !== meeting.meeting_url) changes.push("meeting link changed");\n      if (draft.status === "cancelled" && meeting.status !== "cancelled") changes.push("cancelled");\n      if (changes.length) {\n        let recipients = staff.map(member => member.user_id);\n        if (meeting.visibility === "invited") {\n          const { data } = await supabase.from("staff_meeting_participants").select("user_id").eq("meeting_id", meeting.id);\n          recipients = (data || []).map((row: {user_id:string}) => row.user_id);\n        }\n        await Promise.all(recipients.filter(id => id !== profile?.user_id).map(id => notifyUser(id, "Meeting update: " + meeting.title, "This meeting has been " + changes.join(" and ") + ". Please check the updated details in Staff Activities.", "meeting_update", meeting.id)));\n      }\n      setNotice("Meeting details and records updated." + (changes.length ? " Dashboard notifications were created for affected participants." : ""));\n      setMeetingDrafts(old => { const next = { ...old }; delete next[meeting.id]; return next; });\n      await load();\n    }\n    setSaving(false);\n  }\n\n  async function markAttendance(meetingId: string, value: string) {
+  async function saveMeeting(meeting: Meeting) {
+    if (!supabase || !isOwner) return;
+    const draft = meetingDrafts[meeting.id];
+    if (!draft) return;
+    setSaving(true); setError(""); setNotice("");
+    const startsAt = new Date(draft.starts_at).toISOString();
+    const { error: updateError } = await supabase.from("staff_meetings").update({
+      starts_at: startsAt,
+      meeting_url: draft.meeting_url.trim() || null,
+      status: draft.status,
+      agenda: draft.agenda.trim(),
+      discussion_notes: draft.discussion_notes.trim() || null,
+      decisions: draft.decisions.trim() || null,
+      action_points: draft.action_points.trim() || null,
+      updated_at: new Date().toISOString(),
+    }).eq("id", meeting.id);
+    if (updateError) setError(updateError.message);
+    else {
+      const changes: string[] = [];
+      if (startsAt !== meeting.starts_at) changes.push("rescheduled");
+      if ((draft.meeting_url.trim() || null) !== meeting.meeting_url) changes.push("meeting link changed");
+      if (draft.status === "cancelled" && meeting.status !== "cancelled") changes.push("cancelled");
+      if (changes.length) {
+        let recipients = staff.map(member => member.user_id);
+        if (meeting.visibility === "invited") {
+          const { data } = await supabase.from("staff_meeting_participants").select("user_id").eq("meeting_id", meeting.id);
+          recipients = (data || []).map((row: { user_id: string }) => row.user_id);
+        }
+        await Promise.all(recipients.filter(id => id !== profile?.user_id).map(id =>
+          notifyUser(id, "Meeting update: " + meeting.title, "This meeting has been " + changes.join(" and ") + ". Please check the updated details in Staff Activities.", "meeting_update", meeting.id)
+        ));
+      }
+      setNotice("Meeting details and records updated." + (changes.length ? " Dashboard notifications were created for affected participants." : ""));
+      setMeetingDrafts(old => { const next = { ...old }; delete next[meeting.id]; return next; });
+      await load();
+    }
+    setSaving(false);
+  }
+
+  async function markAttendance(meetingId: string, value: string) {
     if (!supabase) return;
     const { error: updateError } = await supabase.from("staff_meeting_participants").update({ attendance: value }).eq("meeting_id", meetingId).eq("user_id", profile?.user_id);
     if (updateError) setError(updateError.message); else { setAttendance(old => ({ ...old, [meetingId]: value })); setNotice("Attendance updated."); }
