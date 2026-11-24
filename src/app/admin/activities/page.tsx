@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useState, type ComponentType } from "react";
 import Link from "next/link";
 import {
   ArrowLeft, Bell, CalendarDays, Check, CheckCircle2, CircleAlert, Clock3,
@@ -240,7 +240,7 @@ export default function StaffActivitiesPage() {
   if (loading) return <main className="grid min-h-[70vh] place-items-center bg-[#f5f7f3] text-sm font-semibold text-[#42694b]">Loading staff workspace…</main>;
   if (!profile) return <main className="min-h-[70vh] bg-[#f5f7f3] p-8"><section className="mx-auto max-w-xl rounded-3xl bg-white p-7"><h1 className="text-xl font-bold text-[#203b2a]">Staff workspace access</h1><p className="mt-3 text-sm text-red-700">{error}</p><Link href="/admin" className="mt-5 inline-flex text-sm font-bold text-[#315b43]">Return to admin</Link></section></main>;
 
-  const tabs: { id: Tab; label: string; icon: typeof CalendarDays }[] = [
+  const tabs: { id: Tab; label: string; icon: ComponentType<{ size?: number }> }[] = [
     { id: "overview", label: "My dashboard", icon: Bell }, { id: "meetings", label: "Meetings", icon: CalendarDays },
     { id: "tasks", label: "Tasks", icon: CheckCircle2 }, { id: "announcements", label: "Announcements", icon: MegaphoneIcon },
   ];
