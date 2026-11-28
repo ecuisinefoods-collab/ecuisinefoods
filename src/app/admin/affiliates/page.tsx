@@ -72,7 +72,7 @@ export default function AffiliateApplicationsPage() {
           <p className="mt-2 max-w-2xl text-sm leading-6 text-[#758276]">Review reseller and commission-based affiliate applications. Membership activation is a separate controlled step.</p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Link href="/admin/affiliate-sales" className="inline-flex items-center gap-2 rounded-xl border border-[#d9e0db] bg-white px-4 py-3 text-xs font-bold text-[#344c3c]">Sales verification</Link><Link href="/admin/partners" className="inline-flex items-center gap-2 rounded-xl border border-[#d9e0db] bg-white px-4 py-3 text-xs font-bold text-[#344c3c]">Legacy records (read-only transition)</Link>
+          <Link href="/admin/affiliate-activation" className="inline-flex items-center gap-2 rounded-xl border border-[#d9e0db] bg-white px-4 py-3 text-xs font-bold text-[#344c3c]">Activate affiliates</Link><Link href="/admin/affiliate-sales" className="inline-flex items-center gap-2 rounded-xl border border-[#d9e0db] bg-white px-4 py-3 text-xs font-bold text-[#344c3c]">Sales verification</Link><Link href="/admin/partners" className="inline-flex items-center gap-2 rounded-xl border border-[#d9e0db] bg-white px-4 py-3 text-xs font-bold text-[#344c3c]">Legacy records (read-only transition)</Link>
           <button type="button" onClick={()=>{setLoading(true);void load();}} className="inline-flex items-center gap-2 rounded-xl border border-[#d9e0db] bg-white px-4 py-3 text-xs font-bold text-[#344c3c]"><RefreshCw size={14}/> Refresh</button>
         </div>
       </div>
