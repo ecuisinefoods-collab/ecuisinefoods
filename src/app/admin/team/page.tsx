@@ -21,7 +21,7 @@ const roles = [
   { value: "order_officer", label: "Order officer", description: "Customer orders and fulfilment progress." },
   { value: "finance_officer", label: "Finance officer", description: "Finance records and financial entries." },
   { value: "marketing_manager", label: "Marketing manager", description: "Promotional banners and campaigns." },
-  { value: "affiliate_manager", label: "Affiliate manager", description: "View every affiliate’s referrals, attributed sales, conversions and commission performance." },
+  { value: "affiliate_manager", label: "Affiliate manager", description: "Lead the affiliate community, track verified physical sales, coordinate reactivation and submit monthly performance reports." },
   { value: "analyst", label: "Analyst", description: "Read-only access to permitted reports." },
 ];
 const formatDate = (value: string) => new Intl.DateTimeFormat("en-NG", { dateStyle: "medium" }).format(new Date(value));
