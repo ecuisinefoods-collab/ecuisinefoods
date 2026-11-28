@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { ArrowLeft, ClipboardList, LoaderCircle, RefreshCw, ShieldCheck, Target, TrendingUp, Users } from "lucide-react";
 import { supabase } from "@/lib/supabase";
@@ -16,7 +16,7 @@ type Followup = {member_id:string;contact_status:string;followup_note:string|nul
 type Scorecard = {id:string;period_month:string;verified_group_sales_amount:number;affiliates_with_verified_sales:number;target_achievers:number;inactive_affiliates_contacted:number;reactivated_affiliates:number;new_recruits:number;recruits_reaching_first_target:number;manager_notes:string|null;created_at:string};
 const monthStart=()=>new Intl.DateTimeFormat("en-CA",{timeZone:"Africa/Lagos",year:"numeric",month:"2-digit"}).format(new Date())+"-01";
 const money=(n:number)=>new Intl.NumberFormat("en-NG",{style:"currency",currency:"NGN",maximumFractionDigits:0}).format(n);
-const label=(v:string)=>v.replaceAll("_"," ").replace(/\\b\\w/g,c=>c.toUpperCase());
+const label=(v:string)=>v.replaceAll("_"," ").replace(/\b\w/g,c=>c.toUpperCase());
 const statuses=["not_contacted","contacted","interested","onboarding","not_interested","closed"];
 
 export default function AffiliateManagerDashboard(){
@@ -56,7 +56,7 @@ export default function AffiliateManagerDashboard(){
   if(e)setError(e.message);else setNotice("Follow-up record saved for "+row.affiliate_code+".");
   setBusy(""); 
  }
- async function submitScorecard(e:React.FormEvent<HTMLFormElement>){
+ async function submitScorecard(e:FormEvent<HTMLFormElement>){
   e.preventDefault();if(!supabase)return;setBusy("scorecard");setError("");setNotice("");
   const {error:e1}=await supabase.rpc("affiliate_program_save_manager_scorecard",{p_period_month:month,p_inactive_affiliates_contacted:Number(report.contacted),p_reactivated_affiliates:Number(report.reactivated),p_new_recruits:Number(report.recruits),p_recruits_reaching_first_target:Number(report.firstTarget),p_manager_notes:report.notes.trim()||null});
   if(e1)setError(e1.message);else{setNotice("Monthly scorecard saved. Verified sales and target-achievement figures were calculated from approved records.");await load();}
