@@ -15,11 +15,11 @@ from pg_policies
 where schemaname='public' and tablename='affiliate_applications';
 
 create table if not exists private.affiliate_applications_grants_backup_20261128 as
-select now() as captured_at, grantee, privilege_type, table_name
+select now() as captured_at, grantee, privilege_type, table_name, null::text as column_name, 'table'::text as grant_scope
 from information_schema.role_table_grants
 where table_schema='public' and table_name='affiliate_applications'
 union all
-select now() as captured_at, grantee, privilege_type, table_name
+select now() as captured_at, grantee, privilege_type, table_name, column_name, 'column'::text as grant_scope
 from information_schema.role_column_grants
 where table_schema='public' and table_name='affiliate_applications';
 
