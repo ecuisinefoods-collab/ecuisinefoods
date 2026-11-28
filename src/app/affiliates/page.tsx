@@ -28,7 +28,7 @@ export default function AffiliatesPage() {
               <p className="mt-2 text-xs leading-6 text-[#c5d4c7]">Work with authorised stock sources, serve customers and earn through the difference between your approved stock acquisition price and selling price.</p>
             </article>
             <article className="rounded-3xl border border-white/10 bg-white/[.06] p-5 backdrop-blur sm:translate-y-8">
-              <span className="grid h-11 w-11 place-items-center rounded-2xl bg-[#e7c96e]/15 text-[#f0d98c]"><ChartNoAxesCombined size={20}/></span>
+              <span className="grid h-11 w-11 place-items-center rounded-2xl bg-[#e7c96e]/15 text-[#f0d98c]"><TrendingUp size={20}/></span>
               <h2 className="mt-4 text-base font-extrabold text-white">Commission model</h2>
               <p className="mt-2 text-xs leading-6 text-[#c5d4c7]">Generate customer sales and earn commission on eligible sales after payment and management verification, under agreed programme terms.</p>
             </article>
