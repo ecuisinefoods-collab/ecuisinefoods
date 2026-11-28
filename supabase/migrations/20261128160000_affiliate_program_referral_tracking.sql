@@ -111,17 +111,29 @@ set search_path = pg_catalog, public
 as $$
 declare
   v_customer_key text;
+  v_phone_digits text;
   v_attribution public.affiliate_program_customer_attributions%rowtype;
   v_click public.affiliate_program_referral_clicks%rowtype;
 begin
   if p_order_number is null or nullif(trim(p_tracking_code),'') is null then return false; end if;
-  if length(regexp_replace(coalesce(p_customer_phone,''),'[^0-9]','','g')) >= 7 then
-    v_customer_key := md5('phone:' || regexp_replace(p_customer_phone,'[^0-9]','','g'));
+  v_phone_digits := regexp_replace(coalesce(p_customer_phone,''),'[^0-9]','','g');
+  if length(v_phone_digits) >= 7 then
+    v_customer_key := md5('phone:' || v_phone_digits);
   elsif nullif(trim(p_customer_email),'') is not null then
     v_customer_key := md5('email:' || lower(trim(p_customer_email)));
   else
     return false;
   end if;
+
+  -- Never allow a public caller to attach an arbitrary or another customer's order.
+  if not exists (
+    select 1 from public.orders o
+    where o.order_number=p_order_number and o.tracking_code=trim(p_tracking_code)
+      and (
+        (length(v_phone_digits)>=7 and regexp_replace(coalesce(o.phone,''),'[^0-9]','','g')=v_phone_digits)
+        or (nullif(trim(p_customer_email),'') is not null and lower(coalesce(o.email,''))=lower(trim(p_customer_email)))
+      )
+  ) then return false; end if;
 
   -- Serialize attribution decisions for the same customer to prevent concurrent orders creating competing referrals.
   perform pg_advisory_xact_lock(hashtext(v_customer_key));
