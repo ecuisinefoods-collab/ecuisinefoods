@@ -18,6 +18,9 @@ type Application = {
   created_at: string;
   reviewed_at: string | null;
   review_note: string | null;
+  responsibilities_accepted: boolean;
+  responsibilities_version: string | null;
+  responsibilities_accepted_at: string | null;
 };
 
 const statuses: ApplicationStatus[] = ["submitted","under_review","approved","rejected","withdrawn"];
@@ -90,7 +93,8 @@ export default function AffiliateApplicationsPage() {
           </div>
           <div className="flex min-w-[180px] flex-col items-start gap-2 sm:items-end"><span className="text-[10px] font-semibold text-[#8a9787]">Applied {new Date(item.created_at).toLocaleString("en-NG",{dateStyle:"medium",timeStyle:"short"})}</span><select aria-label={`Update status for ${item.full_name}`} value={item.status} disabled={saving===item.id} onChange={e=>void updateStatus(item,e.target.value as ApplicationStatus)} className="rounded-xl border border-[#dce5dc] bg-white px-3 py-2.5 text-xs font-bold text-[#34513e]">{statuses.map(status=><option key={status} value={status}>{label(status)}</option>)}</select></div>
         </div>
-        {item.experience_note?<p className="mt-4 rounded-xl border border-[#e7ece5] bg-[#f8faf7] p-4 text-sm leading-6 text-[#52695a]">{item.experience_note}</p>:null}\n        <div className="mt-4 flex flex-wrap items-center gap-2 rounded-xl border border-[#e7ece5] bg-[#f8faf7] px-4 py-3 text-xs"><span className="font-bold text-[#405648]">Responsibilities commitment:</span><span className={item.responsibilities_accepted?"font-bold text-[#286342]":"font-bold text-[#9b7835]"}>{item.responsibilities_accepted?"Accepted":"Not recorded"}</span>{item.responsibilities_version&&<span className="text-[#879487]">Version {item.responsibilities_version}</span>}{item.responsibilities_accepted_at&&<span className="text-[#879487]">· {new Date(item.responsibilities_accepted_at).toLocaleString("en-NG",{dateStyle:"medium",timeStyle:"short"})}</span>}</div>
+        {item.experience_note?<p className="mt-4 rounded-xl border border-[#e7ece5] bg-[#f8faf7] p-4 text-sm leading-6 text-[#52695a]">{item.experience_note}</p>:null}
+        <div className="mt-4 flex flex-wrap items-center gap-2 rounded-xl border border-[#e7ece5] bg-[#f8faf7] px-4 py-3 text-xs"><span className="font-bold text-[#405648]">Responsibilities commitment:</span><span className={item.responsibilities_accepted?"font-bold text-[#286342]":"font-bold text-[#9b7835]"}>{item.responsibilities_accepted?"Accepted":"Not recorded"}</span>{item.responsibilities_version&&<span className="text-[#879487]">Version {item.responsibilities_version}</span>}{item.responsibilities_accepted_at&&<span className="text-[#879487]">· {new Date(item.responsibilities_accepted_at).toLocaleString("en-NG",{dateStyle:"medium",timeStyle:"short"})}</span>}</div>
       </article>)}</div>:null}
       <p className="mt-7 flex items-center gap-2 text-[10px] leading-5 text-[#93a092]"><ShieldCheck size={13}/> Application review is owner-only. Bank details are not collected or displayed on this page.</p>
       <span className="sr-only">Signed in role: {role}</span>
