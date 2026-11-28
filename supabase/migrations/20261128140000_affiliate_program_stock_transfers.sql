@@ -34,12 +34,15 @@ begin
   if not exists (select 1 from public.affiliate_program_members where id = p_member_id and status in ('active','onboarding')) then
     raise exception 'Choose an active or onboarding affiliate.';
   end if;
-  if p_source_type not in ('company','stockist','affiliate') then raise exception 'Invalid stock source.'; end if;
+  if p_source_type is null or p_source_type not in ('company','stockist','affiliate') then raise exception 'Invalid stock source.'; end if;
   if p_source_type <> 'company' and nullif(trim(p_source_name),'') is null then
     raise exception 'Enter the stockist or affiliate source name.';
   end if;
-  if p_payment_status not in ('pending','paid','not_required') then raise exception 'Invalid stock payment status.'; end if;
-  if p_items is null or jsonb_typeof(p_items) <> 'array' or jsonb_array_length(p_items) < 1 or jsonb_array_length(p_items) > 20 then
+  if p_payment_status is null or p_payment_status not in ('pending','paid','not_required') then raise exception 'Invalid stock payment status.'; end if;
+  if p_items is null or jsonb_typeof(p_items) is distinct from 'array' then
+    raise exception 'Stock items must be supplied as a list.';
+  end if;
+  if jsonb_array_length(p_items) < 1 or jsonb_array_length(p_items) > 20 then
     raise exception 'Add between 1 and 20 stock transfer items.';
   end if;
 
