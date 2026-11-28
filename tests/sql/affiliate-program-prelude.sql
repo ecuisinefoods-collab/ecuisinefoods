@@ -68,7 +68,7 @@ grant select,insert on storage.objects to authenticated;
 -- Minimal storefront order shape used by affiliate attribution validation.
 create table public.orders (
   order_number bigint primary key,
-  tracking_code text not null unique,
+  tracking_token_hash text not null unique,
   phone text not null,
   email text
 );
