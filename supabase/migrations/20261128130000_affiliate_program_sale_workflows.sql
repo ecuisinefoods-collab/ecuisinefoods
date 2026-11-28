@@ -89,6 +89,9 @@ begin
   select * into v_member from public.affiliate_program_members where id = v_sale.member_id for update;
 
   if p_decision = 'approved' then
+    if v_member.affiliate_model = 'commission' then
+      raise exception 'Commission settlement rules are not yet configured. Management must confirm the remittance process before approving commission sales.';
+    end if;
     if v_sale.payment_status <> 'paid' then raise exception 'Only fully paid sales can be approved.'; end if;
     if v_member.affiliate_model = 'reseller' then
       for v_item in
