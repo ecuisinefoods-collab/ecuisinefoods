@@ -43,6 +43,7 @@ const groups: NavGroup[] = [
     { label: "Affiliate programme", href: "/admin/affiliates", icon: Users, roles: ["owner", "store_manager", "marketing_manager"] },
     { label: "Affiliate Sales & Growth", href: "/admin/affiliate-manager", icon: ClipboardList, roles: ["owner", "affiliate_manager"] },
     { label: "Affiliate targets & rewards", href: "/admin/affiliate-performance", icon: Trophy, roles: ["owner"] },
+    { label: "Affiliate payout details", href: "/admin/affiliate-payouts", icon: Wallet, roles: ["owner"] },
     { label: "Legacy partner records", href: "/admin/partners", icon: ClipboardList, roles: ["owner"] },
   ]},
   { label: "Procurement & Supply", icon: Truck, items: [
