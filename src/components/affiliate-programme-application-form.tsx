@@ -105,7 +105,7 @@ export function AffiliateProgrammeApplicationForm() {
       </div>
       <label className="mt-6 flex cursor-pointer items-start gap-3 rounded-xl border border-[#dce5db] bg-white p-4">
         <input required type="checkbox" checked={accepted} onChange={e=>setAccepted(e.target.checked)} className="mt-0.5 h-4 w-4 shrink-0 accent-[#0b6849]"/>
-        <span className="text-xs font-semibold leading-6 text-[#405648]">I confirm that I have read, understood and agree to fulfil these affiliate responsibilities, follow programme instructions and uphold eCuisinefoods' brand standards. I understand that repeated failure to participate may lead to reminders, follow-up, a formal warning and eventual inactivation after a fair review.</span>
+        <span className="text-xs font-semibold leading-6 text-[#405648]">I confirm that I have read, understood and agree to fulfil these affiliate responsibilities, follow programme instructions and uphold eCuisinefoods&apos; brand standards. I understand that repeated failure to participate may lead to reminders, follow-up, a formal warning and eventual inactivation after a fair review.</span>
       </label>
       <p className="mt-3 text-[10px] leading-5 text-[#8c998d]">Acceptance is recorded with the version and date of this commitment. You will also be able to review these responsibilities from your affiliate dashboard.</p>
     </section>
