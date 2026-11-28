@@ -13,7 +13,9 @@ type RosterRow = {
   sales_target_progress:number|null; units_target_progress:number|null;
 };
 type Followup = {member_id:string;contact_status:string;followup_note:string|null;contacted_at:string|null;next_followup_at:string|null};
-type Scorecard = {id:string;period_month:string;verified_group_sales_amount:number;affiliates_with_verified_sales:number;target_achievers:number;inactive_affiliates_contacted:number;reactivated_affiliates:number;new_recruits:number;recruits_reaching_first_target:number;manager_notes:string|null;created_at:string};\ntype Participation = {id:string;member_id:string;activity_type:string;activity_date:string;participation_status:string;manager_note:string|null;created_at:string};\ntype ComplianceAction = {id:string;member_id:string;action_type:string;action_note:string;created_at:string};
+type Scorecard = {id:string;period_month:string;verified_group_sales_amount:number;affiliates_with_verified_sales:number;target_achievers:number;inactive_affiliates_contacted:number;reactivated_affiliates:number;new_recruits:number;recruits_reaching_first_target:number;manager_notes:string|null;created_at:string};
+type Participation = {id:string;member_id:string;activity_type:string;activity_date:string;participation_status:string;manager_note:string|null;created_at:string};
+type ComplianceAction = {id:string;member_id:string;action_type:string;action_note:string;created_at:string};
 const monthStart=()=>new Intl.DateTimeFormat("en-CA",{timeZone:"Africa/Lagos",year:"numeric",month:"2-digit"}).format(new Date())+"-01";
 const money=(n:number)=>new Intl.NumberFormat("en-NG",{style:"currency",currency:"NGN",maximumFractionDigits:0}).format(n);
 const label=(v:string)=>v.replaceAll("_"," ").replace(/\b\w/g,c=>c.toUpperCase());
@@ -21,7 +23,9 @@ const statuses=["not_contacted","contacted","interested","onboarding","not_inter
 
 export default function AffiliateManagerDashboard(){
  const [rows,setRows]=useState<RosterRow[]>([]);const [followups,setFollowups]=useState<Record<string,Followup>>({});
- const [scorecards,setScorecards]=useState<Scorecard[]>([]);const [participation,setParticipation]=useState<Participation[]>([]);const [complianceActions,setComplianceActions]=useState<ComplianceAction[]>([]);const [adminRole,setAdminRole]=useState("");const [month,setMonth]=useState(monthStart());\n const [complianceForm,setComplianceForm]=useState({member_id:"",action_type:"reminder",action_note:""});\n const [activityForm,setActivityForm]=useState({member_id:"",activity_type:"social_media_engagement",activity_date:new Date().toLocaleDateString("en-CA",{timeZone:"Africa/Lagos"}),participation_status:"completed",manager_note:""});
+ const [scorecards,setScorecards]=useState<Scorecard[]>([]);const [participation,setParticipation]=useState<Participation[]>([]);const [complianceActions,setComplianceActions]=useState<ComplianceAction[]>([]);const [adminRole,setAdminRole]=useState("");const [month,setMonth]=useState(monthStart());
+ const [complianceForm,setComplianceForm]=useState({member_id:"",action_type:"reminder",action_note:""});
+ const [activityForm,setActivityForm]=useState({member_id:"",activity_type:"social_media_engagement",activity_date:new Date().toLocaleDateString("en-CA",{timeZone:"Africa/Lagos"}),participation_status:"completed",manager_note:""});
  const [filter,setFilter]=useState("all");const [search,setSearch]=useState("");
  const [loading,setLoading]=useState(true);const [busy,setBusy]=useState("");const [error,setError]=useState("");const [notice,setNotice]=useState("");
  const [report,setReport]=useState({contacted:"0",reactivated:"0",recruits:"0",firstTarget:"0",notes:""});
@@ -30,7 +34,8 @@ export default function AffiliateManagerDashboard(){
   const {data:{session}}=await supabase.auth.getSession();
   if(!session){setError("Please sign in through the admin dashboard.");setLoading(false);return;}
   const {data:admin,error:adminError}=await supabase.from("admin_profiles").select("role,is_active").eq("user_id",session.user.id).maybeSingle();
-  if(adminError||!admin?.is_active||!["owner","affiliate_manager"].includes(admin.role)){setError("This workspace is restricted to the owner and assigned Affiliate Sales & Growth Manager.");setLoading(false);return;}\n  setAdminRole(admin.role);
+  if(adminError||!admin?.is_active||!["owner","affiliate_manager"].includes(admin.role)){setError("This workspace is restricted to the owner and assigned Affiliate Sales & Growth Manager.");setLoading(false);return;}
+  setAdminRole(admin.role);
   const [roster,notes,cards,activityRows,actionRows]=await Promise.all([
    supabase.rpc("get_affiliate_program_manager_roster",{p_period_month:month}),
    supabase.from("affiliate_program_manager_followups").select("member_id,contact_status,followup_note,contacted_at,next_followup_at"),
@@ -39,7 +44,11 @@ export default function AffiliateManagerDashboard(){
   if(roster.error||notes.error||cards.error||activityRows.error||actionRows.error){setError("Manager information could not be loaded. Confirm the affiliate programme database migrations have been installed.");setLoading(false);return;}
   setRows((roster.data||[]) as RosterRow[]);
   setFollowups(Object.fromEntries(((notes.data||[]) as Followup[]).map(n=>[n.member_id,n])));
-  setScorecards((cards.data||[]) as Scorecard[]);\n  setParticipation((activityRows.data||[]) as Participation[]);\n  setComplianceActions((actionRows.data||[]) as ComplianceAction[]);\n  if(!complianceForm.member_id&&((roster.data||[]) as RosterRow[]).length)setComplianceForm(v=>({...v,member_id:((roster.data||[]) as RosterRow[])[0].member_id}));\n  if(!activityForm.member_id&&((roster.data||[]) as RosterRow[]).length)setActivityForm(v=>({...v,member_id:((roster.data||[]) as RosterRow[])[0].member_id}));
+  setScorecards((cards.data||[]) as Scorecard[]);
+  setParticipation((activityRows.data||[]) as Participation[]);
+  setComplianceActions((actionRows.data||[]) as ComplianceAction[]);
+  if(!complianceForm.member_id&&((roster.data||[]) as RosterRow[]).length)setComplianceForm(v=>({...v,member_id:((roster.data||[]) as RosterRow[])[0].member_id}));
+  if(!activityForm.member_id&&((roster.data||[]) as RosterRow[]).length)setActivityForm(v=>({...v,member_id:((roster.data||[]) as RosterRow[])[0].member_id}));
   setLoading(false);setError("");
  },[month]);
  useEffect(()=>{void load();},[load]);
@@ -73,18 +82,18 @@ export default function AffiliateManagerDashboard(){
  async function recordComplianceAction(e:FormEvent<HTMLFormElement>){
   e.preventDefault();if(!supabase)return;
   if(!complianceForm.member_id||complianceForm.action_note.trim().length<3){setError("Choose an affiliate and enter a clear note.");return;}
-  setBusy("compliance");setError("");setNotice("");
+  setBusy("compliance");setError("");setNotice("");let succeeded=false;
   if(complianceForm.action_type==="inactivate"){
    if(adminRole!=="owner"){setError("Only the owner can inactivate an affiliate.");setBusy("");return;}
    const {error:e1}=await supabase.rpc("affiliate_program_owner_set_member_status",{p_member_id:complianceForm.member_id,p_status:"inactive",p_reason:complianceForm.action_note.trim()});
-   if(e1)setError(e1.message);else setNotice("Affiliate access has been set to inactive and the decision recorded.");
+   if(e1)setError(e1.message);else{setNotice("Affiliate access has been set to inactive and the decision recorded.");succeeded=true;}
   } else {
    const {data:{session}}=await supabase.auth.getSession();
    if(!session){setError("Please sign in again.");setBusy("");return;}
    const {error:e1}=await supabase.from("affiliate_program_compliance_actions").insert({member_id:complianceForm.member_id,action_type:complianceForm.action_type,action_note:complianceForm.action_note.trim(),created_by:session.user.id});
-   if(e1)setError(e1.message);else setNotice("Compliance action recorded.");
+   if(e1)setError(e1.message);else{setNotice("Compliance action recorded.");succeeded=true;}
   }
-  if(!error){setComplianceForm(v=>({...v,action_note:""}));await load();}
+  if(succeeded){setComplianceForm(v=>({...v,action_note:""}));await load();}
   setBusy("");
  }
  async function submitScorecard(e:FormEvent<HTMLFormElement>){
