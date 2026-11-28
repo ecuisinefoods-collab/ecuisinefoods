@@ -43,3 +43,24 @@ create table public.product_variants (
 );
 grant usage on schema auth,private to anon,authenticated;
 grant usage on schema public to anon,authenticated;
+
+-- Minimal private Supabase Storage surface for migration validation.
+create schema storage;
+create table storage.buckets (
+  id text primary key,
+  name text not null,
+  public boolean not null default false,
+  file_size_limit bigint,
+  allowed_mime_types text[]
+);
+create table storage.objects (
+  id uuid primary key default gen_random_uuid(),
+  bucket_id text not null references storage.buckets(id),
+  name text not null
+);
+alter table storage.objects enable row level security;
+create or replace function storage.foldername(object_name text)
+returns text[] language sql immutable
+as $$ select string_to_array(object_name, '/') $$;
+grant usage on schema storage to anon,authenticated;
+grant select,insert on storage.objects to authenticated;
