@@ -72,3 +72,39 @@ create table public.orders (
   phone text not null,
   email text
 );
+
+-- Minimal legacy affiliate application table and the broad legacy policies being retired.
+create table public.affiliate_applications (
+  id uuid primary key default gen_random_uuid(),
+  full_name text not null,
+  email text not null,
+  phone text,
+  social_handle text,
+  primary_platform text not null,
+  audience_size text not null,
+  promotion_channels text,
+  motivation text not null,
+  status text not null default 'new',
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  skills text,
+  availability text,
+  preferred_activities text[] not null default '{}',
+  deadline_commitment boolean not null default false,
+  audience_description text,
+  bank_name text,
+  bank_account_name text,
+  bank_account_number text
+);
+alter table public.affiliate_applications enable row level security;
+grant select,insert,update on public.affiliate_applications to authenticated;
+grant insert on public.affiliate_applications to anon;
+create policy "Affiliate admins may read applications" on public.affiliate_applications
+  for select to authenticated using (private.has_admin_role(array['owner','store_manager','marketing_manager']));
+create policy "Affiliate admins may update application status" on public.affiliate_applications
+  for update to authenticated using (private.has_admin_role(array['owner','store_manager','marketing_manager']))
+  with check (private.has_admin_role(array['owner','store_manager','marketing_manager']));
+create policy "Affiliate finance may read payout bank details" on public.affiliate_applications
+  for select to authenticated using (private.has_admin_role(array['owner','finance_officer']));
+create policy "Public may submit affiliate applications" on public.affiliate_applications
+  for insert to anon,authenticated with check (status='new');
