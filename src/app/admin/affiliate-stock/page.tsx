@@ -1,5 +1,5 @@
 "use client";
-import { useCallback,useEffect,useState } from "react";
+import { useCallback,useEffect,useState,type FormEvent } from "react";
 import Link from "next/link";
 import { ArrowLeft,Boxes,CheckCircle2,LoaderCircle,RefreshCw,ShieldCheck,Truck } from "lucide-react";
 import { supabase } from "@/lib/supabase";
@@ -31,7 +31,7 @@ export default function AffiliateStockPage(){
   setLoading(false);
  },[]);
  useEffect(()=>{void load();},[load]);
- async function record(e:React.FormEvent<HTMLFormElement>){
+ async function record(e:FormEvent<HTMLFormElement>){
   e.preventDefault();if(!supabase)return;const q=Number(quantity),price=Number(unitPrice);
   if(!memberId||!variantId||!Number.isInteger(q)||q<1||!Number.isFinite(price)||price<0){setError("Complete all required stock details.");return;}
   setBusy("record");setError("");setNotice("");
