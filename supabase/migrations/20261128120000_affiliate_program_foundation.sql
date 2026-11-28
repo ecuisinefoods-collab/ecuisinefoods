@@ -148,6 +148,7 @@ create index if not exists affiliate_program_audit_entity_idx
 
 -- Explicit Data API grants. Row-level policies below remain the actual access boundary.
 grant select, insert, update on public.affiliate_program_applications to authenticated;
+grant insert on public.affiliate_program_applications to anon;
 grant select, insert, update on public.affiliate_program_members to authenticated;
 grant select, insert, update on public.affiliate_program_payout_details to authenticated;
 grant select, insert, update on public.affiliate_program_stock_transfers to authenticated;
@@ -167,9 +168,9 @@ alter table public.affiliate_program_sale_items enable row level security;
 alter table public.affiliate_program_audit_log enable row level security;
 
 -- Application owners can submit and view their own applications; only owner reviews.
-create policy affiliate_program_applications_submit_own
-  on public.affiliate_program_applications for insert to authenticated
-  with check (user_id = auth.uid());
+create policy affiliate_program_applications_submit_public
+  on public.affiliate_program_applications for insert to anon, authenticated
+  with check (user_id is null or user_id = auth.uid());
 create policy affiliate_program_applications_read_own
   on public.affiliate_program_applications for select to authenticated
   using (user_id = auth.uid());
