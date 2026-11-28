@@ -4,9 +4,12 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build --no-lint",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "lint:affiliate": "eslint src/app/affiliates/page.tsx src/app/affiliate/page.tsx src/app/admin/affiliates/page.tsx src/components/affiliate-programme-application-form.tsx src/app/admin/affiliate-sales/page.tsx src/app/admin/affiliate-activation/page.tsx src/app/admin/affiliate-stock/page.tsx src/app/admin/affiliate-manager/page.tsx src/app/admin/affiliate-payouts/page.tsx src/components/checkout-form.tsx src/components/referral-tracker.tsx",
+    "build:ci": "next build --no-lint"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.99.0",

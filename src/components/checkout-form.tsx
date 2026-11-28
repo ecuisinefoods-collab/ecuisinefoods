@@ -24,6 +24,9 @@ const DELIVERY_DESTINATIONS = [
   { state: "Federal Capital Territory", label: "Abuja (FCT)" },
 ] as const;
 
+type CheckoutVariantRow={id:string;pack_size:string;price:number;sale_price:number|null;sale_starts_at:string|null;sale_ends_at:string|null;stock_quantity:number};
+type ProductImageRow={id:string;image_url:string|null};
+type SiteSettingRow={setting_key:string;setting_value:string};
 const CART_KEY="ecuisinefoods-cart-v1";
 const money=(n:number)=>"₦"+Number(n||0).toLocaleString("en-NG");
 
@@ -45,6 +48,7 @@ export function CheckoutForm({ locations, deliveryZones }: { locations: Location
   const [landmark,setLandmark]=useState("");
   const [notes,setNotes]=useState("");
   const [couponCode,setCouponCode]=useState("");
+  const [affiliateCode,setAffiliateCode]=useState("");
   const [appliedCoupon,setAppliedCoupon]=useState<{code:string;discount:number}|null>(null);
   const [couponMessage,setCouponMessage]=useState("");
   const [submitting,setSubmitting]=useState(false);
@@ -65,10 +69,10 @@ export function CheckoutForm({ locations, deliveryZones }: { locations: Location
       const {data,error}=await supabase.from("product_variants").select("id,pack_size,price,sale_price,sale_starts_at,sale_ends_at,stock_quantity").in("id",saved.map(item=>item.variant_id));
       if(!active)return;
       if(error){setStockIssue("We could not verify the latest stock. Please refresh this page and try again.");setStockChecked(true);return;}
-      const rows=new Map((data??[]).map((variant:any)=>[variant.id,variant]));
+      const rows=new Map(((data??[]) as CheckoutVariantRow[]).map(variant=>[variant.id,variant]));
       const {data:productRows}=await supabase.from("products").select("id,image_url").in("id",saved.map(item=>item.product_id));
       if(!active)return;
-      const imageMap=new Map((productRows??[]).map((product:any)=>[product.id,product.image_url]));
+      const imageMap=new Map(((productRows??[]) as ProductImageRow[]).map(product=>[product.id,product.image_url]));
       let adjusted=false;
       const refreshed=saved.map(item=>{
         const variant=rows.get(item.variant_id) as {id:string;pack_size:string;price:number;sale_price:number|null;sale_starts_at:string|null;sale_ends_at:string|null;stock_quantity:number}|undefined;
@@ -112,7 +116,7 @@ export function CheckoutForm({ locations, deliveryZones }: { locations: Location
       const settingKeys=["payment_bank_name","payment_account_name","payment_account_number","payment_transfer_instructions","payment_bank_transfer_enabled","payment_cash_pickup_enabled","payment_cash_delivery_enabled"];
       const {data}=await supabase.from("site_settings").select("setting_key,setting_value").in("setting_key",settingKeys);
       if(!active||!data)return;
-      const values=Object.fromEntries(data.map((row:any)=>[row.setting_key,row.setting_value]));
+      const values=Object.fromEntries((data as SiteSettingRow[]).map(row=>[row.setting_key,row.setting_value]));
       setPaymentSettings({
         bank_name:values.payment_bank_name??"",
         account_name:values.payment_account_name??"",
@@ -148,6 +152,19 @@ export function CheckoutForm({ locations, deliveryZones }: { locations: Location
     if(!stockChecked||stockIssue||stockUnavailable){setError(stockIssue||"The cart quantity is above the latest available stock. Please return to your cart and review it.");return;}
     if(!canContinue){setError("Please complete the required checkout details and check the minimum order for this delivery area.");return;}
     setSubmitting(true);setError("");
+    let referralCode=window.localStorage.getItem("ecuisine_program_referral");
+    let attributionToken=window.localStorage.getItem("ecuisine_program_referral_token");
+    const referralAt=Number(window.localStorage.getItem("ecuisine_program_referral_at")||0);
+    if(affiliateCode.trim()&&(!referralCode||!attributionToken||!referralAt||Date.now()-referralAt>30*24*60*60*1000)){
+      const code=affiliateCode.trim().toUpperCase();
+      const token=crypto.randomUUID()+crypto.randomUUID();
+      const {error:referralError}=await supabase.rpc("record_affiliate_program_referral_click",{p_referral_code:code,p_landing_path:"/checkout",p_attribution_token:token});
+      if(referralError){setError("We could not verify that affiliate code. Please check the code or remove it to continue without a referral.");setSubmitting(false);return;}
+      referralCode=code;attributionToken=token;
+      window.localStorage.setItem("ecuisine_program_referral",code);
+      window.localStorage.setItem("ecuisine_program_referral_at",String(Date.now()));
+      window.localStorage.setItem("ecuisine_program_referral_token",token);
+    }
     const itemsToSave=cart;
     const payload={
       customer_name:name.trim(),phone:phone.trim(),email:email.trim()||null,
@@ -165,7 +182,16 @@ export function CheckoutForm({ locations, deliveryZones }: { locations: Location
     if(rpcError){setError(/available in the requested quantity|no longer available/i.test(rpcError.message)?"Stock changed while you were checking out. Please return to your cart and review the latest available quantity.":rpcError.message);setSubmitting(false);return;}
     const created=data as OrderCreated;
     if(!created?.order_number||!created?.tracking_code){setError("Your order could not be confirmed as saved. Please retry or contact support.");setSubmitting(false);return;}
-    try{const referralCode=window.localStorage.getItem("ecuisine_partner_referral");const referralAt=Number(window.localStorage.getItem("ecuisine_partner_referral_at")||0);const attributionToken=window.localStorage.getItem("ecuisine_partner_referral_click_token");if(referralCode&&referralAt&&attributionToken&&Date.now()-referralAt<=30*24*60*60*1000){await supabase.rpc("attach_partner_referral_to_order",{p_order_number:created.order_number,p_tracking_code:created.tracking_code,p_referral_code:referralCode,p_attribution_token:attributionToken});}else{window.localStorage.removeItem("ecuisine_partner_referral");window.localStorage.removeItem("ecuisine_partner_referral_at");window.localStorage.removeItem("ecuisine_partner_referral_click_token");}}catch{ /* The customer order remains valid if referral attribution is unavailable. */ }
+    try{
+      await supabase.rpc("attach_affiliate_program_referral_to_order",{
+        p_order_number:created.order_number,
+        p_tracking_code:created.tracking_code,
+        p_referral_code:referralCode,
+        p_attribution_token:attributionToken,
+        p_customer_phone:phone.trim(),
+        p_customer_email:email.trim()||null
+      });
+    }catch{ /* The customer order remains valid if affiliate attribution is unavailable. */ }
 
     const trackingUrl=window.location.origin+"/track?code="+encodeURIComponent(created.tracking_code);
     const selected=locations.find(l=>l.id===pickup);
@@ -224,6 +250,7 @@ export function CheckoutForm({ locations, deliveryZones }: { locations: Location
             <label className="text-xs font-semibold text-[#68766b]">Full name<input required minLength={2} value={name} onChange={e=>setName(e.target.value)} className="mt-1.5 w-full rounded-xl border border-[#dfe4da] bg-white/85 px-3 py-3 text-sm text-[#203329] outline-none focus:border-[#245b42]" placeholder="Your name"/></label>
             <label className="text-xs font-semibold text-[#68766b]">Phone number<input required type="tel" value={phone} onChange={e=>setPhone(e.target.value)} className="mt-1.5 w-full rounded-xl border border-[#dfe4da] bg-white/85 px-3 py-3 text-sm text-[#203329] outline-none focus:border-[#245b42]" placeholder="080…"/></label>
             <label className="text-xs font-semibold text-[#68766b] sm:col-span-2">Email (optional)<input type="email" value={email} onChange={e=>setEmail(e.target.value)} className="mt-1.5 w-full rounded-xl border border-[#dfe4da] bg-white/85 px-3 py-3 text-sm text-[#203329] outline-none focus:border-[#245b42]" placeholder="you@example.com"/></label>
+            <label className="text-xs font-semibold text-[#68766b] sm:col-span-2">Affiliate referral code (optional)<input maxLength={40} value={affiliateCode} onChange={e=>setAffiliateCode(e.target.value.toUpperCase())} className="mt-1.5 w-full rounded-xl border border-[#dfe4da] bg-white/85 px-3 py-3 text-sm text-[#203329] outline-none focus:border-[#245b42]" placeholder="Enter code shared by an eCuisinefoods affiliate"/><span className="mt-1 block text-[10px] font-normal text-[#899288]">If you arrived through an affiliate personal link, the referral is already recorded. The first valid referral takes priority.</span></label>
           </div></section>
           <section className="border-t border-[#edf0e9] pt-5"><h2 className="font-bold text-[#203329]">How would you like to receive your order?</h2><div className="mt-3 grid grid-cols-2 gap-2"><button type="button" onClick={()=>{setMethod("pickup");if(paymentMethod!=="bank_transfer")setPaymentMethod("cash");}} className={`rounded-xl border px-4 py-3 text-sm font-bold ${method==="pickup"?"border-[#245b42] bg-[#edf3e9] text-[#245b42]":"border-[#dfe4da] bg-white/70 text-[#68766b]"}`}>Pickup</button><button type="button" disabled={!deliveryZones.length} onClick={()=>{setMethod("delivery");if(paymentMethod!=="bank_transfer")setPaymentMethod("cash_on_delivery");}} className={`rounded-xl border px-4 py-3 text-sm font-bold ${method==="delivery"?"border-[#245b42] bg-[#edf3e9] text-[#245b42]":"border-[#dfe4da] bg-white/70 text-[#68766b]"} disabled:cursor-not-allowed disabled:opacity-50`}>Home delivery{!deliveryZones.length?" · Not set up":""}</button></div>
             {!deliveryZones.length&&<p className="mt-3 rounded-xl bg-[#fff7e8] p-4 text-xs leading-5 text-[#795b21]">Home delivery cannot be selected yet because no delivery areas or fees have been configured. Please choose one of the active pickup points for this order.</p>}{method==="pickup"?<div className="mt-4 rounded-xl bg-[#fbfaf7]/80 p-4"><label className="text-xs font-semibold text-[#68766b]">Pickup city<select value={city} onChange={e=>{setCity(e.target.value);setPickup("");}} className="mt-1.5 w-full rounded-xl border border-[#dfe4da] bg-white px-3 py-3 text-sm text-[#203329]">{Array.from(new Set(locations.map(l=>l.city))).map(value=><option key={value}>{value}</option>)}</select></label><label className="mt-3 block text-xs font-semibold text-[#68766b]">Pickup location<select required value={pickup} onChange={e=>setPickup(e.target.value)} className="mt-1.5 w-full rounded-xl border border-[#dfe4da] bg-white px-3 py-3 text-sm text-[#203329]"><option value="">Select a location</option>{cityLocations.map(l=><option key={l.id} value={l.id}>{l.location_name}</option>)}</select></label>{pickup&&(()=>{const selected=cityLocations.find(l=>l.id===pickup);return selected?<div className="mt-3 rounded-xl bg-white/75 p-3 text-xs leading-5 text-[#68766b]"><p className="flex gap-2"><MapPin size={14} className="mt-0.5 shrink-0"/>{selected.address||selected.instructions||"Please wait for our order confirmation before visiting."}</p>{selected.opening_hours&&<p className="mt-2">Hours: {selected.opening_hours}</p>}{selected.contact_phone&&<p className="mt-1">Location contact: {selected.contact_phone}</p>}</div>:null;})()}</div>:<div className="mt-4 grid gap-3 rounded-xl bg-[#fbfaf7]/80 p-4 sm:grid-cols-2">

@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  Activity, BarChart3, Bot, Boxes, CalendarDays, ChevronDown, ClipboardList, CreditCard, Handshake,
+  Activity, BarChart3, Bot, Boxes, CalendarDays, ChevronDown, ClipboardList, CreditCard, Handshake, Trophy,
   LayoutDashboard, MapPin, Megaphone, Package, ShieldCheck, ShoppingBag, Store, Truck, Wallet,
   Database, Star, Image as ImageIcon, Tags, Users, type LucideIcon,
 } from "lucide-react";
@@ -41,7 +41,10 @@ const groups: NavGroup[] = [
     { label: "Our story", href: "/admin/story", icon: Store, roles: ["owner", "store_manager", "marketing_manager"] },
     { label: "Partnerships", href: "/admin/partnerships", icon: Handshake, roles: ["owner", "store_manager", "marketing_manager"] },
     { label: "Affiliate programme", href: "/admin/affiliates", icon: Users, roles: ["owner", "store_manager", "marketing_manager"] },
-    { label: "Affiliate performance", href: "/admin/partners", icon: ClipboardList, roles: ["owner", "store_manager", "marketing_manager", "affiliate_manager"] },
+    { label: "Affiliate Sales & Growth", href: "/admin/affiliate-manager", icon: ClipboardList, roles: ["owner", "affiliate_manager"] },
+    { label: "Affiliate targets & rewards", href: "/admin/affiliate-performance", icon: Trophy, roles: ["owner"] },
+    { label: "Affiliate payout details", href: "/admin/affiliate-payouts", icon: Wallet, roles: ["owner"] },
+    { label: "Legacy partner records", href: "/admin/partners", icon: ClipboardList, roles: ["owner"] },
   ]},
   { label: "Procurement & Supply", icon: Truck, items: [
     { label: "Suppliers & raw materials", href: "/admin/procurement", icon: Truck, roles: ["owner", "store_manager", "finance_officer", "analyst"] },

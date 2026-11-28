@@ -1,0 +1,27 @@
+-- Retire legacy affiliate application writes and restrict historical bank data to owner/finance.
+-- Existing rows and bank details are preserved in place. Feature-branch draft only.
+
+begin;
+
+drop policy if exists "Affiliate admins may read applications" on public.affiliate_applications;
+drop policy if exists "Affiliate admins may update application status" on public.affiliate_applications;
+drop policy if exists "Public may submit affiliate applications" on public.affiliate_applications;
+
+-- The remaining legacy finance SELECT policy permits only owner and finance_officer.
+-- The legacy application workflow is retired; new applications use affiliate_program_applications.
+revoke insert on public.affiliate_applications from anon, authenticated;
+revoke insert (
+  full_name,email,phone,social_handle,primary_platform,audience_size,
+  promotion_channels,motivation,skills,availability,preferred_activities,
+  deadline_commitment,audience_description,bank_name,bank_account_name,bank_account_number
+) on public.affiliate_applications from anon, authenticated;
+revoke insert (availability) on public.affiliate_applications from anon, authenticated;
+revoke update on public.affiliate_applications from authenticated;
+revoke update (status,updated_at) on public.affiliate_applications from authenticated;
+
+-- Retire the old anonymous partner-referral endpoints. The rebuilt programme uses
+-- the validated affiliate-program referral wrappers and preserves historical rows.
+revoke all on function public.record_partner_referral_click(text,text,text) from public, anon, authenticated;
+revoke all on function public.attach_partner_referral_to_order(bigint,text,text,text) from public, anon, authenticated;
+
+commit;
