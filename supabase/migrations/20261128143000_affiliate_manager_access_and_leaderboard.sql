@@ -356,4 +356,66 @@ $$;
 revoke all on function public.affiliate_program_set_member_level(uuid,text,date,text) from public, anon, authenticated;
 grant execute on function public.affiliate_program_set_member_level(uuid,text,date,text) to authenticated;
 
+
+-- Affiliates may maintain their own payout details through narrowly scoped RPCs.
+-- Direct table reads remain owner-only.
+create or replace function public.get_affiliate_program_own_payout_details()
+returns table(bank_name text, account_name text, account_number text, updated_at timestamptz)
+language plpgsql
+stable
+security definer
+set search_path = ''
+as $$
+begin
+  if auth.uid() is null or not exists (
+    select 1 from public.affiliate_program_members m
+    where m.user_id=auth.uid() and m.status in ('active','onboarding')
+  ) then
+    raise exception 'An approved affiliate account is required.';
+  end if;
+  return query
+  select d.bank_name,d.account_name,d.account_number,d.updated_at
+  from public.affiliate_program_payout_details d
+  join public.affiliate_program_members m on m.id=d.member_id
+  where m.user_id=auth.uid()
+  limit 1;
+end;
+$$;
+
+revoke all on function public.get_affiliate_program_own_payout_details() from public, anon;
+grant execute on function public.get_affiliate_program_own_payout_details() to authenticated;
+
+create or replace function public.affiliate_program_update_own_payout_details(
+  p_bank_name text, p_account_name text, p_account_number text
+)
+returns void
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_member_id uuid;
+begin
+  if auth.uid() is null then raise exception 'Sign in is required.'; end if;
+  select m.id into v_member_id
+  from public.affiliate_program_members m
+  where m.user_id=auth.uid() and m.status in ('active','onboarding')
+  limit 1;
+  if v_member_id is null then raise exception 'An approved affiliate account is required.'; end if;
+  if length(trim(coalesce(p_bank_name,''))) not between 2 and 100
+    or length(trim(coalesce(p_account_name,''))) not between 2 and 160
+    or trim(coalesce(p_account_number,'')) !~ '^[0-9]{10}$' then
+    raise exception 'Enter a bank name, account name and valid 10-digit account number.';
+  end if;
+  insert into public.affiliate_program_payout_details(member_id,bank_name,account_name,account_number,updated_by,updated_at)
+  values(v_member_id,trim(p_bank_name),trim(p_account_name),trim(p_account_number),auth.uid(),now())
+  on conflict(member_id) do update set
+    bank_name=excluded.bank_name,account_name=excluded.account_name,
+    account_number=excluded.account_number,updated_by=auth.uid(),updated_at=now();
+end;
+$$;
+
+revoke all on function public.affiliate_program_update_own_payout_details(text,text,text) from public, anon;
+grant execute on function public.affiliate_program_update_own_payout_details(text,text,text) to authenticated;
+
 commit;
