@@ -26,7 +26,7 @@ begin
   if not found then raise exception 'An active affiliate programme account is required.'; end if;
   if p_sale_date is null or p_sale_date > current_date then raise exception 'Enter a valid sale date.'; end if;
   if p_payment_status not in ('paid','unpaid','partial') then raise exception 'Invalid payment status.'; end if;
-  if jsonb_typeof(p_items) <> 'array' or jsonb_array_length(p_items) < 1 or jsonb_array_length(p_items) > 20 then
+  if p_items is null or jsonb_typeof(p_items) <> 'array' or jsonb_array_length(p_items) < 1 or jsonb_array_length(p_items) > 20 then
     raise exception 'Add between 1 and 20 sale items.';
   end if;
 
@@ -86,7 +86,7 @@ begin
   if not found or v_sale.status <> 'pending_verification' then
     raise exception 'This sale is no longer awaiting verification.';
   end if;
-  select * into v_member from public.affiliate_program_members where id = v_sale.member_id;
+  select * into v_member from public.affiliate_program_members where id = v_sale.member_id for update;
 
   if p_decision = 'approved' then
     if v_sale.payment_status <> 'paid' then raise exception 'Only fully paid sales can be approved.'; end if;
