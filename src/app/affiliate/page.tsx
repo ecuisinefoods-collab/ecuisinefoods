@@ -63,6 +63,7 @@ export default function AffiliatePortalPage(){
    supabase.from("affiliate_program_compliance_actions").select("id,action_type,action_note,created_at").eq("member_id",m.id).order("created_at",{ascending:false}).limit(30)
   ]);
   if(t.error||s.error||x.error||w.error||a.error||r.error||p.error||l.error||d.error||activity.error||actions.error)setError("Some portal information could not be loaded. Refresh or contact the programme team.");
+  if(m.affiliate_model==="commission"){const {data:summary,error:summaryError}=await supabase.rpc("get_affiliate_program_own_referral_summary");if(summaryError)setError("Referral metrics are temporarily unavailable.");else if(summary){const summaryRow=Array.isArray(summary)?summary[0]:summary;setReferralSummary(summaryRow as ReferralSummary);}}
   setTarget(t.data as typeof target);setSales((s.data||[]) as Sale[]);setTransfers((x.data||[]) as Transfer[]);
   setEarnings((w.data||[]) as Earning[]);setAnnouncements((a.data||[]) as Announcement[]);setResources((r.data||[]) as Resource[]);setLeaderboard((l.data||[]) as LeaderboardRow[]);setParticipation((activity.data||[]) as Participation[]);setComplianceActions((actions.data||[]) as ComplianceAction[]);
   const ownPayout=((d.data||[]) as {bank_name:string;account_name:string;account_number:string;updated_at:string}[])[0]||null;setPayout(ownPayout);setPayoutForm({bank_name:ownPayout?.bank_name||"",account_name:ownPayout?.account_name||"",account_number:ownPayout?.account_number||""});
