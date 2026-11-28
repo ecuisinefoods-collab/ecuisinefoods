@@ -52,7 +52,9 @@ export default function AffiliatePortalPage(){
    supabase.from("affiliate_program_earnings").select("id,amount,earning_type,status,created_at").eq("member_id",m.id).order("created_at",{ascending:false}).limit(30),
    supabase.from("affiliate_program_announcements").select("id,title,body,published_at").eq("is_published",true).order("published_at",{ascending:false}).limit(8),
    supabase.from("affiliate_program_resources").select("id,title,description,resource_type,resource_url").eq("is_published",true).order("created_at",{ascending:false}).limit(20),
-   supabase.from("products").select("id,name,product_variants(id,pack_size,price)").eq("is_active",true).order("name")
+   supabase.from("products").select("id,name,product_variants(id,pack_size,price)").eq("is_active",true).order("name"),
+   supabase.rpc("get_affiliate_program_leaderboard",{p_period_month:monthStart()}),
+   supabase.rpc("get_affiliate_program_own_payout_details")
   ]);
   if(t.error||s.error||x.error||w.error||a.error||r.error||p.error||l.error||d.error)setError("Some portal information could not be loaded. Refresh or contact the programme team.");
   setTarget(t.data as typeof target);setSales((s.data||[]) as Sale[]);setTransfers((x.data||[]) as Transfer[]);
