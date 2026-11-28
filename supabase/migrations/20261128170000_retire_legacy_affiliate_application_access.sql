@@ -15,6 +15,7 @@ revoke insert (
   promotion_channels,motivation,skills,availability,preferred_activities,
   deadline_commitment,audience_description,bank_name,bank_account_name,bank_account_number
 ) on public.affiliate_applications from anon, authenticated;
+revoke insert (availability) on public.affiliate_applications from anon, authenticated;
 revoke update on public.affiliate_applications from authenticated;
 revoke update (status,updated_at) on public.affiliate_applications from authenticated;
 
