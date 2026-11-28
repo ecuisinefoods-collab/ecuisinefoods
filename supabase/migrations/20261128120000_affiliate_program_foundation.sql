@@ -82,7 +82,7 @@ create table if not exists public.affiliate_program_stock_transfer_items (
   product_id uuid not null references public.products(id) on delete restrict,
   variant_id uuid references public.product_variants(id) on delete restrict,
   quantity integer not null check (quantity > 0),
-  unit_acquisition_price numeric(12,2) check (unit_acquisition_price is null or unit_acquisition_price >= 0),
+  unit_acquisition_price numeric(12,2) not null check (unit_acquisition_price >= 0),
   created_at timestamptz not null default now()
 );
 
