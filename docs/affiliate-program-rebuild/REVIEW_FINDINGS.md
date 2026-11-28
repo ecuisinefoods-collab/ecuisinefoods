@@ -41,3 +41,16 @@ Supabase's 28 April 2026 breaking-change notice states that new public-schema ta
 - Feature work remains on `feature/affiliate-program-rebuild`.
 - The inspected Supabase project is the existing live project.
 - No new programme tables, production data changes, destructive operations, merges or deployments have been performed.
+
+
+## Follow-up verification of the three financial-control migrations
+
+A read-only inspection of live database objects confirms that important effects from the three unrecorded financial-control migration files are already present:
+
+- `admin_delete_dataset()` and `admin_reset_store_for_launch()` exist with owner-only checks, and their EXECUTE privileges are restricted to `postgres` and `service_role`.
+- `admin_cleanup_closed_records()` and `admin_delete_customer_order(uuid)` exist, and EXECUTE is restricted to `postgres` and `service_role`.
+- `financial_transactions.reversal_of_id` exists, with the expected unique partial index.
+- The `protect_posted_financial_transaction` trigger function and trigger exist.
+- Owner/finance pending-update RLS policies exist on financial transactions.
+
+This confirms that the three migration files are not simply absent in effect; the live schema already reflects their key changes while the migration ledger does not record those versions. Do not re-run the SQL. The next reconciliation must compare the full migration SQL with live definitions and decide how to align the migration ledger safely, without re-executing DDL or resetting production data.
