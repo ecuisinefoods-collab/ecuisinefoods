@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "lint:affiliate": "eslint src/app/affiliates/page.tsx src/app/affiliate/page.tsx src/app/admin/affiliates/page.tsx src/components/affiliate-programme-application-form.tsx",
+    "build:ci": "next build --no-lint"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.99.0",
