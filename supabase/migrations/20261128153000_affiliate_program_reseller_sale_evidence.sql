@@ -79,6 +79,13 @@ begin
   if p_sale_date is null or p_sale_date > current_date then raise exception 'Enter a valid sale date.'; end if;
   if p_payment_status is distinct from 'paid' then raise exception 'Only completed, paid sales can be submitted for verification.'; end if;
   if nullif(trim(p_payment_evidence_url),'') is null then raise exception 'Upload the customer payment receipt before submitting this sale.'; end if;
+  if p_payment_evidence_url !~ ('^' || auth.uid()::text || '/')
+    or not exists (
+      select 1 from storage.objects o
+      where o.bucket_id='affiliate-sale-evidence' and o.name=p_payment_evidence_url
+    ) then
+    raise exception 'The uploaded receipt could not be verified. Upload the receipt again.';
+  end if;
   if nullif(trim(p_stock_received_from),'') is null then raise exception 'Select who supplied the stock for this sale.'; end if;
   if not exists (
     select 1 from public.affiliate_program_stock_transfers t
