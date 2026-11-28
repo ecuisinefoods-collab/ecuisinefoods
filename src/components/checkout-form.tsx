@@ -24,6 +24,9 @@ const DELIVERY_DESTINATIONS = [
   { state: "Federal Capital Territory", label: "Abuja (FCT)" },
 ] as const;
 
+type CheckoutVariantRow={id:string;pack_size:string;price:number;sale_price:number|null;sale_starts_at:string|null;sale_ends_at:string|null;stock_quantity:number};
+type ProductImageRow={id:string;image_url:string|null};
+type SiteSettingRow={setting_key:string;setting_value:string};
 const CART_KEY="ecuisinefoods-cart-v1";
 const money=(n:number)=>"₦"+Number(n||0).toLocaleString("en-NG");
 
@@ -66,10 +69,10 @@ export function CheckoutForm({ locations, deliveryZones }: { locations: Location
       const {data,error}=await supabase.from("product_variants").select("id,pack_size,price,sale_price,sale_starts_at,sale_ends_at,stock_quantity").in("id",saved.map(item=>item.variant_id));
       if(!active)return;
       if(error){setStockIssue("We could not verify the latest stock. Please refresh this page and try again.");setStockChecked(true);return;}
-      const rows=new Map((data??[]).map((variant:any)=>[variant.id,variant]));
+      const rows=new Map(((data??[]) as CheckoutVariantRow[]).map(variant=>[variant.id,variant]));
       const {data:productRows}=await supabase.from("products").select("id,image_url").in("id",saved.map(item=>item.product_id));
       if(!active)return;
-      const imageMap=new Map((productRows??[]).map((product:any)=>[product.id,product.image_url]));
+      const imageMap=new Map(((productRows??[]) as ProductImageRow[]).map(product=>[product.id,product.image_url]));
       let adjusted=false;
       const refreshed=saved.map(item=>{
         const variant=rows.get(item.variant_id) as {id:string;pack_size:string;price:number;sale_price:number|null;sale_starts_at:string|null;sale_ends_at:string|null;stock_quantity:number}|undefined;
@@ -113,7 +116,7 @@ export function CheckoutForm({ locations, deliveryZones }: { locations: Location
       const settingKeys=["payment_bank_name","payment_account_name","payment_account_number","payment_transfer_instructions","payment_bank_transfer_enabled","payment_cash_pickup_enabled","payment_cash_delivery_enabled"];
       const {data}=await supabase.from("site_settings").select("setting_key,setting_value").in("setting_key",settingKeys);
       if(!active||!data)return;
-      const values=Object.fromEntries(data.map((row:any)=>[row.setting_key,row.setting_value]));
+      const values=Object.fromEntries((data as SiteSettingRow[]).map(row=>[row.setting_key,row.setting_value]));
       setPaymentSettings({
         bank_name:values.payment_bank_name??"",
         account_name:values.payment_account_name??"",
