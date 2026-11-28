@@ -32,7 +32,16 @@ export function ReferralTracker(){
         p_landing_path:window.location.pathname,
         p_attribution_token:attributionToken
       }).then(({error})=>{
-        if(error) console.warn("Affiliate referral could not be recorded.");
+        if(error){
+          try{
+            if(window.localStorage.getItem(REFERRAL_TOKEN_KEY)===attributionToken){
+              window.localStorage.removeItem(REFERRAL_CODE_KEY);
+              window.localStorage.removeItem(REFERRAL_AT_KEY);
+              window.localStorage.removeItem(REFERRAL_TOKEN_KEY);
+            }
+          }catch{/* Storage may be unavailable. */}
+          console.warn("Affiliate referral could not be recorded.");
+        }
       });
     }
   },[]);
