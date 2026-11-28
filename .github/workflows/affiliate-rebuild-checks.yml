@@ -25,6 +25,6 @@ jobs:
       - name: TypeScript check
         run: npm run typecheck
       - name: ESLint
-        run: npm run lint
+        run: npm run lint:affiliate
       - name: Production build
-        run: npm run build
+        run: npm run build:ci
