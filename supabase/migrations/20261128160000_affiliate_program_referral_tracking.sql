@@ -34,7 +34,7 @@ create index if not exists affiliate_program_customer_attributions_key_idx
 create table if not exists public.affiliate_program_order_attributions (
   id uuid primary key default gen_random_uuid(),
   order_number bigint not null unique,
-  tracking_code text not null,
+  tracking_code_hash text not null,
   customer_attribution_id uuid not null references public.affiliate_program_customer_attributions(id) on delete restrict,
   member_id uuid not null references public.affiliate_program_members(id) on delete restrict,
   attributed_at timestamptz not null default now()
@@ -145,7 +145,7 @@ begin
   -- Never allow a public caller to attach an arbitrary or another customer's order.
   if not exists (
     select 1 from public.orders o
-    where o.order_number=p_order_number and o.tracking_code=trim(p_tracking_code)
+    where o.order_number=p_order_number and o.tracking_token_hash=md5(trim(p_tracking_code))
       and (
         (length(v_phone_digits)>=7 and regexp_replace(coalesce(o.phone,''),'[^0-9]','','g')=v_phone_digits)
         or (nullif(trim(p_customer_email),'') is not null and lower(coalesce(o.email,''))=lower(trim(p_customer_email)))
@@ -178,8 +178,8 @@ begin
   end if;
 
   insert into public.affiliate_program_order_attributions
-    (order_number,tracking_code,customer_attribution_id,member_id,attributed_at)
-  values (p_order_number,p_tracking_code,v_attribution.id,v_attribution.member_id,now())
+    (order_number,tracking_code_hash,customer_attribution_id,member_id,attributed_at)
+  values (p_order_number,md5(trim(p_tracking_code)),v_attribution.id,v_attribution.member_id,now())
   on conflict (order_number) do nothing;
   return true;
 end;
