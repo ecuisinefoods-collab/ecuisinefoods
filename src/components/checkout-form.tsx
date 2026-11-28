@@ -165,7 +165,18 @@ export function CheckoutForm({ locations, deliveryZones }: { locations: Location
     if(rpcError){setError(/available in the requested quantity|no longer available/i.test(rpcError.message)?"Stock changed while you were checking out. Please return to your cart and review the latest available quantity.":rpcError.message);setSubmitting(false);return;}
     const created=data as OrderCreated;
     if(!created?.order_number||!created?.tracking_code){setError("Your order could not be confirmed as saved. Please retry or contact support.");setSubmitting(false);return;}
-    try{const referralCode=window.localStorage.getItem("ecuisine_partner_referral");const referralAt=Number(window.localStorage.getItem("ecuisine_partner_referral_at")||0);const attributionToken=window.localStorage.getItem("ecuisine_partner_referral_click_token");if(referralCode&&referralAt&&attributionToken&&Date.now()-referralAt<=30*24*60*60*1000){await supabase.rpc("attach_partner_referral_to_order",{p_order_number:created.order_number,p_tracking_code:created.tracking_code,p_referral_code:referralCode,p_attribution_token:attributionToken});}else{window.localStorage.removeItem("ecuisine_partner_referral");window.localStorage.removeItem("ecuisine_partner_referral_at");window.localStorage.removeItem("ecuisine_partner_referral_click_token");}}catch{ /* The customer order remains valid if referral attribution is unavailable. */ }
+    try{
+      const referralCode=window.localStorage.getItem("ecuisine_program_referral");
+      const attributionToken=window.localStorage.getItem("ecuisine_program_referral_token");
+      await supabase.rpc("attach_affiliate_program_referral_to_order",{
+        p_order_number:created.order_number,
+        p_tracking_code:created.tracking_code,
+        p_referral_code:referralCode,
+        p_attribution_token:attributionToken,
+        p_customer_phone:phone.trim(),
+        p_customer_email:email.trim()||null
+      });
+    }catch{ /* The customer order remains valid if affiliate attribution is unavailable. */ }
 
     const trackingUrl=window.location.origin+"/track?code="+encodeURIComponent(created.tracking_code);
     const selected=locations.find(l=>l.id===pickup);
