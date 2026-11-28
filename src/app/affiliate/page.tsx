@@ -13,7 +13,8 @@ type Earning={id:string;amount:number;earning_type:string;status:string;created_
 type Announcement={id:string;title:string;body:string;published_at:string|null};
 type Resource={id:string;title:string;description:string|null;resource_type:string;resource_url:string};
 type LeaderboardRow={rank_position:number;affiliate_code:string;display_name:string;level:string;approved_sales_amount:number;approved_units:number;target_assigned:boolean;target_achieved:boolean};
-type Payout={bank_name:string;account_name:string;account_number:string;updated_at:string}|null;\ntype ReferralSummary={referral_clicks:number;attributed_customers:number;attributed_orders:number};
+type Payout={bank_name:string;account_name:string;account_number:string;updated_at:string}|null;
+type ReferralSummary={referral_clicks:number;attributed_customers:number;attributed_orders:number};
 const money=(n:number)=>new Intl.NumberFormat("en-NG",{style:"currency",currency:"NGN",maximumFractionDigits:2}).format(n);
 const label=(s:string)=>s.replaceAll("_"," ").replace(/\b\w/g,c=>c.toUpperCase());
 const today=()=>new Intl.DateTimeFormat("en-CA",{timeZone:"Africa/Lagos",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
