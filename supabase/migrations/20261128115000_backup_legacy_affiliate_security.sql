@@ -28,10 +28,28 @@ select now() as captured_at, conname, pg_get_constraintdef(oid) as constraint_de
 from pg_constraint
 where conrelid='public.admin_profiles'::regclass and contype='c';
 
+create table if not exists private.affiliate_referral_rpc_grants_backup_20261128 as
+select
+  now() as captured_at,
+  p.oid::regprocedure::text as function_signature,
+  pg_get_function_identity_arguments(p.oid) as identity_arguments,
+  coalesce(pg_get_userbyid(x.grantee), 'PUBLIC') as grantee,
+  x.privilege_type,
+  x.is_grantable
+from pg_proc p
+join pg_namespace n on n.oid=p.pronamespace
+cross join lateral aclexplode(coalesce(p.proacl, acldefault('f',p.proowner))) x
+where n.nspname='public'
+  and (
+    (p.proname='record_partner_referral_click' and pg_get_function_identity_arguments(p.oid) like '%p_attribution_token%')
+    or (p.proname='attach_partner_referral_to_order' and pg_get_function_identity_arguments(p.oid) like '%p_attribution_token%')
+  );
+
 revoke all on private.affiliate_applications_backup_20261128 from public, anon, authenticated;
 revoke all on private.affiliate_applications_policies_backup_20261128 from public, anon, authenticated;
 revoke all on private.affiliate_applications_grants_backup_20261128 from public, anon, authenticated;
 revoke all on private.admin_profiles_role_constraint_backup_20261128 from public, anon, authenticated;
+revoke all on private.affiliate_referral_rpc_grants_backup_20261128 from public, anon, authenticated;
 
 comment on table private.affiliate_applications_backup_20261128 is
   'Targeted private rollback snapshot of legacy affiliate application rows before retiring legacy application access.';
@@ -41,5 +59,7 @@ comment on table private.affiliate_applications_grants_backup_20261128 is
   'Targeted private rollback snapshot of legacy affiliate application table and column grants.';
 comment on table private.admin_profiles_role_constraint_backup_20261128 is
   'Targeted private rollback snapshot of admin profile role check constraints before affiliate manager role changes.';
+comment on table private.affiliate_referral_rpc_grants_backup_20261128 is
+  'Targeted private rollback snapshot of grants on legacy anonymous partner referral RPCs before their retirement.';
 
 commit;
