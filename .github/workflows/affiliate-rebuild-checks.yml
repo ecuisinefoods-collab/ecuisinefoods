@@ -28,3 +28,46 @@ jobs:
         run: npm run lint:affiliate
       - name: Production build
         run: npm run build:ci
+
+  validate-database:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: affiliate_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d affiliate_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/affiliate_test
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Install PostgreSQL client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+      - name: Create isolated Supabase-compatible test schema
+        run: psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f tests/sql/affiliate-program-prelude.sql
+      - name: Apply affiliate programme migrations to disposable database
+        run: |
+          set -euo pipefail
+          for migration in \
+            supabase/migrations/20261128120000_affiliate_program_foundation.sql \
+            supabase/migrations/20261128123000_affiliate_program_performance_and_engagement.sql \
+            supabase/migrations/20261128130000_affiliate_program_sale_workflows.sql \
+            supabase/migrations/20261128133000_affiliate_program_activation.sql \
+            supabase/migrations/20261128140000_affiliate_program_stock_transfers.sql \
+            supabase/migrations/20261128143000_affiliate_manager_access_and_leaderboard.sql
+          do
+            echo "Applying $migration"
+            psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f "$migration"
+          done
+      - name: Assert expected tables and RPCs exist
+        run: |
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -c "select to_regclass('public.affiliate_program_members'), to_regclass('public.affiliate_program_manager_followups'), to_regprocedure('public.get_affiliate_program_leaderboard(date)'), to_regprocedure('public.get_affiliate_program_manager_roster(date)');"
