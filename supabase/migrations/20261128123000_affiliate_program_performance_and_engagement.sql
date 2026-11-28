@@ -233,7 +233,7 @@ create or replace function public.affiliate_program_protect_earning_record()
 returns trigger
 language plpgsql
 set search_path = pg_catalog, public
-as $
+as $$
 begin
   if tg_op = 'DELETE' then
     raise exception 'Affiliate earning records cannot be deleted; use a reversal record.';
@@ -252,7 +252,7 @@ begin
 
   return new;
 end;
-$;
+$$;
 
 revoke all on function public.affiliate_program_protect_earning_record() from public, anon, authenticated;
 
