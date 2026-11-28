@@ -28,6 +28,7 @@ The activation RPC is owner-only and checks that the approved applicant has a co
 
 ## Owner operations
 - Sales verification: `/admin/affiliate-sales`
+- Stock transfer console: `/admin/affiliate-stock`
 - Stock transfer recording: `/admin/affiliate-stock`
 - Stock transfers are created as recorded and only become confirmed after payment is paid/not-required and an owner confirms receipt.
 - Reseller sale approval checks paid status and confirmed available stock, with member-row locking to serialize stock approvals.
