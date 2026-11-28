@@ -70,4 +70,4 @@ jobs:
           done
       - name: Assert expected tables and RPCs exist
         run: |
-          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -c "select to_regclass('public.affiliate_program_members'), to_regclass('public.affiliate_program_manager_followups'), to_regprocedure('public.get_affiliate_program_leaderboard(date)'), to_regprocedure('public.get_affiliate_program_manager_roster(date)');"
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -c "select to_regclass('public.affiliate_program_members'), to_regclass('public.affiliate_program_manager_followups'), to_regprocedure('public.get_affiliate_program_leaderboard(date)'), to_regprocedure('public.get_affiliate_program_manager_roster(date)'), to_regclass('public.affiliate_program_participation_log'), to_regclass('public.affiliate_program_compliance_actions'), to_regprocedure('public.record_affiliate_program_referral_click(text,text,text)'), to_regprocedure('public.attach_affiliate_program_referral_to_order(bigint,text,text,text,text,text)'), to_regprocedure('public.affiliate_program_owner_set_member_status(uuid,text,text)');"
