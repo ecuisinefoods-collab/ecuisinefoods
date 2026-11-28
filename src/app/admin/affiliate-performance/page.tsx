@@ -11,7 +11,7 @@ type Scorecard={id:string;period_month:string;manager_user_id:string;verified_gr
 type Reward={id:string;scorecard_id:string;reward_amount:number;reward_reason:string;status:string;created_at:string};
 const monthStart=()=>new Intl.DateTimeFormat("en-CA",{timeZone:"Africa/Lagos",year:"numeric",month:"2-digit"}).format(new Date())+"-01";
 const money=(n:number)=>new Intl.NumberFormat("en-NG",{style:"currency",currency:"NGN",maximumFractionDigits:0}).format(n);
-const label=(s:string)=>s.replaceAll("_"," ").replace(/\\b\\w/g,c=>c.toUpperCase());
+const label=(s:string)=>s.replaceAll("_"," ").replace(/\b\w/g,c=>c.toUpperCase());
 
 export default function AffiliatePerformanceAdminPage(){
  const [members,setMembers]=useState<Member[]>([]);const [targets,setTargets]=useState<Record<string,TargetRow>>({});
