@@ -25,8 +25,11 @@ begin
   where user_id = auth.uid() and status = 'active' for share;
   if not found then raise exception 'An active affiliate programme account is required.'; end if;
   if p_sale_date is null or p_sale_date > current_date then raise exception 'Enter a valid sale date.'; end if;
-  if p_payment_status not in ('paid','unpaid','partial') then raise exception 'Invalid payment status.'; end if;
-  if p_items is null or jsonb_typeof(p_items) <> 'array' or jsonb_array_length(p_items) < 1 or jsonb_array_length(p_items) > 20 then
+  if p_payment_status is null or p_payment_status not in ('paid','unpaid','partial') then raise exception 'Invalid payment status.'; end if;
+  if p_items is null or jsonb_typeof(p_items) is distinct from 'array' then
+    raise exception 'Sale items must be supplied as a list.';
+  end if;
+  if jsonb_array_length(p_items) < 1 or jsonb_array_length(p_items) > 20 then
     raise exception 'Add between 1 and 20 sale items.';
   end if;
 
@@ -80,7 +83,10 @@ begin
     select 1 from public.admin_profiles a
     where a.user_id = auth.uid() and a.role = 'owner' and a.is_active = true
   ) then raise exception 'Only the active account owner can verify affiliate sales.'; end if;
-  if p_decision not in ('approved','rejected') then raise exception 'Choose approved or rejected.'; end if;
+  if p_decision is null or p_decision not in ('approved','rejected') then raise exception 'Choose approved or rejected.'; end if;
+  if p_decision = 'rejected' and nullif(trim(p_review_note),'') is null then
+    raise exception 'A reason is required when rejecting a sale.';
+  end if;
 
   select * into v_sale from public.affiliate_program_sales where id = p_sale_id for update;
   if not found or v_sale.status <> 'pending_verification' then
