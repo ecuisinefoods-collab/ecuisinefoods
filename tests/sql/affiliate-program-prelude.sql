@@ -108,3 +108,13 @@ create policy "Affiliate finance may read payout bank details" on public.affilia
   for select to authenticated using (private.has_admin_role(array['owner','finance_officer']));
 create policy "Public may submit affiliate applications" on public.affiliate_applications
   for insert to anon,authenticated with check (status='new');
+
+-- Legacy public partner-referral RPCs retired by the new programme migration.
+create function public.record_partner_referral_click(p_referral_code text,p_landing_path text,p_attribution_token text)
+returns uuid language sql security definer set search_path=public
+as $$ select gen_random_uuid() $$;
+create function public.attach_partner_referral_to_order(p_order_number bigint,p_tracking_code text,p_referral_code text,p_attribution_token text)
+returns boolean language sql security definer set search_path=public
+as $$ select false $$;
+grant execute on function public.record_partner_referral_click(text,text,text) to anon,authenticated;
+grant execute on function public.attach_partner_referral_to_order(bigint,text,text,text) to anon,authenticated;
