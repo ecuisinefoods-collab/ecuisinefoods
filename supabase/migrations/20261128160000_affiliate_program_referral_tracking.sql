@@ -61,7 +61,9 @@ create policy affiliate_program_order_attributions_owner_read
   on public.affiliate_program_order_attributions for select to authenticated
   using (exists (select 1 from public.admin_profiles a where a.user_id=auth.uid() and a.role='owner' and a.is_active=true));
 
-create or replace function public.record_affiliate_program_referral_click(
+grant usage on schema private to anon, authenticated;
+
+create or replace function private.record_affiliate_program_referral_click(
   p_referral_code text,
   p_landing_path text,
   p_attribution_token text
@@ -93,10 +95,25 @@ begin
 end;
 $$;
 
+revoke all on function private.record_affiliate_program_referral_click(text,text,text) from public;
+grant execute on function private.record_affiliate_program_referral_click(text,text,text) to anon,authenticated;
+
+create or replace function public.record_affiliate_program_referral_click(
+  p_referral_code text,
+  p_landing_path text,
+  p_attribution_token text
+)
+returns uuid
+language sql
+security invoker
+set search_path = pg_catalog, public, private
+as $
+  select private.record_affiliate_program_referral_click(p_referral_code,p_landing_path,p_attribution_token);
+$;
 revoke all on function public.record_affiliate_program_referral_click(text,text,text) from public;
 grant execute on function public.record_affiliate_program_referral_click(text,text,text) to anon,authenticated;
 
-create or replace function public.attach_affiliate_program_referral_to_order(
+create or replace function private.attach_affiliate_program_referral_to_order(
   p_order_number bigint,
   p_tracking_code text,
   p_referral_code text,
@@ -168,6 +185,26 @@ begin
 end;
 $$;
 
+revoke all on function private.attach_affiliate_program_referral_to_order(bigint,text,text,text,text,text) from public;
+grant execute on function private.attach_affiliate_program_referral_to_order(bigint,text,text,text,text,text) to anon,authenticated;
+
+create or replace function public.attach_affiliate_program_referral_to_order(
+  p_order_number bigint,
+  p_tracking_code text,
+  p_referral_code text,
+  p_attribution_token text,
+  p_customer_phone text,
+  p_customer_email text
+)
+returns boolean
+language sql
+security invoker
+set search_path = pg_catalog, public, private
+as $
+  select private.attach_affiliate_program_referral_to_order(
+    p_order_number,p_tracking_code,p_referral_code,p_attribution_token,p_customer_phone,p_customer_email
+  );
+$;
 revoke all on function public.attach_affiliate_program_referral_to_order(bigint,text,text,text,text,text) from public;
 grant execute on function public.attach_affiliate_program_referral_to_order(bigint,text,text,text,text,text) to anon,authenticated;
 
