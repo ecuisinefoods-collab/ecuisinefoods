@@ -28,6 +28,8 @@ This plan applies to `20261128120000_affiliate_program_foundation.sql`. The migr
 | Affiliate inserts a sale for another member | Denied |
 | Affiliate inserts a sale as already approved or with review metadata | Denied |
 | Affiliate updates or deletes a sale after submission | Denied |
+| Affiliate reads and updates own payout details | Allowed |
+| Affiliate reads or updates another member's payout details | Denied |
 | Manager/non-owner reads payout details | Denied |
 | Manager/non-owner changes stock transfer, verifies sale, or reads audit log | Denied |
 | Owner reads and manages programme records | Allowed |
