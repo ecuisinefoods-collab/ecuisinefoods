@@ -31,8 +31,8 @@ export default function AffiliatePortalPage(){
  const [payoutForm,setPayoutForm]=useState({bank_name:"",account_name:"",account_number:""});
  const [loading,setLoading]=useState(true);const [busy,setBusy]=useState(false);
  const [error,setError]=useState("");const [notice,setNotice]=useState("");
- const [saleDate,setSaleDate]=useState(today());const [paymentStatus,setPaymentStatus]=useState("paid");
- const [paymentReference,setPaymentReference]=useState("");const [evidenceUrl,setEvidenceUrl]=useState("");const [receiptFile,setReceiptFile]=useState<File|null>(null);const [stockSource,setStockSource]=useState("");
+ const [saleDate,setSaleDate]=useState(today());
+ const [paymentReference,setPaymentReference]=useState("");const [receiptFile,setReceiptFile]=useState<File|null>(null);const [stockSource,setStockSource]=useState("");
  const [saleNote,setSaleNote]=useState("");const [variantId,setVariantId]=useState("");
  const [quantity,setQuantity]=useState("1");const [price,setPrice]=useState("");
 
@@ -85,7 +85,7 @@ export default function AffiliatePortalPage(){
   const {error:uploadError}=await supabase.storage.from("affiliate-sale-evidence").upload(evidencePath,receiptFile,{upsert:false,contentType:receiptFile.type});
   if(uploadError){setError("Receipt upload failed. Please use a JPG, PNG, WEBP or PDF file up to 10 MB.");setBusy(false);return;}
   const {error:e1}=await supabase.rpc("affiliate_program_submit_sale",{p_sale_date:saleDate,p_payment_status:"paid",p_payment_reference:paymentReference.trim()||null,p_payment_evidence_url:evidencePath,p_submitted_note:saleNote.trim()||null,p_stock_received_from:stockSource,p_items:[{product_id:selected.productId,variant_id:selected.id,quantity:q,unit_selling_price:p}]});
-  if(e1)setError(e1.message);else{setNotice("Your sale has been submitted for management verification.");setPaymentReference("");setEvidenceUrl("");setReceiptFile(null);setStockSource("");setSaleNote("");setQuantity("1");await load();}
+  if(e1){await supabase.storage.from("affiliate-sale-evidence").remove([evidencePath]);setError(e1.message);}else{setNotice("Your sale has been submitted for management verification.");setPaymentReference("");setReceiptFile(null);setStockSource("");setSaleNote("");setQuantity("1");await load();}
   setBusy(false);
  }
  async function signOut(){await supabase?.auth.signOut();setMember(null);setSales([]);setNotice("You have signed out.");}
