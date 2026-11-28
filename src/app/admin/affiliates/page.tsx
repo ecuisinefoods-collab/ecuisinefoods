@@ -37,7 +37,7 @@ export default function AffiliateApplicationsPage() {
     const {data:profile,error:profileError}=await supabase.from("admin_profiles").select("role,is_active").eq("user_id",session.user.id).maybeSingle();
     if(profileError||!profile?.is_active||profile.role!=="owner"){setError("Only the account owner can review affiliate programme applications.");setLoading(false);return;}
     setRole(profile.role);
-    const {data,error:queryError}=await supabase.from("affiliate_program_applications").select("id,full_name,email,phone,location,requested_model,experience_note,status,created_at,reviewed_at,review_note").order("created_at",{ascending:false}).limit(250);
+    const {data,error:queryError}=await supabase.from("affiliate_program_applications").select("id,full_name,email,phone,location,requested_model,experience_note,status,created_at,reviewed_at,review_note,responsibilities_accepted,responsibilities_version,responsibilities_accepted_at").order("created_at",{ascending:false}).limit(250);
     if(queryError)setError(queryError.message);
     else{setItems((data||[]) as Application[]);setError("");}
     setLoading(false);
@@ -90,7 +90,7 @@ export default function AffiliateApplicationsPage() {
           </div>
           <div className="flex min-w-[180px] flex-col items-start gap-2 sm:items-end"><span className="text-[10px] font-semibold text-[#8a9787]">Applied {new Date(item.created_at).toLocaleString("en-NG",{dateStyle:"medium",timeStyle:"short"})}</span><select aria-label={`Update status for ${item.full_name}`} value={item.status} disabled={saving===item.id} onChange={e=>void updateStatus(item,e.target.value as ApplicationStatus)} className="rounded-xl border border-[#dce5dc] bg-white px-3 py-2.5 text-xs font-bold text-[#34513e]">{statuses.map(status=><option key={status} value={status}>{label(status)}</option>)}</select></div>
         </div>
-        {item.experience_note?<p className="mt-4 rounded-xl border border-[#e7ece5] bg-[#f8faf7] p-4 text-sm leading-6 text-[#52695a]">{item.experience_note}</p>:null}
+        {item.experience_note?<p className="mt-4 rounded-xl border border-[#e7ece5] bg-[#f8faf7] p-4 text-sm leading-6 text-[#52695a]">{item.experience_note}</p>:null}\n        <div className="mt-4 flex flex-wrap items-center gap-2 rounded-xl border border-[#e7ece5] bg-[#f8faf7] px-4 py-3 text-xs"><span className="font-bold text-[#405648]">Responsibilities commitment:</span><span className={item.responsibilities_accepted?"font-bold text-[#286342]":"font-bold text-[#9b7835]"}>{item.responsibilities_accepted?"Accepted":"Not recorded"}</span>{item.responsibilities_version&&<span className="text-[#879487]">Version {item.responsibilities_version}</span>}{item.responsibilities_accepted_at&&<span className="text-[#879487]">· {new Date(item.responsibilities_accepted_at).toLocaleString("en-NG",{dateStyle:"medium",timeStyle:"short"})}</span>}</div>
       </article>)}</div>:null}
       <p className="mt-7 flex items-center gap-2 text-[10px] leading-5 text-[#93a092]"><ShieldCheck size={13}/> Application review is owner-only. Bank details are not collected or displayed on this page.</p>
       <span className="sr-only">Signed in role: {role}</span>
