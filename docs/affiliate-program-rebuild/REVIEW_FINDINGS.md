@@ -23,6 +23,12 @@ The database currently grants the `authenticated` role SELECT on those bank colu
 
 **Production caution:** this review did not change the live policy or move existing bank data. A separate, explicitly reviewed security migration is needed to harden the legacy table while preserving its existing bank details. Do not assume the frontend's selected columns are a security boundary.
 
+## Legacy bank-data access hardening added to the feature branch
+
+A corrective migration now retires writes to the legacy `public.affiliate_applications` table, removes the broad owner/store-manager/marketing-manager read policy, and retains historical rows and bank fields under the existing owner/finance-only read policy. The legacy application status update policy and write grants are removed. New programme applications and payout details use the separate `affiliate_program_applications` and owner-restricted `affiliate_program_payout_details` tables.
+
+This is a feature-branch change only. It has not been applied to the live project; production policy changes remain gated on migration-history reconciliation and explicit release approval.
+
 ## Migration-history reconciliation
 
 - The live database's recorded migration list ends at `20261124151616`.
