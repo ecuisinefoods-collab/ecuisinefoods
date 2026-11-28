@@ -18,4 +18,9 @@ revoke insert (
 revoke update on public.affiliate_applications from authenticated;
 revoke update (status,updated_at) on public.affiliate_applications from authenticated;
 
+-- Retire the old anonymous partner-referral endpoints. The rebuilt programme uses
+-- the validated affiliate-program referral wrappers and preserves historical rows.
+revoke all on function public.record_partner_referral_click(text,text,text) from public, anon, authenticated;
+revoke all on function public.attach_partner_referral_to_order(bigint,text,text,text) from public, anon, authenticated;
+
 commit;
