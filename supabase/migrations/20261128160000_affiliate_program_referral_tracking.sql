@@ -123,6 +123,9 @@ begin
     return false;
   end if;
 
+  -- Serialize attribution decisions for the same customer to prevent concurrent orders creating competing referrals.
+  perform pg_advisory_xact_lock(hashtext(v_customer_key));
+
   -- Preserve the first valid referral for this customer throughout its 30-day window.
   select * into v_attribution from public.affiliate_program_customer_attributions
   where customer_key=v_customer_key and expires_at>now()
