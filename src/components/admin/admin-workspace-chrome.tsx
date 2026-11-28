@@ -41,7 +41,9 @@ const groups: NavGroup[] = [
     { label: "Our story", href: "/admin/story", icon: Store, roles: ["owner", "store_manager", "marketing_manager"] },
     { label: "Partnerships", href: "/admin/partnerships", icon: Handshake, roles: ["owner", "store_manager", "marketing_manager"] },
     { label: "Affiliate programme", href: "/admin/affiliates", icon: Users, roles: ["owner", "store_manager", "marketing_manager"] },
-    { label: "Affiliate Sales & Growth", href: "/admin/affiliate-manager", icon: ClipboardList, roles: ["owner", "affiliate_manager"] },\n    { label: "Affiliate targets & rewards", href: "/admin/affiliate-performance", icon: Trophy, roles: ["owner"] },\n    { label: "Legacy partner records", href: "/admin/partners", icon: ClipboardList, roles: ["owner"] },
+    { label: "Affiliate Sales & Growth", href: "/admin/affiliate-manager", icon: ClipboardList, roles: ["owner", "affiliate_manager"] },
+    { label: "Affiliate targets & rewards", href: "/admin/affiliate-performance", icon: Trophy, roles: ["owner"] },
+    { label: "Legacy partner records", href: "/admin/partners", icon: ClipboardList, roles: ["owner"] },
   ]},
   { label: "Procurement & Supply", icon: Truck, items: [
     { label: "Suppliers & raw materials", href: "/admin/procurement", icon: Truck, roles: ["owner", "store_manager", "finance_officer", "analyst"] },
