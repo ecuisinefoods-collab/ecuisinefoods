@@ -15,6 +15,10 @@ export function ReferralTracker(){
 
     const attributionToken = `${crypto.randomUUID()}${crypto.randomUUID()}`;
     try{
+      const existingCode=window.localStorage.getItem(REFERRAL_CODE_KEY);
+      const existingAt=Number(window.localStorage.getItem(REFERRAL_AT_KEY)||0);
+      const existingToken=window.localStorage.getItem(REFERRAL_TOKEN_KEY);
+      if(existingCode&&existingAt&&existingToken&&Date.now()-existingAt<30*24*60*60*1000)return;
       window.localStorage.setItem(REFERRAL_CODE_KEY,code);
       window.localStorage.setItem(REFERRAL_AT_KEY,String(Date.now()));
       window.localStorage.setItem(REFERRAL_TOKEN_KEY,attributionToken);
