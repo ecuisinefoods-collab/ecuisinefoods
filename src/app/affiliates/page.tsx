@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, BadgeCheck, Boxes, ChartNoAxesCombined, ShieldCheck, Users } from "lucide-react";
+import { ArrowRight, BadgeCheck, Boxes, TrendingUp, ShieldCheck, Users } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { AffiliateProgrammeApplicationForm } from "@/components/affiliate-programme-application-form";
 
