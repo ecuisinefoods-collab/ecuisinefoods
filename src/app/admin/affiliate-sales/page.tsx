@@ -25,7 +25,7 @@ export default function AffiliateSalesReviewPage(){
    const hydrated=await Promise.all((data||[]).map(async row=>{
     const path=row.payment_evidence_url as string|null;
     if(!path)return row;
-    if(/^https?:\\/\\//i.test(path))return row;
+    if(/^https?:\/\//i.test(path))return row;
     const {data:signed}=await supabase.storage.from("affiliate-sale-evidence").createSignedUrl(path,600);
     return {...row,payment_evidence_url:signed?.signedUrl||null};
    }));
