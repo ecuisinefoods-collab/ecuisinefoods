@@ -56,6 +56,7 @@ jobs:
         run: |
           set -euo pipefail
           for migration in \
+            supabase/migrations/20261128115000_backup_legacy_affiliate_security.sql \
             supabase/migrations/20261128120000_affiliate_program_foundation.sql \
             supabase/migrations/20261128123000_affiliate_program_performance_and_engagement.sql \
             supabase/migrations/20261128130000_affiliate_program_sale_workflows.sql \
