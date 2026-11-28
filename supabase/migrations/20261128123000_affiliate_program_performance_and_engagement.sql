@@ -238,4 +238,38 @@ create policy affiliate_program_resources_owner_all
   using (exists (select 1 from public.admin_profiles a where a.user_id = auth.uid() and a.role = 'owner' and a.is_active = true))
   with check (exists (select 1 from public.admin_profiles a where a.user_id = auth.uid() and a.role = 'owner' and a.is_active = true));
 
+
+-- Preserve financial calculation facts: corrections use reversal/adjustment rows, not edits/deletes.
+create or replace function public.affiliate_program_protect_earning_record()
+returns trigger
+language plpgsql
+set search_path = pg_catalog, public
+as $
+begin
+  if tg_op = 'DELETE' then
+    raise exception 'Affiliate earning records cannot be deleted; use a reversal record.';
+  end if;
+
+  if old.member_id is distinct from new.member_id
+    or old.sale_id is distinct from new.sale_id
+    or old.earning_type is distinct from new.earning_type
+    or old.amount is distinct from new.amount
+    or old.currency is distinct from new.currency
+    or old.calculation_snapshot is distinct from new.calculation_snapshot
+    or old.reversal_of is distinct from new.reversal_of
+    or old.created_at is distinct from new.created_at then
+    raise exception 'Affiliate earning calculation facts are immutable; use a reversal or adjustment record.';
+  end if;
+
+  return new;
+end;
+$;
+
+revoke all on function public.affiliate_program_protect_earning_record() from public, anon, authenticated;
+
+drop trigger if exists affiliate_program_earnings_protect_record on public.affiliate_program_earnings;
+create trigger affiliate_program_earnings_protect_record
+  before update or delete on public.affiliate_program_earnings
+  for each row execute function public.affiliate_program_protect_earning_record();
+
 commit;
