@@ -22,11 +22,12 @@ export default function AffiliateSalesReviewPage(){
    .select("id,sale_number,sale_date,payment_status,status,payment_reference,payment_evidence_url,stock_received_from,submitted_note,review_note,submitted_at,affiliate_program_members(affiliate_code,affiliate_model),affiliate_program_sale_items(id,quantity,unit_selling_price,products(name),product_variants(pack_size))")
    .order("submitted_at",{ascending:false}).limit(150);
   if(queryError)setError(queryError.message);else{
+   const evidenceStorage=supabase.storage.from("affiliate-sale-evidence");
    const hydrated=await Promise.all((data||[]).map(async row=>{
     const path=row.payment_evidence_url as string|null;
     if(!path)return row;
     if(/^https?:\/\//i.test(path))return row;
-    const {data:signed}=await supabase.storage.from("affiliate-sale-evidence").createSignedUrl(path,600);
+    const {data:signed}=await evidenceStorage.createSignedUrl(path,600);
     return {...row,payment_evidence_url:signed?.signedUrl||null};
    }));
    setSales(hydrated as unknown as Sale[]);setError("");
