@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "lint:affiliate": "eslint src/app/affiliates/page.tsx src/app/affiliate/page.tsx src/app/admin/affiliates/page.tsx src/components/affiliate-programme-application-form.tsx src/app/admin/affiliate-sales/page.tsx src/app/admin/affiliate-activation/page.tsx src/app/admin/affiliate-stock/page.tsx",
+    "lint:affiliate": "eslint src/app/affiliates/page.tsx src/app/affiliate/page.tsx src/app/admin/affiliates/page.tsx src/components/affiliate-programme-application-form.tsx src/app/admin/affiliate-sales/page.tsx src/app/admin/affiliate-activation/page.tsx src/app/admin/affiliate-stock/page.tsx src/app/admin/affiliate-manager/page.tsx src/components/checkout-form.tsx src/components/referral-tracker.tsx",
     "build:ci": "next build --no-lint"
   },
   "dependencies": {
