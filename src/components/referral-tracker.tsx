@@ -3,29 +3,32 @@
 import { useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 
+const REFERRAL_CODE_KEY="ecuisine_program_referral";
+const REFERRAL_AT_KEY="ecuisine_program_referral_at";
+const REFERRAL_TOKEN_KEY="ecuisine_program_referral_token";
+
 export function ReferralTracker(){
   useEffect(()=>{
     const params=new URLSearchParams(window.location.search);
     const code=(params.get("ref")||"").trim().toUpperCase();
     if(!code || !/^[A-Z0-9-]{4,40}$/.test(code)) return;
 
-    // Each referral visit gets a fresh attribution token. Only its hash is stored server-side.
     const attributionToken = `${crypto.randomUUID()}${crypto.randomUUID()}`;
     try{
-      window.localStorage.setItem("ecuisine_partner_referral",code);
-      window.localStorage.setItem("ecuisine_partner_referral_at",String(Date.now()));
-      window.localStorage.setItem("ecuisine_partner_referral_click_token",attributionToken);
+      window.localStorage.setItem(REFERRAL_CODE_KEY,code);
+      window.localStorage.setItem(REFERRAL_AT_KEY,String(Date.now()));
+      window.localStorage.setItem(REFERRAL_TOKEN_KEY,attributionToken);
     }catch{
       return;
     }
 
     if(supabase){
-      void supabase.rpc("record_partner_referral_click",{
+      void supabase.rpc("record_affiliate_program_referral_click",{
         p_referral_code:code,
         p_landing_path:window.location.pathname,
         p_attribution_token:attributionToken
       }).then(({error})=>{
-        if(error) console.warn("Referral click could not be recorded.");
+        if(error) console.warn("Affiliate referral could not be recorded.");
       });
     }
   },[]);
