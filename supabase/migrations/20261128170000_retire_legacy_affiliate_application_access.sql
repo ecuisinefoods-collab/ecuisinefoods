@@ -10,6 +10,12 @@ drop policy if exists "Public may submit affiliate applications" on public.affil
 -- The remaining legacy finance SELECT policy permits only owner and finance_officer.
 -- The legacy application workflow is retired; new applications use affiliate_program_applications.
 revoke insert on public.affiliate_applications from anon, authenticated;
+revoke insert (
+  full_name,email,phone,social_handle,primary_platform,audience_size,
+  promotion_channels,motivation,skills,availability,preferred_activities,
+  deadline_commitment,audience_description,bank_name,bank_account_name,bank_account_number
+) on public.affiliate_applications from anon, authenticated;
 revoke update on public.affiliate_applications from authenticated;
+revoke update (status,updated_at) on public.affiliate_applications from authenticated;
 
 commit;
