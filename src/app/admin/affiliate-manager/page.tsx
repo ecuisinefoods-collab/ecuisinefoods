@@ -39,7 +39,9 @@ export default function AffiliateManagerDashboard(){
   const [roster,notes,cards,activityRows,actionRows]=await Promise.all([
    supabase.rpc("get_affiliate_program_manager_roster",{p_period_month:month}),
    supabase.from("affiliate_program_manager_followups").select("member_id,contact_status,followup_note,contacted_at,next_followup_at"),
-   supabase.rpc("get_affiliate_program_manager_scorecards")
+   supabase.rpc("get_affiliate_program_manager_scorecards"),
+   supabase.from("affiliate_program_participation_log").select("id,member_id,activity_type,activity_date,participation_status,manager_note,created_at").order("created_at",{ascending:false}).limit(200),
+   supabase.from("affiliate_program_compliance_actions").select("id,member_id,action_type,action_note,created_at").order("created_at",{ascending:false}).limit(200)
   ]);
   if(roster.error||notes.error||cards.error||activityRows.error||actionRows.error){setError("Manager information could not be loaded. Confirm the affiliate programme database migrations have been installed.");setLoading(false);return;}
   setRows((roster.data||[]) as RosterRow[]);
