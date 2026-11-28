@@ -142,6 +142,7 @@ returns table (
   level text,
   approved_sales_amount numeric,
   approved_units bigint,
+  target_assigned boolean,
   target_achieved boolean
 )
 language plpgsql
@@ -174,6 +175,7 @@ begin
     select m.id, m.affiliate_code, coalesce(a.full_name,'Affiliate')::text as display_name,
       m.level, coalesce(totals.sales_amount,0)::numeric(14,2) as sales_amount,
       coalesce(totals.units,0)::bigint as units,
+      (target.id is not null) as target_assigned,
       case when target.id is null then false
         else (target.target_sales_amount is null or target.target_sales_amount = 0 or coalesce(totals.sales_amount,0) >= target.target_sales_amount)
          and (target.target_units is null or target.target_units = 0 or coalesce(totals.units,0) >= target.target_units)
@@ -186,7 +188,7 @@ begin
     where m.status='active'
   )
   select row_number() over(order by r.sales_amount desc, r.units desc, r.affiliate_code),
-    r.affiliate_code, r.display_name, r.level, r.sales_amount, r.units, r.target_achieved
+    r.affiliate_code, r.display_name, r.level, r.sales_amount, r.units, r.target_assigned, r.target_achieved
   from ranked r
   order by r.sales_amount desc, r.units desc, r.affiliate_code
   limit 20;
