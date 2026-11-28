@@ -165,18 +165,7 @@ alter table public.affiliate_program_announcements enable row level security;
 alter table public.affiliate_program_resources enable row level security;
 
 
--- Affiliates may maintain their own payout details, but cannot view other members' details.
-create policy affiliate_program_payout_details_read_own
-  on public.affiliate_program_payout_details for select to authenticated
-  using (exists (select 1 from public.affiliate_program_members m where m.id = member_id and m.user_id = auth.uid()));
-create policy affiliate_program_payout_details_insert_own
-  on public.affiliate_program_payout_details for insert to authenticated
-  with check (exists (select 1 from public.affiliate_program_members m where m.id = member_id and m.user_id = auth.uid()));
-create policy affiliate_program_payout_details_update_own
-  on public.affiliate_program_payout_details for update to authenticated
-  using (exists (select 1 from public.affiliate_program_members m where m.id = member_id and m.user_id = auth.uid()))
-  with check (exists (select 1 from public.affiliate_program_members m where m.id = member_id and m.user_id = auth.uid()));
-
+-- Payout details remain owner-only; affiliates cannot read bank details through the Data API.
 -- Active rules and published learning/announcements are readable by approved programme members.
 create policy affiliate_program_level_rules_member_read
   on public.affiliate_program_level_rules for select to authenticated
