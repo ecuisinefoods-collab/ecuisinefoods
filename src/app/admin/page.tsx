@@ -7,7 +7,7 @@ import {
   Activity, ArrowDownRight, ArrowUpRight, BarChart3, Boxes, Truck,
   ChevronRight, CircleDollarSign, ClipboardList, LogOut, LayoutDashboard,
   Megaphone, Package, ShieldCheck, ShoppingBag, Users, Wallet, CreditCard,
-  Handshake, MapPin, Tags, Image as ImageIcon, Star, Database, Bot, CalendarDays,
+  Handshake, MapPin, Tags, Image as ImageIcon, Star, Database, Bot, CalendarDays, Trophy,
 } from "lucide-react";
 
 type AdminProfile = {
@@ -57,6 +57,12 @@ export default function AdminPage() {
       return;
     }
     setProfile(admin as AdminProfile);
+    if (admin.role === "affiliate_manager") {
+      setOrders([]);
+      setStats({ revenue: 0, orders: 0, products: 0, income: 0, expenses: 0 });
+      setLoading(false);
+      return;
+    }
 
     const [orderResult, orderCountResult, completedResult, productResult, financeResult] = await Promise.all([
       supabase.from("orders").select("id,order_number,customer_name,total,status,created_at").order("created_at", { ascending: false }).limit(8),
@@ -165,6 +171,20 @@ export default function AdminPage() {
     { label: "Recorded net", value: money(stats.income - stats.expenses), note: "Recorded income less expenses", icon: Wallet, tone: "purple" },
   ];
 
+  if (profile?.role === "affiliate_manager") {
+    return (
+      <main className="admin-glass-shell grid min-h-screen place-items-center px-4 py-12 text-[#25392b]">
+        <section className="w-full max-w-xl rounded-3xl border border-white bg-white p-8 text-center shadow-xl">
+          <Users size={34} className="mx-auto text-[#477554]"/>
+          <h1 className="mt-4 text-2xl font-black">Affiliate team workspace</h1>
+          <p className="mt-3 text-sm leading-6 text-[#758276]">Your access is limited to affiliate team performance, follow-ups, training and monthly reporting.</p>
+          <Link href="/admin/affiliate-manager" className="mt-6 inline-flex items-center justify-center rounded-xl bg-[#0b6849] px-5 py-3 text-sm font-bold text-white">Open manager dashboard</Link>
+          <button onClick={signOut} className="mt-4 block w-full text-xs font-semibold text-[#718174]">Sign out</button>
+        </section>
+      </main>
+    );
+  }
+
   const sections = [
     {
       id: "operations", number: "01", title: "Operations & Production",
@@ -208,7 +228,9 @@ export default function AdminPage() {
         { label: "Our story", description: "Manage the brand story page.", href: "/admin/story", icon: Users, roles: ["owner", "store_manager"], action: "Edit story" },
         { label: "Partnership enquiries", description: "Review business and collaboration enquiries.", href: "/admin/partnerships", icon: Handshake, roles: ["owner", "store_manager", "marketing_manager"], action: "View enquiries" },
         { label: "Affiliate programme", description: "Manage affiliate applications and activity.", href: "/admin/affiliates", icon: Users, roles: ["owner", "store_manager", "marketing_manager"], action: "Manage affiliates" },
-        { label: "Affiliate performance", description: "Review referral traffic, attributed orders and commissions.", href: "/admin/partners", icon: ClipboardList, roles: ["owner", "store_manager", "marketing_manager", "affiliate_manager"], action: "View performance" },
+        { label: "Affiliate Sales & Growth", description: "Manage affiliate follow-ups, verified team performance and monthly reporting.", href: "/admin/affiliate-manager", icon: ClipboardList, roles: ["owner", "affiliate_manager"], action: "Open manager dashboard" },
+        { label: "Affiliate targets & rewards", description: "Assign monthly targets, record level decisions and review manager rewards.", href: "/admin/affiliate-performance", icon: Trophy, roles: ["owner"], action: "Configure performance" },
+        { label: "Legacy partner records", description: "Access historical referral records during the transition; this is not the new programme.", href: "/admin/partners", icon: ClipboardList, roles: ["owner"], action: "View legacy records" },
       ],
     },
     {
