@@ -107,9 +107,9 @@ returns uuid
 language sql
 security invoker
 set search_path = pg_catalog, public, private
-as $
+as $wrapper$
   select private.record_affiliate_program_referral_click(p_referral_code,p_landing_path,p_attribution_token);
-$;
+$wrapper$;
 revoke all on function public.record_affiliate_program_referral_click(text,text,text) from public;
 grant execute on function public.record_affiliate_program_referral_click(text,text,text) to anon,authenticated;
 
@@ -200,11 +200,11 @@ returns boolean
 language sql
 security invoker
 set search_path = pg_catalog, public, private
-as $
+as $wrapper$
   select private.attach_affiliate_program_referral_to_order(
     p_order_number,p_tracking_code,p_referral_code,p_attribution_token,p_customer_phone,p_customer_email
   );
-$;
+$wrapper$;
 revoke all on function public.attach_affiliate_program_referral_to_order(bigint,text,text,text,text,text) from public;
 grant execute on function public.attach_affiliate_program_referral_to_order(bigint,text,text,text,text,text) to anon,authenticated;
 
