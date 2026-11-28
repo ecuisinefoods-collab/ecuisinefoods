@@ -230,6 +230,7 @@ export default function AdminPage() {
         { label: "Affiliate programme", description: "Manage affiliate applications and activity.", href: "/admin/affiliates", icon: Users, roles: ["owner", "store_manager", "marketing_manager"], action: "Manage affiliates" },
         { label: "Affiliate Sales & Growth", description: "Manage affiliate follow-ups, verified team performance and monthly reporting.", href: "/admin/affiliate-manager", icon: ClipboardList, roles: ["owner", "affiliate_manager"], action: "Open manager dashboard" },
         { label: "Affiliate targets & rewards", description: "Assign monthly targets, record level decisions and review manager rewards.", href: "/admin/affiliate-performance", icon: Trophy, roles: ["owner"], action: "Configure performance" },
+        { label: "Affiliate payout details", description: "View private bank details submitted by affiliates. Owner-only access.", href: "/admin/affiliate-payouts", icon: Wallet, roles: ["owner"], action: "View payout details" },
         { label: "Legacy partner records", description: "Access historical referral records during the transition; this is not the new programme.", href: "/admin/partners", icon: ClipboardList, roles: ["owner"], action: "View legacy records" },
       ],
     },
